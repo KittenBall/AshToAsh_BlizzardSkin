@@ -1,0 +1,13 @@
+## Interface: 90100
+## Author: 绿毛龟12138
+## Version: 1.0
+## Title: AshToAsh_BlizzardSkin
+## Title-zhCN: AshToAsh暴雪皮肤
+## Notes: AshToAsh Skin Blizzard Style
+## Notes-zhCN: AshToAsh的暴雪样式皮肤
+## Dependices: Scorpio, AshToAsh
+## DefaultState: enabled
+
+Api.lua
+Template.lua
+Skin.lua
