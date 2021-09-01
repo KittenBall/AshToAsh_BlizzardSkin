@@ -1,6 +1,6 @@
 Scorpio "AshToAsh.BlizzardSkin.Template" ""
 
-namespace "AshToAsh.Skin.Blizzard"
+import "Scorpio.Secure.UnitFrame"
 
 UI.Property         {
     name                = "UseParentLevel",
@@ -23,6 +23,193 @@ class "SelectionHighlightTexture" { Texture }
 -- 仇恨指示器
 __Sealed__() __ChildProperty__(AshUnitFrame, "AshBlzSkinAggroHighlight")
 class "AggroHighlight" { Texture }
+
+-- 载具
+__Sealed__() __ChildProperty__(AshUnitFrame, "AshBlzSkinVehicleIcon")
+class "VehicleIcon" { Texture }
+
+-- 死亡
+__Sealed__() __ChildProperty__(AshUnitFrame, "AshBlzSkinDeadIcon")
+class "DeadIcon" { Texture }
+
+-- Buff icon
+__Sealed__() class "AshBlzSkinBuffIcon" { AshAuraPanelIcon }
+
+-- Debuff icon
+__Sealed__() class "AshBlzSkinDebuffIcon" { AshBlzSkinBuffIcon }
+
+-- Debuff panel
+__Sealed__() __ChildProperty__(AshUnitFrame, "AshBlzSkinDebuffPanel")
+class "DebuffPanel"(function()
+    inherit "AuraPanel"
+
+    local shareCooldown         = { start = 0, duration = 0 }
+    local priorityDebuffs       = {}
+    local nonBossDebuffs        = {}
+
+    local isPriorityDebuff
+    local _, classFileName = UnitClass("player")
+    if ( classFileName == "PALADIN" ) then
+		isPriorityDebuff = function(spellID)
+			local isForbearance = (spellId == 25771)
+			return isForbearance or SpellIsPriorityAura(spellID)
+		end
+	else
+		isPriorityDebuff = function(spellID)
+			return SpellIsPriorityAura(spellID)
+		end
+	end
+
+    local function shouldDisplayDebuff(unitCaster, spellID)
+        local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellID, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
+        if ( hasCustom ) then
+            return showForMySpec or (alwaysShowMine and (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle") )
+        else
+            return true
+        end
+    end
+
+    local function refreshAura(self, unit, filter, eleIdx, auraIdx, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, castByPlayer, ...)
+        if not name then return end
+
+        if not self.CustomFilter or self.CustomFilter(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, castByPlayer, ...) then
+            if not isBossDebuff then
+                if isPriorityDebuff(spellID) then
+                    tinsert(priorityDebuffs, auraIdx)
+                elseif shouldDisplayDebuff(caster, spellID) then
+                    tinsert(nonBossDebuffs, auraIdx)
+                end
+            end
+        end
+
+        auraIdx                 = auraIdx + 1
+        return refreshAura(self, unit, filter, eleIdx, auraIdx, UnitAura(unit, auraIdx, filter))
+    end
+
+    local function showElements(self, unit, filter, auras, eleIdx)
+        if eleIdx > self.MaxCount then return eleIdx end
+
+        for _, auraIdx in ipairs(auras) do
+            if auraIdx then
+                local name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, castByPlayer = UnitAura(unit, auraIdx, filter)
+
+                self.Elements[eleIdx]:Show()
+
+                shareCooldown.start             = expires - duration
+                shareCooldown.duration          = duration
+
+                self.AuraIndex[eleIdx]          = auraIdx
+                self.AuraName[eleIdx]           = name
+                self.AuraIcon[eleIdx]           = icon
+                self.AuraCount[eleIdx]          = count
+                self.AuraDebuff[eleIdx]         = dtype
+                self.AuraCooldown[eleIdx]       = shareCooldown
+                self.AuraStealable[eleIdx]      = isStealable and not UnitIsUnit(unit, "player")
+                self.AuraSpellID[eleIdx]        = spellID
+                self.AuraBossDebuff[eleIdx]     = isBossDebuff
+                self.AuraCastByPlayer[eleIdx]   = castByPlayer
+
+                eleIdx = eleIdx + 1
+                
+                if eleIdx > self.MaxCount then return eleIdx end
+            end
+        end
+        return eleIdx
+    end
+
+    property "Refresh"          {
+        set                     = function(self, unit)
+            self.Unit           = unit
+            wipe(priorityDebuffs)
+            wipe(nonBossDebuffs)
+            local filter = "HARMFUL"
+            refreshAura(self, unit, filter, 1, 1, UnitAura(unit, 1, filter))
+
+            local eleIdx = 1
+            eleIdx = showElements(self, unit, filter, priorityDebuffs, eleIdx)
+            eleIdx = showElements(self, unit, filter, nonBossDebuffs, eleIdx)
+            self.Count = eleIdx -1
+        end
+    }
+
+end)
+
+-- BossDebuff
+__Sealed__() __ChildProperty__(AshUnitFrame, "AshBlzSkinBossDebuffPanel")
+class "BossDebuffPanel"(function()
+    inherit "AuraPanel"
+
+    local shareCooldown         = { start = 0, duration = 0 }
+    local bossDebuffs           = {}
+    local bossBuffs             = {}
+
+    local function refreshAura(self, unit, filter, eleIdx, auraIdx, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
+        if not name then return end
+
+        if not self.CustomFilter or self.CustomFilter(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...) then
+            if isBossAura then
+                if filter == "HARMFULE" then
+                    tinsert(bossDebuffs, auraIdx)
+                elseif filter == "HELPFUL" then
+                    tinsert(bossBuffs, auraIdx)
+                end
+            end
+        end
+
+        auraIdx                 = auraIdx + 1
+        return refreshAura(self, unit, filter, eleIdx, auraIdx, UnitAura(unit, auraIdx, filter))
+    end
+
+    local function showElements(self, unit, filter, auras, eleIdx)
+        if eleIdx > self.MaxCount then return eleIdx end
+
+        for _, auraIdx in ipairs(auras) do
+            if auraIdx then
+                local name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, castByPlayer = UnitAura(unit, auraIdx, filter)
+
+                self.Elements[eleIdx]:Show()
+
+                shareCooldown.start             = expires - duration
+                shareCooldown.duration          = duration
+
+                self.AuraIndex[eleIdx]          = auraIdx
+                self.AuraName[eleIdx]           = name
+                self.AuraIcon[eleIdx]           = icon
+                self.AuraCount[eleIdx]          = count
+                self.AuraDebuff[eleIdx]         = dtype
+                self.AuraCooldown[eleIdx]       = shareCooldown
+                self.AuraStealable[eleIdx]      = isStealable and not UnitIsUnit(unit, "player")
+                self.AuraSpellID[eleIdx]        = spellID
+                self.AuraBossDebuff[eleIdx]     = isBossDebuff
+                self.AuraCastByPlayer[eleIdx]   = castByPlayer
+
+                eleIdx = eleIdx + 1
+                
+                if eleIdx > self.MaxCount then return eleIdx end
+            end
+        end
+        return eleIdx
+    end
+
+    property "Refresh"          {
+        set                     = function(self, unit)
+            self.Unit           = unit
+            wipe(bossDebuffs)
+            wipe(bossBuffs)
+            
+            local filterHarmful = "HARMFUL"
+            local filterHelpful = "HELPFUL"
+            refreshAura(self, unit, filterHarmful, 1, 1, UnitAura(unit, 1, filterHarmful))
+            refreshAura(self, unit, filterHelpful, 1, 1, UnitAura(unit, 1, filterHelpful))
+
+            local eleIdx = 1
+            eleIdx = showElements(self, unit, filterHarmful, bossDebuffs, eleIdx)
+            eleIdx = showElements(self, unit, filterHelpful, bossBuffs, eleIdx)
+            self.Count = eleIdx -1
+        end
+    }
+
+end)
 
 -- CastBar 修改自Scorpio.UI.CooldownStatusBar
 __Sealed__() __ChildProperty__(AshUnitFrame, "AshBlzSkinCastBar")
