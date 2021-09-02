@@ -38,6 +38,9 @@ __Sealed__() class "AshBlzSkinBuffIcon" { AshAuraPanelIcon }
 -- Debuff icon
 __Sealed__() class "AshBlzSkinDebuffIcon" { AshBlzSkinBuffIcon }
 
+-- ClassBuff icon
+__Sealed__() class "AshBlzSkinClassBuffIcon" { AshBlzSkinBuffIcon }
+
 -- Debuff panel
 __Sealed__() __ChildProperty__(AshUnitFrame, "AshBlzSkinDebuffPanel")
 class "DebuffPanel"(function()
@@ -131,14 +134,6 @@ class "DebuffPanel"(function()
             self.Count = eleIdx -1
         end
     }
-
-    -- 不允许更改.
-    property "AuraFilter" { 
-        type                    = struct{ AuraFilter } + String,
-        field                   = "__AuraPanel_AuraFilter",
-        set                     = Toolset.fakefunc,
-        default                 = "HARMFUL"
-    }
 end)
 
 -- 专用于BossDebuffPanel
@@ -151,7 +146,7 @@ class "AshBlzSkinBossDebuffIcon"(function()
             if not parent then return end
 
             GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
-            GameTooltip:SetUnitAura(parent.Unit, self.AuraName, self.AuraFilter)
+            GameTooltip:SetUnitAura(parent.Unit, self.AuraIndex, self.AuraFilter)
         end
     end
 
@@ -160,7 +155,8 @@ class "AshBlzSkinBossDebuffIcon"(function()
         self.OnEnter = OnEnter
     end
 
-    property "AuraName" { type = String }
+    property "AuraFilter" { type = String}
+
 end)
 
 -- BossDebuff
@@ -177,7 +173,7 @@ class "BossDebuffPanel"(function()
 
         if not self.CustomFilter or self.CustomFilter(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...) then
             if isBossAura then
-                if filter == "HARMFULE" then
+                if filter == "HARMFUL" then
                     tinsert(bossDebuffs, auraIdx)
                 elseif filter == "HELPFUL" then
                     tinsert(bossBuffs, auraIdx)
@@ -201,8 +197,7 @@ class "BossDebuffPanel"(function()
                 shareCooldown.start             = expires - duration
                 shareCooldown.duration          = duration
 
-                -- Harmful和Helpful混合了，auraIdx不对了，鼠标提示用auraName，具体看BossDebuffIcon
-                -- self.AuraIndex[eleIdx]          = auraIdx
+                self.AuraIndex[eleIdx]          = auraIdx
                 self.AuraName[eleIdx]           = name
                 self.AuraIcon[eleIdx]           = icon
                 self.AuraCount[eleIdx]          = count

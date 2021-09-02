@@ -6,7 +6,7 @@ Style.RegisterSkin(SKIN_NAME)
 
 HEALTHBAR = (Scorpio.IsRetail or IsAddOnLoaded("LibHealComm-4.0") or pcall(_G.LibStub, "LibHealComm-4.0")) and "PredictionHealthBar" or "HealthBar"
 
-local shareColor    = Color(0, 0, 0, 1)
+local shareColor    = ColorType(0, 0, 0, 1)
 local shareSize     = Size(1, 1)
 
 local resizeUnitFrameAuraOnSizeChange = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
@@ -23,7 +23,7 @@ local function resizeUnitFrameIconOnSizeChange(size)
     end)
 end
 
-local shareAnchor1 = Anchor()
+local shareAnchor1 = Anchor("TOP")
 local shareLocation = {}
 
 local function getAnchor(anchor, point, x, y, relativeTo, relativePoint)
@@ -32,6 +32,7 @@ local function getAnchor(anchor, point, x, y, relativeTo, relativePoint)
     anchor.y                = y
     anchor.relativeTo       = relativeTo
     anchor.relativePoint    = relativePoint
+    return anchor
 end
 
 local function getLocation(...)
@@ -39,6 +40,7 @@ local function getLocation(...)
     for i = 1, select("#", ...) do
         tinsert(shareLocation, select(i, ...))
     end
+    return shareLocation
 end
 
 local relocationUnitFrameIconOnSizeChange = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
@@ -61,8 +63,6 @@ local function shouldDisplayBuff(...)
 		return (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle") and canApplyAura and not SpellIsSelfBuff(spellId)
 	end
 end
-
-local 
 SKIN_STYLE =                                                                                {
     [AshBlzSkinBuffIcon]                                                                    = {
         IconTexture                                                                         = {
@@ -75,7 +75,7 @@ SKIN_STYLE =                                                                    
             drawLayer                                                                       = "OVERLAY",
             fontObject                                                                      = NumberFontNormalSmall,
             location                                                                        = {
-                Anchor("BOTTOMRIGHT", 5, 0)
+                Anchor("BOTTOMRIGHT", 0, 0)
             },
             text                                                                            = Wow.FromPanelProperty("AuraCount"):Map(function(val)
                 if val >= 100 then
@@ -96,6 +96,10 @@ SKIN_STYLE =                                                                    
         },
     },
 
+    [AshBlzSkinClassBuffIcon]                                                               = {
+        enableMouse                                                                         = false
+    },
+
     [AshBlzSkinDebuffIcon]                                                                  = {
         BackgroundTexture                                                                   = {
             drawLayer                                                                       = "BORDER",
@@ -111,8 +115,14 @@ SKIN_STYLE =                                                                    
 
     -- Boss debuff icon
     [AshBlzSkinBossDebuffIcon]                                                              = {
-        auraFilter                                                                          = Wow.FromPanelProperty("AuraFilter"),
-        auraName                                                                            = Wow.FromPanelProperty("AuraName")
+        Cooldown                                                                            = {
+            setAllPoints                                                                    = true,
+            enableMouse                                                                     = false,
+            cooldown                                                                        = Wow.FromPanelProperty("AuraCooldown"),
+            reverse                                                                         = true
+        },
+
+        auraFilter                                                                          = Wow.FromPanelProperty("AuraFilter")
     },
 
     [AshUnitFrame]                                                                          = {
@@ -151,7 +161,7 @@ SKIN_STYLE =                                                                    
             setAllPoints                                                                    = true,
             visible                                                                         = Wow.UnitThreatLevel():Map("l=> l>0"),
             vertexColor                                                                     = Wow.UnitThreatLevel():Map(function(level)
-                shareColor.r, shareColor.g, shareColor.b, shareColor.a = GetThreatStatusColor(level), 1
+                shareColor.r, shareColor.g, shareColor.b, shareColor.a = GetThreatStatusColor(level)
                 return shareColor
             end)
         },
@@ -292,7 +302,7 @@ SKIN_STYLE =                                                                    
                 Anchor("BOTTOMRIGHT", -1, 1)
             },
             value                                                                           = AshBlzSkinApi.UnitPower(),
-            minMaxVlaues                                                                    = AshBlzSkinApi.UnitPowerMax(),
+            minMaxValues                                                                    = AshBlzSkinApi.UnitPowerMax(),
             statusBarColor                                                                  = AshBlzSkinApi.UnitPowerColor(),
 
             BackgroundTexture                                                               = {
@@ -346,7 +356,7 @@ SKIN_STYLE =                                                                    
             leftToRight                                                                     = false,
             topToBottom                                                                     = false,
             location                                                                        = {
-                Anchor("BOTTOMRIGHT", 0, 0, HEALTHBAR, "BOTTOMRIGHT")
+                Anchor("BOTTOMRIGHT", 0, 1.5, HEALTHBAR, "BOTTOMRIGHT")
             },
             customFilter                                                                    = function(...) return not isBossAura(...) and shouldDisplayBuff(...) and not _AuraBlackList[select(10, ...)] end,
         },
@@ -369,8 +379,13 @@ SKIN_STYLE =                                                                    
             location                                                                        = {
                 Anchor("BOTTOMLEFT", 0, 0, "AshBlzSkinBossDebuffPanel", "BOTTOMRIGHT")
             },
+            auraFilter                                                                      = Wow.Unit():Map(function(unit)
+                return UnitCanAttack("player", unit) and "PLAYER|HARMFUL" or "HARMFUL"
+            end),
             
-            customFilter                                                                    = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID) return not (_AuraBlackList[spellID] or _EnlargeDebuffList[spellID]) end,
+            customFilter                                                                    = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID)
+                return not (_AuraBlackList[spellID] or _EnlargeDebuffList[spellID]) 
+            end,
         },
 
         EnlargeDebuffPanel                                                                  = NIL,
@@ -395,13 +410,13 @@ SKIN_STYLE =                                                                    
                 return 15 * componentScale
             end),
             location                                                                        = {
-                Anchor("BOTTOMLEFT", 0, 0, HEALTHBAR, "BOTTOMLEFT")
+                Anchor("BOTTOMLEFT", 0, 1.5, HEALTHBAR, "BOTTOMLEFT")
             }
         },
 
         -- 职业buff
         ClassBuffPanel                                                                      = {
-            elementType                                                                     = AshBlzSkinBuffIcon,
+            elementType                                                                     = AshBlzSkinClassBuffIcon,
             location                                                                        = relocationUnitFrameIconOnSizeChange,
             rowCount                                                                        = 1,
             columnCount                                                                     = 1,
