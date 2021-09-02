@@ -122,7 +122,7 @@ class "DebuffPanel"(function()
             self.Unit           = unit
             wipe(priorityDebuffs)
             wipe(nonBossDebuffs)
-            local filter = "HARMFUL"
+            local filter = self.AuraFilter
             refreshAura(self, unit, filter, 1, 1, UnitAura(unit, 1, filter))
 
             local eleIdx = 1
@@ -132,6 +132,35 @@ class "DebuffPanel"(function()
         end
     }
 
+    -- 不允许更改.
+    property "AuraFilter" { 
+        type                    = struct{ AuraFilter } + String,
+        field                   = "__AuraPanel_AuraFilter",
+        set                     = Toolset.fakefunc,
+        default                 = "HARMFUL"
+    }
+end)
+
+-- 专用于BossDebuffPanel
+class "AshBlzSkinBossDebuffIcon"(function()
+    inherit "AshBlzSkinDebuffIcon"
+
+    local function OnEnter(self)
+        if self.ShowTooltip and self.AuraFilter then
+            local parent        = self:GetParent()
+            if not parent then return end
+
+            GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
+            GameTooltip:SetUnitAura(parent.Unit, self.AuraName, self.AuraFilter)
+        end
+    end
+
+    function __ctor(self)
+        super(self)
+        self.OnEnter = OnEnter
+    end
+
+    property "AuraName" { type = String }
 end)
 
 -- BossDebuff
@@ -165,14 +194,15 @@ class "BossDebuffPanel"(function()
 
         for _, auraIdx in ipairs(auras) do
             if auraIdx then
-                local name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, castByPlayer = UnitAura(unit, auraIdx, filter)
+                local name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, castByPlayer =  UnitAura(unit, auraIdx, filter)
 
                 self.Elements[eleIdx]:Show()
 
                 shareCooldown.start             = expires - duration
                 shareCooldown.duration          = duration
 
-                self.AuraIndex[eleIdx]          = auraIdx
+                -- Harmful和Helpful混合了，auraIdx不对了，鼠标提示用auraName，具体看BossDebuffIcon
+                -- self.AuraIndex[eleIdx]          = auraIdx
                 self.AuraName[eleIdx]           = name
                 self.AuraIcon[eleIdx]           = icon
                 self.AuraCount[eleIdx]          = count
@@ -182,6 +212,7 @@ class "BossDebuffPanel"(function()
                 self.AuraSpellID[eleIdx]        = spellID
                 self.AuraBossDebuff[eleIdx]     = isBossDebuff
                 self.AuraCastByPlayer[eleIdx]   = castByPlayer
+                self.AuraFilter[eleIdx]         = filter
 
                 eleIdx = eleIdx + 1
                 
@@ -209,6 +240,8 @@ class "BossDebuffPanel"(function()
         end
     }
 
+    __Indexer__() __Observable__()
+    property "AuraFilter" { set = Toolset.fakefunc }
 end)
 
 -- CastBar 修改自Scorpio.UI.CooldownStatusBar

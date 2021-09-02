@@ -8,6 +8,7 @@
 ## Dependices: Scorpio, AshToAsh
 ## DefaultState: enabled
 ## X-WebSite: https://bbs.nga.cn/read.php?tid=28327819&_ff=274
+## X-Credit: Kurapica
 
 Api.lua
 Template.lua

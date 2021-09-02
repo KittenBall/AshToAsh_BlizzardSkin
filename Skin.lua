@@ -24,7 +24,6 @@ local function resizeUnitFrameIconOnSizeChange(size)
 end
 
 local shareAnchor1 = Anchor()
-local shareAnchor2 = Anchor()
 local shareLocation = {}
 
 local function getAnchor(anchor, point, x, y, relativeTo, relativePoint)
@@ -47,19 +46,19 @@ local relocationUnitFrameIconOnSizeChange = Wow.FromFrameSize(UnitFrame):Map(fun
 end)
 
 local function isBossAura(...)
-	return select(12, ...);
+	return select(12, ...)
 end
 
 -- 直接抄的，不想研究taint了 CompactUnitFrame_UtilShouldDisplayBuff
 local function shouldDisplayBuff(...)
-	local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura = ...;
+	local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura = ...
 
-	local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT");
+	local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
 
 	if ( hasCustom ) then
-		return showForMySpec or (alwaysShowMine and (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle"));
+		return showForMySpec or (alwaysShowMine and (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle"))
 	else
-		return (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle") and canApplyAura and not SpellIsSelfBuff(spellId);
+		return (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle") and canApplyAura and not SpellIsSelfBuff(spellId)
 	end
 end
 
@@ -108,6 +107,12 @@ SKIN_STYLE =                                                                    
             texCoords                                                                       = RectType(0.296875, 0.5703125, 0, 0.515625),
             vertexColor                                                                     = Wow.FromPanelProperty("AuraDebuff"):Map(function(dtype) return DebuffTypeColor[dtype] or DebuffTypeColor["none"] end)
         }
+    },
+
+    -- Boss debuff icon
+    [AshBlzSkinBossDebuffIcon]                                                              = {
+        auraFilter                                                                          = Wow.FromPanelProperty("AuraFilter"),
+        auraName                                                                            = Wow.FromPanelProperty("AuraName")
     },
 
     [AshUnitFrame]                                                                          = {
@@ -286,6 +291,9 @@ SKIN_STYLE =                                                                    
                 Anchor("TOPLEFT", 0, 0, HEALTHBAR, "BOTTOMLEFT"),
                 Anchor("BOTTOMRIGHT", -1, 1)
             },
+            value                                                                           = AshBlzSkinApi.UnitPower(),
+            minMaxVlaues                                                                    = AshBlzSkinApi.UnitPowerMax(),
+            statusBarColor                                                                  = AshBlzSkinApi.UnitPowerColor(),
 
             BackgroundTexture                                                               = {
                 file                                                                        = "Interface\\RaidFrame\\Raid-Bar-Resource-Background",
@@ -369,7 +377,7 @@ SKIN_STYLE =                                                                    
 
         --  Boss debuff
         AshBlzSkinBossDebuffPanel                                                           = {
-            elementType                                                                     = AshBlzSkinDebuffIcon,
+            elementType                                                                     = AshBlzSkinBossDebuffIcon,
             orientation                                                                     = Orientation.HORIZONTAL,
             leftToRight                                                                     = true,
             topToBottom                                                                     = false,

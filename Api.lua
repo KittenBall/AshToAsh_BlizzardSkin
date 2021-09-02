@@ -5,11 +5,10 @@ namespace "AshToAsh.Skin.Blizzard"
 __Sealed__()
 interface "AshBlzSkinApi" {}
 
-local tapDeniedColor = ColorType(0.9, 0.9, 0.9)
-
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitColor()
     local shareColor = Color(1, 1, 1, 1)
+    local tapDeniedColor = ColorType(0.9, 0.9, 0.9)
     return Wow.FromUnitEvent("UNIT_CONNECTION", "UNIT_NAME_UPDATE"):Map(function(unit)
         if not UnitIsConnected(unit) then
             return Color.GRAY
@@ -31,12 +30,73 @@ function AshBlzSkinApi.UnitColor()
     end)
 end
 
-local nonInterruptibleColor = ColorType(0.7, 0.7, 0.7)
-local channelColor = ColorType(0, 1, 0)
-local castColor = ColorType(1, 0.7, 0)
+local function getDisplayedPowerID(unit)
+	local barInfo = GetUnitPowerBarInfo(unit)
+	if ( barInfo and barInfo.showOnRaid and (UnitInParty(unit) or UnitInRaid(unit)) ) then
+		return ALTERNATE_POWER_INDEX
+	else
+		return UnitPowerType(unit)
+	end
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.UnitPower(frequent)
+    return Wow.FromUnitEvent(frequent and "UNIT_POWER_FREQUENT" or "UNIT_POWER_UPDATE", "UNIT_MAXPOWER", "UNIT_DISPLAYPOWER", "UNIT_POWER_BAR_SHOW", "UNIT_POWER_BAR_HIDE")
+        :Next():Map(function(unit)
+            return UnitPower(unit, getDisplayedPowerID(unit)) 
+        end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.UnitPowerMax()
+    local minMax                = { min = 0 }
+    return Wow.FromUnitEvent("UNIT_MAXPOWER", "UNIT_DISPLAYPOWER", "UNIT_POWER_BAR_SHOW", "UNIT_POWER_BAR_HIDE")
+        :Map(function(unit) minMax.max =  UnitPowerMax(unit, getDisplayedPowerID(unit)) return minMax end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.UnitPowerColor()
+    local scolor                = Color(1, 1, 1)
+    return Wow.FromUnitEvent("UNIT_CONNECTION", "UNIT_DISPLAYPOWER", "UNIT_POWER_BAR_SHOW", "UNIT_POWER_BAR_HIDE")
+        :Map(function(unit)
+            if not UnitIsConnected(unit) then
+                scolor.r        = 0.5
+                scolor.g        = 0.5
+                scolor.b        = 0.5
+            else
+                local barInfo = GetUnitPowerBarInfo(unit)
+		        if ( barInfo and barInfo.showOnRaid ) then
+                    local _, _, r, g, b = UnitPowerType(unit, ALTERNATE_POWER_INDEX)
+                    if r then
+                        scolor.r    = r
+                        scolor.g    = g
+                        scolor.b    = b
+                    else
+                        scolor.r, scolor.g, scolor.b = 0.7, 0.7, 0.6
+                    end
+                else
+                    local _, ptoken, r, g, b = UnitPowerType(unit)
+                    local color     = ptoken and Color[ptoken]
+                    if color then return color end
+
+                    if r then
+                        scolor.r    = r
+                        scolor.g    = g
+                        scolor.b    = b
+                    else
+                        return Color.MANA
+                    end
+                end
+            end
+            return scolor
+        end)
+end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitCastBarColor()
+    local nonInterruptibleColor = ColorType(0.7, 0.7, 0.7)
+    local channelColor = ColorType(0, 1, 0)
+    local castColor = ColorType(1, 0.7, 0)
     return Wow.UnitCastChannel():CombineLatest(Wow.UnitCastInterruptible()):Map(function(channel, interruptible)
         if not interruptible then
             return nonInterruptibleColor
