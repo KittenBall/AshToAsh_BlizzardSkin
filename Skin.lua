@@ -6,6 +6,9 @@ Style.RegisterSkin(SKIN_NAME)
 
 HEALTHBAR = (Scorpio.IsRetail or IsAddOnLoaded("LibHealComm-4.0") or pcall(_G.LibStub, "LibHealComm-4.0")) and "PredictionHealthBar" or "HealthBar"
 
+local shareColor    = Color(0, 0, 0, 1)
+local shareSize     = Size(1, 1)
+
 local resizeUnitFrameAuraOnSizeChange = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
     local componentScale = min(w / 72, h / 36)
     return 10 * componentScale
@@ -14,12 +17,33 @@ end)
 local function resizeUnitFrameIconOnSizeChange(size)
     return Wow.FromFrameSize(UnitFrame):Map(function(w, h)
         local componentScale = min(w / 72, h / 36)
-        return Size((size or 15) * componentScale, (size or 15) * componentScale)
+        shareSize.width = (size or 15) * componentScale
+        shareSize.height = (size or 15) * componentScale
+        return shareSize
     end)
 end
 
+local shareAnchor1 = Anchor()
+local shareAnchor2 = Anchor()
+local shareLocation = {}
+
+local function getAnchor(anchor, point, x, y, relativeTo, relativePoint)
+    anchor.point            = point
+    anchor.x                = x
+    anchor.y                = y
+    anchor.relativeTo       = relativeTo
+    anchor.relativePoint    = relativePoint
+end
+
+local function getLocation(...)
+    wipe(shareLocation)
+    for i = 1, select("#", ...) do
+        tinsert(shareLocation, select(i, ...))
+    end
+end
+
 local relocationUnitFrameIconOnSizeChange = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
-    return { Anchor("BOTTOM", 0, h/3 - 4) }
+    return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, h/3-4))
 end)
 
 local function isBossAura(...)
@@ -39,6 +63,7 @@ local function shouldDisplayBuff(...)
 	end
 end
 
+local 
 SKIN_STYLE =                                                                                {
     [AshBlzSkinBuffIcon]                                                                    = {
         IconTexture                                                                         = {
@@ -91,6 +116,7 @@ SKIN_STYLE =                                                                    
         frameStrata                                                                         = "LOW",
         alpha                                                                               = Wow.UnitInRange():Map('v=>v and 1 or 0.55'),
         
+        -- 去除默认皮肤的目标指示器
         Label2                                                                              = NIL,
         Label3                                                                              = NIL,
 
@@ -109,7 +135,7 @@ SKIN_STYLE =                                                                    
             texCoords                                                                       = RectType(0.00781250, 0.55468750, 0.28906250, 0.55468750),
             setAllPoints                                                                    = true,
             ignoreParentAlpha                                                               = true,
-            visible                                                                         = Wow.UnitIsTarget():Map(function(val) return val end)
+            visible                                                                         = Wow.UnitIsTarget()
         },
 
         -- 仇恨指示器
@@ -120,7 +146,8 @@ SKIN_STYLE =                                                                    
             setAllPoints                                                                    = true,
             visible                                                                         = Wow.UnitThreatLevel():Map("l=> l>0"),
             vertexColor                                                                     = Wow.UnitThreatLevel():Map(function(level)
-                return ColorType(GetThreatStatusColor(level))
+                shareColor.r, shareColor.g, shareColor.b, shareColor.a = GetThreatStatusColor(level), 1
+                return shareColor
             end)
         },
 
@@ -164,7 +191,12 @@ SKIN_STYLE =                                                                    
                 Anchor("TOPLEFT", 3, -2)
             },
             size                                                                            = Wow.UnitRoleVisible():Map(function(val)
-                return val and Size(12, 12) or Size(1, 1)
+                if val then
+                    shareSize.width, shareSize.height = 12, 12
+                else
+                    shareSize.width, shareSize.height = 1, 1
+                end
+                return shareSize
             end),
             visible                                                                         = true
         } or nil,
@@ -359,7 +391,7 @@ SKIN_STYLE =                                                                    
             }
         },
 
-        -- 特殊buff
+        -- 职业buff
         ClassBuffPanel                                                                      = {
             elementType                                                                     = AshBlzSkinBuffIcon,
             location                                                                        = relocationUnitFrameIconOnSizeChange,

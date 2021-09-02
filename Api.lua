@@ -5,8 +5,11 @@ namespace "AshToAsh.Skin.Blizzard"
 __Sealed__()
 interface "AshBlzSkinApi" {}
 
+local tapDeniedColor = ColorType(0.9, 0.9, 0.9)
+
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitColor()
+    local shareColor = Color(1, 1, 1, 1)
     return Wow.FromUnitEvent("UNIT_CONNECTION", "UNIT_NAME_UPDATE"):Map(function(unit)
         if not UnitIsConnected(unit) then
             return Color.GRAY
@@ -15,27 +18,32 @@ function AshBlzSkinApi.UnitColor()
             if UnitIsPlayer(unit) or UnitTreatAsPlayerForDisplay(unit)  then
                 return Color[cls or "PALADIN"]
             elseif not UnitPlayerControlled(unit) and UnitIsTapDenied(unit) then
-                return ColorType(0.9, 0.9, 0.9)
+                return tapDeniedColor
             elseif UnitIsFriend("player", unit) then
                 return Color[cls or "GREEN"]
             elseif UnitCanAttack("player", unit) then
                 return Color.RED
             else
-                return ColorType(UnitSelectionColor(unit, true))
+                shareColor.r, shareColor.g, shareColor.b, shareColor.a = UnitSelectionColor(unit, true)
+                return shareColor
             end
         end
     end)
 end
 
+local nonInterruptibleColor = ColorType(0.7, 0.7, 0.7)
+local channelColor = ColorType(0, 1, 0)
+local castColor = ColorType(1, 0.7, 0)
+
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitCastBarColor()
     return Wow.UnitCastChannel():CombineLatest(Wow.UnitCastInterruptible()):Map(function(channel, interruptible)
         if not interruptible then
-            return ColorType(0.7, 0.7, 0.7)
+            return nonInterruptibleColor
         elseif channel then
-            return ColorType(0, 1, 0)
+            return channelColor
         else
-            return ColorType(1, 0.7, 0)
+            return castColor
         end
     end)
 end
@@ -67,6 +75,8 @@ function AshBlzSkinApi.UnitBossAura()
             end
             return false
         end)
+
+        if hasBossAura then return true end
 
         AuraUtil.ForEachAura(unit, "HELPFUL", 1, function(...)
             if select(12, ...) then
