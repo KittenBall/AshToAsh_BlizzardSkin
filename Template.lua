@@ -155,11 +155,11 @@ class "AshBlzSkinBossDebuffIcon"(function()
         self.OnEnter = OnEnter
     end
 
-    property "AuraFilter" { type = String}
+    property "AuraFilter" { type = String }
 
 end)
 
--- BossDebuff
+-- BossDebuff Panel
 __Sealed__() __ChildProperty__(AshUnitFrame, "AshBlzSkinBossDebuffPanel")
 class "BossDebuffPanel"(function()
     inherit "AuraPanel"
@@ -237,6 +237,18 @@ class "BossDebuffPanel"(function()
 
     __Indexer__() __Observable__()
     property "AuraFilter" { set = Toolset.fakefunc }
+end)
+
+-- DispellDebuff Panel
+__Sealed__() __ChildProperty__(AshUnitFrame, "AshBlzSkinDispellDebuffPanel")
+class "DispellDebuffPanel" (function(_ENV)
+    inherit "AuraPanel"
+
+    property "AuraFilter"   {
+        type                = String,
+        set                 = false,
+        default             = "HARMFUL|RAID"
+    }
 end)
 
 -- CastBar 修改自Scorpio.UI.CooldownStatusBar
