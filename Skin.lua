@@ -9,7 +9,7 @@ HEALTHBAR = (Scorpio.IsRetail or IsAddOnLoaded("LibHealComm-4.0") or pcall(_G.Li
 local shareColor    = ColorType(0, 0, 0, 1)
 local shareSize     = Size(1, 1)
 
-local function resizeUnitFrameAuraOnSizeChange(size)
+local function resizeOnUnitFrameChanged(size)
     return Wow.FromFrameSize(UnitFrame):Map(function(w, h)
         local componentScale = min(w / 72, h / 36)
         return (size or 10) * componentScale
@@ -160,6 +160,7 @@ SKIN_STYLE =                                                                    
         -- 目标选中边框
         AshBlzSkinSelectionHighlightTexture                                                 = {
             drawLayer                                                                       = "OVERLAY",
+            subLevel                                                                        = 1,
             file                                                                            = "Interface\\RaidFrame\\Raid-FrameHighlights",
             texCoords                                                                       = RectType(0.00781250, 0.55468750, 0.28906250, 0.55468750),
             setAllPoints                                                                    = true,
@@ -178,6 +179,36 @@ SKIN_STYLE =                                                                    
                 shareColor.r, shareColor.g, shareColor.b, shareColor.a = GetThreatStatusColor(level)
                 return shareColor
             end)
+        },
+
+        -- 拥有驱散debuff的能力
+        AshBlzSkinDispellAbilityHighlight                                                   = {
+            drawLayer                                                                       = "OVERLAY",
+            subLevel                                                                        = 2,
+            file                                                                            = "Interface\\RaidFrame\\Raid-FrameHighlights",
+            texCoords                                                                       = RectType(0.00781250, 0.55468750, 0.28906250, 0.55468750),
+            setAllPoints                                                                    = true,
+            ignoreParentAlpha                                                               = true,
+            vertexColor                                                                     = AshBlzSkinApi.UnitDebuffCanDispellColor(),
+            visible                                                                         = AshBlzSkinApi.UnitDebuffCanDispell(),
+
+            AnimationGroup                                                                  = {
+                playing                                                                     = AshBlzSkinApi.UnitDebuffCanDispell(),
+                looping                                                                     = "REPEAT",
+
+                Alpha1                                                                      = {
+                    order                                                                   = 1,
+                    duration                                                                = 0.2,
+                    fromAlpha                                                               = 0,
+                    toAlpha                                                                 = 1
+                },
+                Alpha2                                                                      = {
+                    order                                                                   = 2,
+                    duration                                                                = 0.2,
+                    fromAlpha                                                               = 1,
+                    toAlpha                                                                 = 0
+                }
+            }
         },
 
         -- 名字
@@ -362,8 +393,8 @@ SKIN_STYLE =                                                                    
         BuffPanel                                                                           = {
             elementType                                                                     = AshBlzSkinBuffIcon,
             orientation                                                                     = Orientation.HORIZONTAL,
-            elementWidth                                                                    = resizeUnitFrameAuraOnSizeChange(),
-            elementHeight                                                                   = resizeUnitFrameAuraOnSizeChange(),
+            elementWidth                                                                    = resizeOnUnitFrameChanged(),
+            elementHeight                                                                   = resizeOnUnitFrameChanged(),
             marginRight                                                                     = 3,
             rowCount                                                                        = 1,
             columnCount                                                                     = 3,
@@ -388,8 +419,8 @@ SKIN_STYLE =                                                                    
             marginLeft                                                                      = 1.5,
             hSpacing                                                                        = 1.5,
             vSpacing                                                                        = 1,
-            elementWidth                                                                    = resizeUnitFrameAuraOnSizeChange(),
-            elementHeight                                                                   = resizeUnitFrameAuraOnSizeChange(),
+            elementWidth                                                                    = resizeOnUnitFrameChanged(),
+            elementHeight                                                                   = resizeOnUnitFrameChanged(),
             location                                                                        = {
                 Anchor("BOTTOMLEFT", 0, 0, "AshBlzSkinBossDebuffPanel", "BOTTOMRIGHT")
             },
@@ -415,14 +446,8 @@ SKIN_STYLE =                                                                    
             marginLeft                                                                      = 3,
             hSpacing                                                                        = 1.5,
             vSpacing                                                                        = 1,
-            elementWidth                                                                    = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
-                local componentScale = min(w / 72, h / 36)
-                return 15 * componentScale
-            end),
-            elementHeight                                                                   = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
-                local componentScale = min(w / 72, h / 36)
-                return 15 * componentScale
-            end),
+            elementWidth                                                                    = resizeOnUnitFrameChanged(15),
+            elementHeight                                                                   = resizeOnUnitFrameChanged(15),
             location                                                                        = {
                 Anchor("BOTTOMLEFT", 0, 1.5, HEALTHBAR, "BOTTOMLEFT")
             }
@@ -435,8 +460,8 @@ SKIN_STYLE =                                                                    
             rowCount                                                                        = 1,
             columnCount                                                                     = 1,
             visible                                                                         = AshBlzSkinApi.UnitIsPlayer(),
-            elementWidth                                                                    = resizeUnitFrameAuraOnSizeChange(),
-            elementHeight                                                                   = resizeUnitFrameAuraOnSizeChange()
+            elementWidth                                                                    = resizeOnUnitFrameChanged(),
+            elementHeight                                                                   = resizeOnUnitFrameChanged()
         },
 
         -- 可驱散debuff (是可驱散类型即可驱散debuff)
@@ -451,8 +476,8 @@ SKIN_STYLE =                                                                    
             marginRight                                                                     = 3,
             marginTop                                                                       = 4.5,
             visible                                                                         = AshBlzSkinApi.UnitIsPlayer(),
-            elementWidth                                                                    = resizeUnitFrameAuraOnSizeChange(8),
-            elementHeight                                                                   = resizeUnitFrameAuraOnSizeChange(8),
+            elementWidth                                                                    = resizeOnUnitFrameChanged(8),
+            elementHeight                                                                   = resizeOnUnitFrameChanged(8),
             location                                                                        = {
                 Anchor("TOPRIGHT", 0, 0, HEALTHBAR, "TOPRIGHT")
             }

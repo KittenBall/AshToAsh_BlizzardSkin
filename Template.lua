@@ -44,6 +44,10 @@ __Sealed__() class "AshBlzSkinClassBuffIcon" { AshBlzSkinBuffIcon }
 -- 可驱散类型
 __Sealed__() class "AshBlzSkinDispellIcon" { Scorpio.Secure.UnitFrame.AuraPanelIcon  }
 
+-- 有能驱散Debuff的能力
+__Sealed__() __ChildProperty__(AshUnitFrame, "AshBlzSkinDispellAbilityHighlight")
+class "DispellAbilityHighlight"{ Texture }
+
 -- Debuff panel
 __Sealed__() __ChildProperty__(AshUnitFrame, "AshBlzSkinDebuffPanel")
 class "DebuffPanel"(function()
@@ -249,6 +253,7 @@ class "DispellDebuffPanel" (function(_ENV)
 
     local shareCooldown         = { start = 0, duration = 0 }
     local dispellDebuffs        = {}
+    -- 可驱散Debuff类型
     local dispellDebuffTypes    = { Magic = true, Curse = true, Disease = true, Poison = true }
 
     local function refreshAura(self, unit, filter, eleIdx, auraIdx, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
