@@ -125,6 +125,17 @@ SKIN_STYLE =                                                                    
         auraFilter                                                                          = Wow.FromPanelProperty("AuraFilter")
     },
 
+    [AshBlzSkinDispellIcon]                                                                 = {
+        IconTexture                                                                         = {
+            drawLayer                                                                       = "ARTWORK",
+            setAllPoints                                                                    = true,
+            file                                                                            = Wow.FromPanelProperty("AuraDebuff"):Map(function(dtype)
+                return "Interface\\RaidFrame\\Raid-Icon-Debuff"..dtype
+            end),
+            texCoords                                                                       = RectType(0.125, 0.875, 0.125, 0.875)
+        }
+    },
+
     [AshUnitFrame]                                                                          = {
         inherit                                                                             = "default",
 
@@ -237,7 +248,7 @@ SKIN_STYLE =                                                                    
 
         -- 主坦克、主助理
         RaidRosterIcon                                                                      = {
-            location                                                                        = { 
+            location                                                                        = {
                 Anchor("TOPRIGHT", -1, 0, "LeaderIcon", "TOPLEFT")
             },
             size                                                                            = Size(12, 12),
@@ -422,6 +433,23 @@ SKIN_STYLE =                                                                    
             columnCount                                                                     = 1,
             elementWidth                                                                    = resizeUnitFrameAuraOnSizeChange,
             elementHeight                                                                   = resizeUnitFrameAuraOnSizeChange
+        },
+
+        -- 可驱散Debuff (是可驱散类型即可驱散debuff)
+        AshBlzSkinDispellDebuffPanel                                                        = {
+            elementType                                                                     = AshBlzSkinDispellIcon,
+            leftToRight                                                                     = false,
+            topToBottom                                                                     = false,
+            rowCount                                                                        = 1,
+            columnCount                                                                     = 4,
+            hSpacing                                                                        = 1.5,
+            vSpacing                                                                        = 1,
+            marginRight                                                                     = 3,
+            elementWidth                                                                    = resizeUnitFrameAuraOnSizeChange,
+            elementHeight                                                                   = resizeUnitFrameAuraOnSizeChange,
+            location                                                                        = {
+                Anchor("TOPRIGHT", 0, -1.5, HEALTHBAR, "TOPRIGHT")
+            }
         }
     }
 }

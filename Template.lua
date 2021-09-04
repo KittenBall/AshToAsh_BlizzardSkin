@@ -41,6 +41,9 @@ __Sealed__() class "AshBlzSkinDebuffIcon" { AshBlzSkinBuffIcon }
 -- ClassBuff icon
 __Sealed__() class "AshBlzSkinClassBuffIcon" { AshBlzSkinBuffIcon }
 
+-- 可驱散类型
+__Sealed__() class "AshBlzSkinDispellIcon" { Scorpio.Secure.UnitFrame.AuraPanelIcon  }
+
 -- Debuff panel
 __Sealed__() __ChildProperty__(AshUnitFrame, "AshBlzSkinDebuffPanel")
 class "DebuffPanel"(function()
@@ -244,10 +247,61 @@ __Sealed__() __ChildProperty__(AshUnitFrame, "AshBlzSkinDispellDebuffPanel")
 class "DispellDebuffPanel" (function(_ENV)
     inherit "AuraPanel"
 
-    property "AuraFilter"   {
-        type                = String,
-        set                 = false,
-        default             = "HARMFUL|RAID"
+    local shareCooldown         = { start = 0, duration = 0 }
+    local dispellDebuffs        = {}
+    local dispellDebuffTypes    = { Magic = true, Curse = true, Disease = true, Poison = true }
+
+    local function refreshAura(self, unit, filter, eleIdx, auraIdx, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
+        if not name or eleIdx > self.MaxCount then return eleIdx end
+
+        if dispellDebuffTypes[dtype] and not dispellDebuffs[dtype] then
+            dispellDebuffs[dtype]           = true
+
+            self.Elements[eleIdx]:Show()
+
+            shareCooldown.start             = expires - duration
+            shareCooldown.duration          = duration
+
+            self.AuraIndex[eleIdx]          = auraIdx
+            self.AuraName[eleIdx]           = name
+            self.AuraIcon[eleIdx]           = icon
+            self.AuraCount[eleIdx]          = count
+            self.AuraDebuff[eleIdx]         = dtype
+            self.AuraCooldown[eleIdx]       = shareCooldown
+            self.AuraStealable[eleIdx]      = isStealable and not UnitIsUnit(unit, "player")
+            self.AuraSpellID[eleIdx]        = spellID
+            self.AuraBossDebuff[eleIdx]     = isBossDebuff
+            self.AuraCastByPlayer[eleIdx]   = castByPlayer
+
+            eleIdx = eleIdx + 1
+        end
+        
+        auraIdx = auraIdx + 1
+        return refreshAura(self, unit, filter, eleIdx, auraIdx, UnitAura(unit, auraIdx, filter))
+    end
+
+    property "Refresh"          {
+        set                     = function(self, unit)
+            self.Unit           = unit
+            local filter        = self.AuraFilter
+
+            for k in pairs(dispellDebuffs) do
+                dispellDebuffs[k] = nil
+            end
+
+            -- we don't care about priority here
+            self.Count          = refreshAura(self, unit, filter, 1, 1, UnitAura(unit, 1, filter)) - 1
+        end
+    }
+
+    property "AuraPriority"     { set = false }
+
+    property "CustomFilter"     { set = false }
+
+    property "AuraFilter"       {
+        type                    = String,
+        set                     = false,
+        default                 = "HARMFUL|RAID"
     }
 end)
 
