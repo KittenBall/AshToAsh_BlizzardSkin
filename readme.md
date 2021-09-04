@@ -1,4 +1,4 @@
-## Bizzard style Skin for [AshToAsh](https://www.curseforge.com/wow/addons/ashtoash)
+## Bizzard style skin for [AshToAsh](https://www.curseforge.com/wow/addons/ashtoash)
 
 This addon provide a skin look like blizzard style to AshToAsh
 
