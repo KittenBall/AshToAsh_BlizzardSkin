@@ -1,5 +1,0 @@
-package-as: AshToAsh_BlizzardSkin
-enable-nolib-creation: no
-
-ignore:
-  - README.md

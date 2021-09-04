@@ -7,8 +7,10 @@
 ## Notes-zhCN: AshToAsh的暴雪样式皮肤
 ## Dependices: Scorpio, AshToAsh
 ## DefaultState: enabled
-## X-WebSite: https://bbs.nga.cn/read.php?tid=28327819&_ff=274
+## X-WebSite: https://github.com/GreenhairTurtle/AshToAsh_BlizzardSkin
 ## X-Credit: Kurapica
+## X-Curse-Project-ID: 522904
+## X-Wago-ID: Xb6XqBKp
 
 Api.lua
 Template.lua
