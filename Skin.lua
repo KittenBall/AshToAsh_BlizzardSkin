@@ -9,10 +9,12 @@ HEALTHBAR = (Scorpio.IsRetail or IsAddOnLoaded("LibHealComm-4.0") or pcall(_G.Li
 local shareColor    = ColorType(0, 0, 0, 1)
 local shareSize     = Size(1, 1)
 
-local resizeUnitFrameAuraOnSizeChange = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
-    local componentScale = min(w / 72, h / 36)
-    return 10 * componentScale
-end)
+local function resizeUnitFrameAuraOnSizeChange(size)
+    return Wow.FromFrameSize(UnitFrame):Map(function(w, h)
+        local componentScale = min(w / 72, h / 36)
+        return (size or 10) * componentScale
+    end)
+end
 
 local function resizeUnitFrameIconOnSizeChange(size)
     return Wow.FromFrameSize(UnitFrame):Map(function(w, h)
@@ -46,6 +48,7 @@ end
 local relocationUnitFrameIconOnSizeChange = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
     return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, h/3-4))
 end)
+
 
 local function isBossAura(...)
 	return select(12, ...)
@@ -359,8 +362,8 @@ SKIN_STYLE =                                                                    
         BuffPanel                                                                           = {
             elementType                                                                     = AshBlzSkinBuffIcon,
             orientation                                                                     = Orientation.HORIZONTAL,
-            elementWidth                                                                    = resizeUnitFrameAuraOnSizeChange,
-            elementHeight                                                                   = resizeUnitFrameAuraOnSizeChange,
+            elementWidth                                                                    = resizeUnitFrameAuraOnSizeChange(),
+            elementHeight                                                                   = resizeUnitFrameAuraOnSizeChange(),
             marginRight                                                                     = 3,
             rowCount                                                                        = 1,
             columnCount                                                                     = 3,
@@ -385,8 +388,8 @@ SKIN_STYLE =                                                                    
             marginLeft                                                                      = 1.5,
             hSpacing                                                                        = 1.5,
             vSpacing                                                                        = 1,
-            elementWidth                                                                    = resizeUnitFrameAuraOnSizeChange,
-            elementHeight                                                                   = resizeUnitFrameAuraOnSizeChange,
+            elementWidth                                                                    = resizeUnitFrameAuraOnSizeChange(),
+            elementHeight                                                                   = resizeUnitFrameAuraOnSizeChange(),
             location                                                                        = {
                 Anchor("BOTTOMLEFT", 0, 0, "AshBlzSkinBossDebuffPanel", "BOTTOMRIGHT")
             },
@@ -431,11 +434,12 @@ SKIN_STYLE =                                                                    
             location                                                                        = relocationUnitFrameIconOnSizeChange,
             rowCount                                                                        = 1,
             columnCount                                                                     = 1,
-            elementWidth                                                                    = resizeUnitFrameAuraOnSizeChange,
-            elementHeight                                                                   = resizeUnitFrameAuraOnSizeChange
+            visible                                                                         = AshBlzSkinApi.UnitIsPlayer(),
+            elementWidth                                                                    = resizeUnitFrameAuraOnSizeChange(),
+            elementHeight                                                                   = resizeUnitFrameAuraOnSizeChange()
         },
 
-        -- 可驱散Debuff (是可驱散类型即可驱散debuff)
+        -- 可驱散debuff (是可驱散类型即可驱散debuff)
         AshBlzSkinDispellDebuffPanel                                                        = {
             elementType                                                                     = AshBlzSkinDispellIcon,
             leftToRight                                                                     = false,
@@ -445,10 +449,12 @@ SKIN_STYLE =                                                                    
             hSpacing                                                                        = 1.5,
             vSpacing                                                                        = 1,
             marginRight                                                                     = 3,
-            elementWidth                                                                    = resizeUnitFrameAuraOnSizeChange,
-            elementHeight                                                                   = resizeUnitFrameAuraOnSizeChange,
+            marginTop                                                                       = 4.5,
+            visible                                                                         = AshBlzSkinApi.UnitIsPlayer(),
+            elementWidth                                                                    = resizeUnitFrameAuraOnSizeChange(8),
+            elementHeight                                                                   = resizeUnitFrameAuraOnSizeChange(8),
             location                                                                        = {
-                Anchor("TOPRIGHT", 0, -1.5, HEALTHBAR, "TOPRIGHT")
+                Anchor("TOPRIGHT", 0, 0, HEALTHBAR, "TOPRIGHT")
             }
         }
     }

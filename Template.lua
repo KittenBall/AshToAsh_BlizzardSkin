@@ -289,11 +289,11 @@ class "DispellDebuffPanel" (function(_ENV)
                 dispellDebuffs[k] = nil
             end
 
-            -- we don't care about priority here
             self.Count          = refreshAura(self, unit, filter, 1, 1, UnitAura(unit, 1, filter)) - 1
         end
     }
 
+    -- we don't care about priority in dispell panel
     property "AuraPriority"     { set = false }
 
     property "CustomFilter"     { set = false }

@@ -149,3 +149,10 @@ function AshBlzSkinApi.UnitBossAura()
         return hasBossAura
     end)
 end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.UnitIsPlayer()
+    return Wow.Unit():Map(function(unit)
+        return UnitIsPlayer(unit) or UnitTreatAsPlayerForDisplay(unit)
+    end)
+end
