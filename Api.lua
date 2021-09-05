@@ -2,6 +2,10 @@ Scorpio "AshToAsh.BlizzardSkin" ""
 
 namespace "AshToAsh.Skin.Blizzard"
 
+
+SKIN_NAME = "AshToAsh.BlizzardSkin"
+Style.RegisterSkin(SKIN_NAME)
+
 __Sealed__()
 interface "AshBlzSkinApi" {}
 
@@ -297,3 +301,99 @@ function AshBlzSkinApi.UnitDebuffCanDispellColor()
         return DebuffTypeColor[dType or ""]
     end)
 end
+
+-- Center status
+local centerStatusSubject = BehaviorSubject()
+centerStatusSubject:OnNext("any")
+
+__SystemEvent__ "INCOMING_RESURRECT_CHANGED" "UNIT_OTHER_PARTY_CHANGED" "UNIT_PHASE" "UNIT_FLAGS" "UNIT_CTR_OPTIONS" "INCOMING_SUMMON_CHANGED"
+function UpdateCenterStatusIcon(unit)
+    centerStatusSubject:OnNext(unit)
+end
+
+local function unitInDistance(unit)
+	local distance, checkedDistance = UnitDistanceSquared(unit);
+
+	if ( checkedDistance ) then
+		return distance < DISTANCE_THRESHOLD_SQUARED
+	end
+end
+
+function AshBlzSkinApi.UnitInDistance()
+    return Wow.FromUnitEvent(Observable.Interval(0.5):Map("=>'any'")):Map(function(unit)
+        return unit, UnitIsUnit(unit, "player") or not (UnitInParty(unit) or UnitInRaid(unit)) or unitInDistance(unit)
+    end)
+end
+
+local unitInDistanceMap = {}
+AshBlzSkinApi.UnitInDistance():Subscribe(function(unit, inDistance)
+    if unitInDistanceMap[unit] ~= inDistance then
+        unitInDistanceMap[unit] = inDistance
+        centerStatusSubject:OnNext(unit)
+    end
+end)
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.UnitCenterStatusIconVisible()
+    return Wow.FromUnitEvent(centerStatusSubject):Map(function(unit)
+        if UnitInOtherParty(unit) or UnitHasIncomingResurrection(unit) or UnitPhaseReason(unit) then
+            return true
+        elseif C_IncomingSummon.HasIncomingSummon(unit) then
+            local staus = C_IncomingSummon.IncomingSummonStatus(unit)
+            return status == Enum.SummonStatus.Pending or staus == Enum.SummonStatus.Accepted or staus == Enum.SummonStatus.Declined
+        end
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.UnitCenterStatusIconUpdate()
+    local texture = {}
+    local border = {}
+    local sRect = RectType()
+    local tooltip
+    return Wow.FromUnitEvent(centerStatusSubject):Map(function(unit)
+        wipe(texture)
+        wipe(border)
+        if UnitInOtherParty(unit) then
+            texture.file = "Interface\\LFGFrame\\LFG-Eye"
+            sRect.left, sRect.right, sRect.top, sRect.bottom = 0.125, 0.25, 0.25, 0.5
+            border.file = "Interface\\Common\\RingBorder"
+            border.visible = true
+            tooltip = PARTY_IN_PUBLIC_GROUP_MESSAGE
+        elseif UnitHasIncomingResurrection(unit) then
+            texture.file = "Interface\\RaidFrame\\Raid-Icon-Rez"
+            sRect.left, sRect.right, sRect.top, sRect.bottom = 0, 1, 0, 1
+            border.visible = false
+            tooltip = nil
+        elseif C_IncomingSummon.HasIncomingSummon(unit) then
+            if status == Enum.SummonStatus.Pending then
+                texture.atlas = "Raid-Icon-SummonPending"
+                sRect.left, sRect.right, sRect.top, sRect.bottom = 0, 1, 0, 1
+                border.visible = false
+                tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_PENDING
+			elseif( status == Enum.SummonStatus.Accepted ) then
+                texture.atlas = "Raid-Icon-SummonAccepted"
+                sRect.left, sRect.right, sRect.top, sRect.bottom = 0, 1, 0, 1
+                border.visible = false
+                tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_ACCEPTED
+			elseif( status == Enum.SummonStatus.Declined ) then
+                texture.atlas = "Raid-Icon-SummonDeclined"
+                sRect.left, sRect.right, sRect.top, sRect.bottom = 0, 1, 0, 1
+                border.visible = false
+                tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_DECLINED
+			end
+        else
+            local phaseReason = UnitPhaseReason(unit);
+            if phaseReason then
+                texture.file = "Interface\\TargetingFrame\\UI-PhasingIcon"
+                sRect.left, sRect.right, sRect.top, sRect.bottom = 0.15625, 0.84375, 0.15625, 0.84375
+                border.visible = false
+                tooltip = PartyUtil.GetPhasedReasonString(phaseReason, unit)
+            end
+        end
+
+        texture.texCoords = sRect
+        return texture, border, tooltip
+    end)
+end
+-- Center status

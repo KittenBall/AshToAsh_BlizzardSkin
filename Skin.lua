@@ -1,9 +1,5 @@
 Scorpio "AshToAsh.BlizzardSkin.Active" ""
 
-SKIN_NAME = "AshToAsh.BlizzardSkin"
-
-Style.RegisterSkin(SKIN_NAME)
-
 HEALTHBAR = (Scorpio.IsRetail or IsAddOnLoaded("LibHealComm-4.0") or pcall(_G.LibStub, "LibHealComm-4.0")) and "PredictionHealthBar" or "HealthBar"
 
 local shareColor    = ColorType(0, 0, 0, 1)
@@ -288,14 +284,14 @@ SKIN_STYLE =                                                                    
             size                                                                            = Size(12, 12),
         },
 
-        -- 复活图标
-        ResurrectIcon                                                                       = {
-            drawLayer                                                                       = "OVERLAY",
-            location                                                                        = {
-                Anchor("BOTTOM", 0, 0, HEALTHBAR, "BOTTOM")
-            },
-            size                                                                            = resizeUnitFrameIconOnSizeChange(18)
-        },
+        -- 复活图标，不需要了，用CenterStatusIcon
+        -- ResurrectIcon                                                                       = {
+        --     drawLayer                                                                       = "OVERLAY",
+        --     location                                                                        = {
+        --         Anchor("BOTTOM", 0, 0, HEALTHBAR, "BOTTOM")
+        --     },
+        --     size                                                                            = resizeUnitFrameIconOnSizeChange(18)
+        -- },
 
         -- 标记图标
         RaidTargetIcon                                                                      = {
@@ -317,6 +313,35 @@ SKIN_STYLE =                                                                    
             drawLayer                                                                       = "OVERLAY",
             location                                                                        = relocationUnitFrameIconOnSizeChange,
             size                                                                            = resizeUnitFrameIconOnSizeChange()
+        },
+
+        -- 中间状态图标
+        AshBlzSkinCenterStatusIcon                                                          = {
+            location                                                                        = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
+                return getLocation(getAnchor(shareAnchor1, "CENTER", 0, h / 3 + 2, nil, "BOTTOM"))
+            end),
+            size                                                                            = resizeUnitFrameIconOnSizeChange(22),
+            visible                                                                         = AshBlzSkinApi.UnitCenterStatusIconVisible():Map(function(result) return result end),
+            tooltip                                                                         = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(_, _, tooltip) return tooltip end),
+
+            IconTexture                                                                     = {
+                setAllPoints                                                                = true,
+                drawLayer                                                                   = "ARTWORK",
+                file                                                                        = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(texture) return texture.file end),
+                texCoords                                                                   = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(texture) return texture.texCoords end),
+                visible                                                                     = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(texture) return texture.file and true or false end),
+            },
+
+            Texture                                                                         = {
+                atlas                                                                       = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(texture) return texture.atlas end),
+                texCoords                                                                   = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(texture) return texture.texCoords end),
+                visible                                                                     = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(texture) return texture.atlas and true or false end),
+            },
+
+            Border                                                                          = {
+                file                                                                        = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(_, border) return border.file end),
+                visible                                                                     = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(_, border) return border.visible end)
+            }
         },
 
         -- 血条

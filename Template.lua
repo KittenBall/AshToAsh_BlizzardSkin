@@ -48,6 +48,47 @@ __Sealed__() class "AshBlzSkinDispellIcon" { Scorpio.Secure.UnitFrame.AuraPanelI
 __Sealed__() __ChildProperty__(AshUnitFrame, "AshBlzSkinDispellAbilityHighlight")
 class "DispellAbilityHighlight"{ Texture }
 
+-- 中间状态图标
+__Sealed__() __ChildProperty__(AshUnitFrame, "AshBlzSkinCenterStatusIcon") 
+class "CenterStatusIcon"(function()
+    inherit "Button"
+
+    property "Tooltip" { type = String }
+
+    local function OnClick(self, button)
+        -- self:GetParent():GetScript("OnClick")(self:GetParent(), button)
+    end
+
+    local function OnEnter(self, motion)
+        if self.Tooltip then
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetText(self.Tooltip, nil, nil, nil, nil, true)
+            GameTooltip:Show()
+        else
+            -- self:GetParent():GetScript("OnEnter")(self:GetParent(), motion)
+        end
+    end
+    
+    local function OnLeave(self, motion)
+        if self.Tooltip then
+            GameTooltip:Hide()
+        else
+            -- self:GetParent():GetScript("OnLeave")(self:GetParent(), motion)
+        end
+    end
+
+    __Template__{
+        Border      = Texture,
+        Texture     = Texture
+    }
+    function __ctor(self)
+        self:RegisterForClicks("LeftButtonDown", "RightButtonUp")
+        self.OnClick = self.OnClick + OnClick
+        self.OnEnter = self.OnEnter + OnEnter
+        self.OnLeave = self.OnLeave + OnLeave
+    end
+end)
+
 -- Debuff panel
 __Sealed__() __ChildProperty__(AshUnitFrame, "AshBlzSkinDebuffPanel")
 class "DebuffPanel"(function()
@@ -130,9 +171,11 @@ class "DebuffPanel"(function()
     property "Refresh"          {
         set                     = function(self, unit)
             self.Unit           = unit
+            local filter = self.AuraFilter
+            if not (unit  and self:IsVisible()) then return end
+
             wipe(priorityDebuffs)
             wipe(nonBossDebuffs)
-            local filter = self.AuraFilter
             refreshAura(self, unit, filter, 1, 1, UnitAura(unit, 1, filter))
 
             local eleIdx = 1
@@ -227,6 +270,7 @@ class "BossDebuffPanel"(function()
     property "Refresh"          {
         set                     = function(self, unit)
             self.Unit           = unit
+            if not (unit  and self:IsVisible()) then return end
             wipe(bossDebuffs)
             wipe(bossBuffs)
             
@@ -289,11 +333,10 @@ class "DispellDebuffPanel" (function(_ENV)
         set                     = function(self, unit)
             self.Unit           = unit
             local filter        = self.AuraFilter
+            if not (unit and filter and filter ~= "" and self:IsVisible()) then return end
 
-            for k in pairs(dispellDebuffs) do
-                dispellDebuffs[k] = nil
-            end
-
+            wipe(dispellDebuffs)
+ 
             self.Count          = refreshAura(self, unit, filter, 1, 1, UnitAura(unit, 1, filter)) - 1
         end
     }
@@ -351,3 +394,17 @@ class "CastBar" (function(_ENV)
         self.OnUpdate = self.OnUpdate + OnUpdate
     end
 end)
+
+Style.UpdateSkin(SKIN_NAME,{
+    [CenterStatusIcon]              = {
+        Texture                                                                         = {
+            drawLayer                                                                   = "ARTWORK",
+            setAllPoints                                                                = true
+        },
+
+        Border                                                                          = {
+            drawLayer                                                                   = "BORDER",
+            setAllPoints                                                                = true
+        }
+    }
+})
