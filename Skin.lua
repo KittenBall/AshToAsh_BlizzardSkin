@@ -285,13 +285,7 @@ SKIN_STYLE =                                                                    
         },
 
         -- 复活图标，不需要了，用CenterStatusIcon
-        -- ResurrectIcon                                                                       = {
-        --     drawLayer                                                                       = "OVERLAY",
-        --     location                                                                        = {
-        --         Anchor("BOTTOM", 0, 0, HEALTHBAR, "BOTTOM")
-        --     },
-        --     size                                                                            = resizeUnitFrameIconOnSizeChange(18)
-        -- },
+        ResurrectIcon                                                                       = NIL,
 
         -- 标记图标
         RaidTargetIcon                                                                      = {
@@ -321,7 +315,7 @@ SKIN_STYLE =                                                                    
                 return getLocation(getAnchor(shareAnchor1, "CENTER", 0, h / 3 + 2, nil, "BOTTOM"))
             end),
             size                                                                            = resizeUnitFrameIconOnSizeChange(22),
-            visible                                                                         = AshBlzSkinApi.UnitCenterStatusIconVisible():Map(function(result) return result end),
+            visible                                                                         = AshBlzSkinApi.UnitCenterStatusIconVisible(),
             tooltip                                                                         = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(_, _, tooltip) return tooltip end),
 
             IconTexture                                                                     = {

@@ -55,17 +55,13 @@ class "CenterStatusIcon"(function()
 
     property "Tooltip" { type = String }
 
-    local function OnClick(self, button)
-        -- self:GetParent():GetScript("OnClick")(self:GetParent(), button)
-    end
-
     local function OnEnter(self, motion)
         if self.Tooltip then
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
             GameTooltip:SetText(self.Tooltip, nil, nil, nil, nil, true)
             GameTooltip:Show()
         else
-            -- self:GetParent():GetScript("OnEnter")(self:GetParent(), motion)
+            self:GetParent():OnEnter(motion)
         end
     end
     
@@ -73,7 +69,7 @@ class "CenterStatusIcon"(function()
         if self.Tooltip then
             GameTooltip:Hide()
         else
-            -- self:GetParent():GetScript("OnLeave")(self:GetParent(), motion)
+            self:GetParent():OnLeave(motion)
         end
     end
 
@@ -82,8 +78,6 @@ class "CenterStatusIcon"(function()
         Texture     = Texture
     }
     function __ctor(self)
-        self:RegisterForClicks("LeftButtonDown", "RightButtonUp")
-        self.OnClick = self.OnClick + OnClick
         self.OnEnter = self.OnEnter + OnEnter
         self.OnLeave = self.OnLeave + OnLeave
     end
@@ -396,7 +390,10 @@ class "CastBar" (function(_ENV)
 end)
 
 Style.UpdateSkin(SKIN_NAME,{
-    [CenterStatusIcon]              = {
+    [CenterStatusIcon]                                                                  = {
+        enableMouseMotion                                                               = true,
+        enableMouseClicks                                                               = false,
+
         Texture                                                                         = {
             drawLayer                                                                   = "ARTWORK",
             setAllPoints                                                                = true
