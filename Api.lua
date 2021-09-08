@@ -2,13 +2,11 @@ Scorpio "AshToAsh.BlizzardSkin" ""
 
 namespace "AshToAsh.Skin.Blizzard"
 
-
 SKIN_NAME = "AshToAsh.BlizzardSkin"
 Style.RegisterSkin(SKIN_NAME)
 
 __Sealed__()
 interface "AshBlzSkinApi" {}
-
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitColor()
@@ -44,11 +42,14 @@ local function getDisplayedPowerID(unit)
 	end
 end
 
+-------------------------------------------------
+-- Power start
+-------------------------------------------------
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPower(frequent)
     return Wow.FromUnitEvent(frequent and "UNIT_POWER_FREQUENT" or "UNIT_POWER_UPDATE", "UNIT_MAXPOWER", "UNIT_DISPLAYPOWER", "UNIT_POWER_BAR_SHOW", "UNIT_POWER_BAR_HIDE")
         :Next():Map(function(unit)
-            return UnitPower(unit, getDisplayedPowerID(unit)) 
+            return UnitPower(unit, getDisplayedPowerID(unit))
         end)
 end
 
@@ -96,6 +97,9 @@ function AshBlzSkinApi.UnitPowerColor()
             return scolor
         end)
 end
+-------------------------------------------------
+-- Power end
+-------------------------------------------------
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitCastBarColor()
@@ -120,12 +124,33 @@ function AshBlzSkinApi.UnitVehicleVisible()
     end)
 end
 
+-------------------------------------------------
+-- Dead start
+-------------------------------------------------
+local deadSubject = BehaviorSubject()
+
+__SystemEvent__ "UNIT_CONNECTION" "PLAYER_FLAGS_CHANGED"
+function UpdateDeadStatus(unit)
+    deadSubject:OnNext(unit)
+end
+
+-- 抄的Scorpio UnitApi
+__CombatEvent__ "UNIT_DIED" "UNIT_DESTROYED" "UNIT_DISSIPATES"
+function COMBAT_UNIT_DIED(_, event, _, _, _, _, _, destGUID)
+    for unit in Scorpio.GetUnitsFromGUID(destGUID) do
+        deadSubject:OnNext(unit)
+    end
+end
+
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitIsDead()
-    return Wow.FromUnitEvent(Wow.FromEvent("UNIT_HEALTH", "UNIT_CONNECTION", "PLAYER_FLAGS_CHANGED")):Next():Map(function(unit)
+    return Wow.FromUnitEvent(deadSubject):Map(function(unit)
         return UnitIsDeadOrGhost(unit) and UnitIsConnected(unit)
     end)
 end
+-------------------------------------------------
+-- Dead end
+-------------------------------------------------
 
 -- 是否有Boss给的Aura
 __Static__() __AutoCache__()
@@ -162,9 +187,10 @@ function AshBlzSkinApi.UnitIsPlayer()
     end)
 end
 
+-------------------------------------------------
+-- Dispell end
+-------------------------------------------------
 -- 职业可驱散debuff类型
--- { Magic = true, Curse = true, Disease = true, Poison = true }
-
 CLASS_DISPELL_TYPE              = {
     -- 奶骑
     [65]                        = {
@@ -271,26 +297,28 @@ local function isDebuffCanDispell(specID, dType)
     return false
 end
 
--- 单位是否有能驱散的debuff
+-- 单位是否有玩家能驱散的debuff
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitDebuffCanDispell()
-    return Wow.UnitAura():Map(function(unit)
-        local canDispell, canDispellType
-        local inInstance, instanceType = IsInInstance()
-        -- 在副本内才工作
-        if inInstance and (instanceType == "party" or instanceType == "raid" or instanceType == "scenario") then
-            local specID = GetSpecializationInfo(GetSpecialization())
-            AuraUtil.ForEachAura(unit, "HARMFUL|RAID", 1, function(_, _, _, dType)
-                if isDebuffCanDispell(specID, dType) then
-                    canDispell = true
-                    canDispellType = dType
-                    return true
-                end
-                return false
-            end)
-        end
-        return canDispell or false, canDispellType
-    end)
+    return Wow.UnitAura()
+        :Where(function(unit)
+            -- 在副本内才工作
+            local inInstance, instanceType = IsInInstance()
+            return inInstance and (instanceType == "party" or instanceType == "raid" or instanceType == "scenario")
+        end)
+        :Map(function(unit)
+            local canDispell, canDispellType
+                local specID = GetSpecializationInfo(GetSpecialization())
+                AuraUtil.ForEachAura(unit, "HARMFUL|RAID", 1, function(_, _, _, dType)
+                    if isDebuffCanDispell(specID, dType) then
+                        canDispell = true
+                        canDispellType = dType
+                        return true
+                    end
+                    return false
+                end)
+            return canDispell or false, canDispellType
+        end)
 end
 
 
@@ -301,8 +329,13 @@ function AshBlzSkinApi.UnitDebuffCanDispellColor()
         return DebuffTypeColor[dType or ""]
     end)
 end
+-------------------------------------------------
+-- Dispell end
+-------------------------------------------------
 
--- Center status
+-------------------------------------------------
+-- Center Status start
+-------------------------------------------------
 local centerStatusSubject = BehaviorSubject()
 centerStatusSubject:OnNext("any")
 
@@ -396,4 +429,6 @@ function AshBlzSkinApi.UnitCenterStatusIconUpdate()
         return texture, border, tooltip
     end)
 end
--- Center status
+-------------------------------------------------
+-- Center Status end
+-------------------------------------------------

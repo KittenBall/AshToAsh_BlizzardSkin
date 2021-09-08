@@ -1,6 +1,6 @@
 ## Interface: 90100
 ## Author: 绿毛龟12138
-## Version: 1.1
+## Version: @project-version@
 ## Title: AshToAsh_BlizzardSkin
 ## Title-zhCN: AshToAsh暴雪皮肤
 ## Notes: AshToAsh Skin Blizzard Style
