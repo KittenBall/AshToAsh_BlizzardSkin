@@ -270,141 +270,203 @@ end
 -------------------------------------------------
 -- Dispell end
 -------------------------------------------------
--- 职业可驱散debuff类型
-CLASS_DISPELL_TYPE              = {
-    -- 奶骑
-    [65]                        = {
-        Magic                   = true,
-        Disease                 = true,
-        Poison                  = true
-    },
-    -- 防骑
-    [66]                        = {
-        Disease                 = true,
-        Poison                  = true
-    },
-    -- 惩戒
-    [70]                        = {
-        Disease                 = true,
-        Poison                  = true
-    },
-    -- 奶萨
-    [264]                       = {
-        Magic                   = true,
-        Curse                   = true
-    },
-    --增强
-    [263]                       = {
-        Curse                   = true
-    },
-    -- 元素
-    [262]                       = {
-        Curse                   = true
-    },
-    -- 戒律
-    [256]                       = {
-        Magic                   = true,
-        Disease                 = true
-    },
-    -- 神牧
-    [257]                       = {
-        Magic                   = true,
-        Disease                 = true
-    },
-    -- 暗牧
-    [258]                       = {
-        Magic                   = true,
-        Disease                 = true
-    },
-    -- 奶僧
-    [270]                       = {
-        Magic                   = true,
-        Disease                 = true,
-        Poison                  = true
-    },
-    -- 踏风
-    [269]                       = {
-        Disease                 = true,
-        Poison                  = true
-    },
-    -- 酒仙
-    [268]                       = {
-        Disease                 = true,
-        Poison                  = true
-    },
-    -- 火法
-    [63]                        = {
-        Curse                   = true
-    },
-    -- 冰法
-    [64]                        = {
-        Curse                   = true
-    },
-    -- 奥法
-    [62]                        = {
-        Curse                   = true
-    },
-    -- 鸟德 
-    [102]                       = {
-        Curse                   = true,
-        Poison                  = true
-    },
-    -- 野德
-    [103]                       = {
-        Curse                   = true,
-        Poison                  = true
-    },
-    -- 熊
-    [104]                       = {
-        Curse                   = true,
-        Poison                  = true
-    },
-    -- 奶德
-    [105]                       = {
-        Magic                   = true,
-        Curse                   = true,
-        Poison                  = true
+if Scorpio.IsRetail then
+    -- 职业可驱散debuff类型
+    CLASS_DISPELL_TYPE              = {
+        -- 奶骑
+        [65]                        = {
+            Magic                   = true,
+            Disease                 = true,
+            Poison                  = true
+        },
+        -- 防骑
+        [66]                        = {
+            Disease                 = true,
+            Poison                  = true
+        },
+        -- 惩戒
+        [70]                        = {
+            Disease                 = true,
+            Poison                  = true
+        },
+        -- 奶萨
+        [264]                       = {
+            Magic                   = true,
+            Curse                   = true
+        },
+        --增强
+        [263]                       = {
+            Curse                   = true
+        },
+        -- 元素
+        [262]                       = {
+            Curse                   = true
+        },
+        -- 戒律
+        [256]                       = {
+            Magic                   = true,
+            Disease                 = true
+        },
+        -- 神牧
+        [257]                       = {
+            Magic                   = true,
+            Disease                 = true
+        },
+        -- 暗牧
+        [258]                       = {
+            Magic                   = true,
+            Disease                 = true
+        },
+        -- 奶僧
+        [270]                       = {
+            Magic                   = true,
+            Disease                 = true,
+            Poison                  = true
+        },
+        -- 踏风
+        [269]                       = {
+            Disease                 = true,
+            Poison                  = true
+        },
+        -- 酒仙
+        [268]                       = {
+            Disease                 = true,
+            Poison                  = true
+        },
+        -- 火法
+        [63]                        = {
+            Curse                   = true
+        },
+        -- 冰法
+        [64]                        = {
+            Curse                   = true
+        },
+        -- 奥法
+        [62]                        = {
+            Curse                   = true
+        },
+        -- 鸟德 
+        [102]                       = {
+            Curse                   = true,
+            Poison                  = true
+        },
+        -- 野德
+        [103]                       = {
+            Curse                   = true,
+            Poison                  = true
+        },
+        -- 熊
+        [104]                       = {
+            Curse                   = true,
+            Poison                  = true
+        },
+        -- 奶德
+        [105]                       = {
+            Magic                   = true,
+            Curse                   = true,
+            Poison                  = true
+        }
     }
-}
 
 
--- 可驱散Debuff类型
-local dispellDebuffTypes    = { Magic = true, Curse = true, Disease = true, Poison = true }
-local function isDebuffCanDispell(specID, dType)
-    if dispellDebuffTypes[dType] and CLASS_DISPELL_TYPE[specID] and CLASS_DISPELL_TYPE[specID][dType] then
-        return true
+    -- 可驱散Debuff类型
+    local dispellDebuffTypes    = { Magic = true, Curse = true, Disease = true, Poison = true }
+    local function isDebuffCanDispell(specID, dType)
+        if dispellDebuffTypes[dType] and CLASS_DISPELL_TYPE[specID] and CLASS_DISPELL_TYPE[specID][dType] then
+            return true
+        end
+        return false
     end
-    return false
-end
 
--- 单位是否有玩家能驱散的debuff
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitDebuffCanDispell()
-    return Wow.UnitAura():Map(function(unit)
-            -- 在副本内才工作
-            local inInstance, instanceType = IsInInstance()
-            if not (inInstance and instanceType ~= "none") then return false end
-            local canDispell, canDispellType
-            local specID = GetSpecializationInfo(GetSpecialization())
-            AuraUtil.ForEachAura(unit, "HARMFUL|RAID", 1, function(_, _, _, dType)
-                if isDebuffCanDispell(specID, dType) then
-                    canDispell = true
-                    canDispellType = dType
-                    return true
-                end
-                return false
+    -- 单位是否有玩家能驱散的debuff
+    __Static__() __AutoCache__()
+    function AshBlzSkinApi.UnitDebuffCanDispell()
+        return Wow.UnitAura():Map(function(unit)
+                -- 在副本内才工作
+                local inInstance, instanceType = IsInInstance()
+                if not (inInstance and instanceType ~= "none") then return false end
+                local canDispell, canDispellType
+                local specID = GetSpecializationInfo(GetSpecialization())
+                AuraUtil.ForEachAura(unit, "HARMFUL|RAID", 1, function(_, _, _, dType)
+                    if isDebuffCanDispell(specID, dType) then
+                        canDispell = true
+                        canDispellType = dType
+                        return true
+                    end
+                    return false
+                end)
+                return canDispell or false, canDispellType
             end)
-            return canDispell or false, canDispellType
+    end
+
+
+    -- 单位可驱散的Debuff颜色
+    __Static__() __AutoCache__()
+    function AshBlzSkinApi.UnitDebuffCanDispellColor()
+        return AshBlzSkinApi.UnitDebuffCanDispell():Map(function(_, dType)
+            return DebuffTypeColor[dType or ""]
         end)
-end
+    end
+else
+    CLASS_DISPELL_TYPE              = {
+        PALADIN                     = {
+            Disease                 = true,
+            Poison                  = true
+        },
+        SHAMAN                      = {
+            Curse                   = true
+        },
+        DRUID                       = {
+            Curse                   = true,
+            Poison                  = true
+        },
+        PRIEST                      = {
+            Disease                 = true
+        },
+        MAGE                        = {
+            Curse                   = true
+        }
+    }
+
+    -- 可驱散Debuff类型
+    local dispellDebuffTypes    = { Magic = true, Curse = true, Disease = true, Poison = true }
+    local function isDebuffCanDispell(class, name, _, _, dType)
+        if not dType then return name, false end
+        if dispellDebuffTypes[dType] and CLASS_DISPELL_TYPE[class] and CLASS_DISPELL_TYPE[class][dType] then
+            return name, true
+        end
+        return name, false
+    end
+
+    -- 单位是否有玩家能驱散的debuff
+    __Static__() __AutoCache__()
+    function AshBlzSkinApi.UnitDebuffCanDispell()
+        return Wow.UnitAura():Map(function(unit)
+                -- 在副本内才工作
+                local inInstance, instanceType = IsInInstance()
+                if not (inInstance and instanceType ~= "none") then return false end
+
+                local class = UnitClassBase(unit)
+                local canDispell, canDispellType
+                local index = 1
+                local name
+
+                while not canDispell and name do
+                    name, canDispell = isDebuffCanDispell(class, UnitAura(unit, index, "HARMFUL|RAID"))
+                end
+
+                return canDispell or false, canDispellType
+            end)
+    end
 
 
--- 单位可驱散的Debuff颜色
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitDebuffCanDispellColor()
-    return AshBlzSkinApi.UnitDebuffCanDispell():Map(function(_, dType)
-        return DebuffTypeColor[dType or ""]
-    end)
+    -- 单位可驱散的Debuff颜色
+    __Static__() __AutoCache__()
+    function AshBlzSkinApi.UnitDebuffCanDispellColor()
+        return AshBlzSkinApi.UnitDebuffCanDispell():Map(function(_, dType)
+            return DebuffTypeColor[dType or ""]
+        end)
+    end
 end
 -------------------------------------------------
 -- Dispell end
