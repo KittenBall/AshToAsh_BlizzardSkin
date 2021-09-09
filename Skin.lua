@@ -1,6 +1,6 @@
 Scorpio "AshToAsh.BlizzardSkin.Active" ""
 
-HEALTHBAR = (Scorpio.IsRetail or IsAddOnLoaded("LibHealComm-4.0") or pcall(_G.LibStub, "LibHealComm-4.0")) and "PredictionHealthBar" or "HealthBar"
+HEALTHBAR           = (Scorpio.IsRetail or Scorpio.IsBCC or IsAddOnLoaded("LibHealComm-4.0") or pcall(_G.LibStub, "LibHealComm-4.0")) and "PredictionHealthBar" or "HealthBar"
 
 local shareColor    = ColorType(0, 0, 0, 1)
 local shareSize     = Size(1, 1)
@@ -214,10 +214,7 @@ SKIN_STYLE =                                                                    
             wordWrap                                                                        = false,
             justifyH                                                                        = "LEFT",
             textColor                                                                       = NIL,
-            location                                                                        = {
-                Anchor("TOPLEFT", 0, -1, "RoleIcon", "TOPRIGHT"),
-                Anchor("TOPRIGHT", -3, -3)
-            }
+            location                                                                        = Scorpio.IsRetail and { Anchor("TOPLEFT", 0, -1, "RoleIcon", "TOPRIGHT"), Anchor("TOPRIGHT", -3, -3) } or { Anchor("TOPLEFT", 3, -2), Anchor("TOPRIGHT", -3, -2) }
         },
 
         -- 血量文本
@@ -258,7 +255,7 @@ SKIN_STYLE =                                                                    
         } or nil,
 
         -- 载具图标
-        AshBlzSkinVehicleIcon                                                               = {
+        AshBlzSkinVehicleIcon                                                               = Scorpio.IsRetail and {
             location                                                                        = {
                 Anchor("TOPLEFT", 0, -1, "RoleIcon", "BOTTOMLEFT")
             },
@@ -266,7 +263,7 @@ SKIN_STYLE =                                                                    
             file                                                                            = "Interface\\Vehicles\\UI-Vehicles-Raid-Icon",
             texCoords                                                                       = RectType(0, 1, 0, 1),
             visible                                                                         = AshBlzSkinApi.UnitVehicleVisible()
-        },
+        } or NIL,
 
         -- 队长图标
         LeaderIcon                                                                          = {

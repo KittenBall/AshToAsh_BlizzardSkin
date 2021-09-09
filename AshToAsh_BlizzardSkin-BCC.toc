@@ -1,5 +1,4 @@
-## Interface: 90100
-## Interface-BCC: 20502
+## Interface: 20502
 ## Author: 绿毛龟12138
 ## Version: @project-version@
 ## Title: AshToAsh_BlizzardSkin

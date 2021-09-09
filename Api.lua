@@ -33,13 +33,20 @@ function AshBlzSkinApi.UnitColor()
     end)
 end
 
-local function getDisplayedPowerID(unit)
-	local barInfo = GetUnitPowerBarInfo(unit)
-	if ( barInfo and barInfo.showOnRaid and (UnitInParty(unit) or UnitInRaid(unit)) ) then
-		return ALTERNATE_POWER_INDEX
-	else
-		return UnitPowerType(unit)
-	end
+local getDisplayedPowerID
+if Scorpio.IsRetail then
+    getDisplayedPowerID = function(unit)
+	    local barInfo = GetUnitPowerBarInfo(unit)
+	    if ( barInfo and barInfo.showOnRaid and (UnitInParty(unit) or UnitInRaid(unit)) ) then
+	    	return ALTERNATE_POWER_INDEX
+	    else
+	    	return UnitPowerType(unit)
+	    end
+    end
+else
+    getDisplayedPowerID = function (unit)
+        return UnitPowerType(unit)
+    end
 end
 
 -------------------------------------------------
@@ -60,26 +67,54 @@ function AshBlzSkinApi.UnitPowerMax()
         :Map(function(unit) minMax.max =  UnitPowerMax(unit, getDisplayedPowerID(unit)) return minMax end)
 end
 
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitPowerColor()
-    local scolor                = Color(1, 1, 1)
-    return Wow.FromUnitEvent("UNIT_CONNECTION", "UNIT_DISPLAYPOWER", "UNIT_POWER_BAR_SHOW", "UNIT_POWER_BAR_HIDE")
-        :Map(function(unit)
-            if not UnitIsConnected(unit) then
-                scolor.r        = 0.5
-                scolor.g        = 0.5
-                scolor.b        = 0.5
-            else
-                local barInfo = GetUnitPowerBarInfo(unit)
-		        if ( barInfo and barInfo.showOnRaid ) then
-                    local _, _, r, g, b = UnitPowerType(unit, ALTERNATE_POWER_INDEX)
-                    if r then
-                        scolor.r    = r
-                        scolor.g    = g
-                        scolor.b    = b
+if Scorpio.IsRetail then
+    __Static__() __AutoCache__()
+    function AshBlzSkinApi.UnitPowerColor()
+        local scolor                = Color(1, 1, 1)
+        return Wow.FromUnitEvent("UNIT_CONNECTION", "UNIT_DISPLAYPOWER", "UNIT_POWER_BAR_SHOW", "UNIT_POWER_BAR_HIDE")
+            :Map(function(unit)
+                if not UnitIsConnected(unit) then
+                    scolor.r        = 0.5
+                    scolor.g        = 0.5
+                    scolor.b        = 0.5
+                else
+                    local barInfo = GetUnitPowerBarInfo(unit)
+    		        if ( barInfo and barInfo.showOnRaid ) then
+                        local _, _, r, g, b = UnitPowerType(unit, ALTERNATE_POWER_INDEX)
+                        if r then
+                            scolor.r    = r
+                            scolor.g    = g
+                            scolor.b    = b
+                        else
+                            scolor.r, scolor.g, scolor.b = 0.7, 0.7, 0.6
+                        end
                     else
-                        scolor.r, scolor.g, scolor.b = 0.7, 0.7, 0.6
+                        local _, ptoken, r, g, b = UnitPowerType(unit)
+                        local color     = ptoken and Color[ptoken]
+                        if color then return color end
+
+                        if r then
+                            scolor.r    = r
+                            scolor.g    = g
+                            scolor.b    = b
+                        else
+                            return Color.MANA
+                        end
                     end
+                end
+                return scolor
+            end)
+    end
+else
+    __Static__() __AutoCache__()
+    function AshBlzSkinApi.UnitPowerColor()
+        local scolor                = Color(1, 1, 1)
+        return Wow.FromUnitEvent("UNIT_CONNECTION", "UNIT_DISPLAYPOWER", "UNIT_POWER_BAR_SHOW", "UNIT_POWER_BAR_HIDE")
+            :Map(function(unit)
+                if not UnitIsConnected(unit) then
+                    scolor.r        = 0.5
+                    scolor.g        = 0.5
+                    scolor.b        = 0.5
                 else
                     local _, ptoken, r, g, b = UnitPowerType(unit)
                     local color     = ptoken and Color[ptoken]
@@ -93,28 +128,43 @@ function AshBlzSkinApi.UnitPowerColor()
                         return Color.MANA
                     end
                 end
-            end
             return scolor
         end)
+    end
 end
 -------------------------------------------------
 -- Power end
 -------------------------------------------------
 
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitCastBarColor()
-    local nonInterruptibleColor = ColorType(0.7, 0.7, 0.7)
-    local channelColor = ColorType(0, 1, 0)
-    local castColor = ColorType(1, 0.7, 0)
-    return Wow.UnitCastChannel():CombineLatest(Wow.UnitCastInterruptible()):Map(function(channel, interruptible)
-        if not interruptible then
-            return nonInterruptibleColor
-        elseif channel then
-            return channelColor
-        else
-            return castColor
-        end
-    end)
+if Scorpio.IsRetail then
+    __Static__() __AutoCache__()
+    function AshBlzSkinApi.UnitCastBarColor()
+        local nonInterruptibleColor = ColorType(0.7, 0.7, 0.7)
+        local channelColor = ColorType(0, 1, 0)
+        local castColor = ColorType(1, 0.7, 0)
+        return Wow.UnitCastChannel():CombineLatest(Wow.UnitCastInterruptible()):Map(function(channel, interruptible)
+            if not interruptible then
+                return nonInterruptibleColor
+            elseif channel then
+                return channelColor
+            else
+                return castColor
+            end
+        end)
+    end
+else
+    __Static__() __AutoCache__()
+    function AshBlzSkinApi.UnitCastBarColor()
+        local channelColor = ColorType(0, 1, 0)
+        local castColor = ColorType(1, 0.7, 0)
+        return Wow.UnitCastChannel():Map(function(channel)
+            if channel then
+                return channelColor
+            else
+                return castColor
+            end
+        end)
+    end
 end
 
 __Static__() __AutoCache__()
@@ -151,33 +201,63 @@ end
 -------------------------------------------------
 -- Dead end
 -------------------------------------------------
-
+if Scorpio.IsRetail then
 -- 是否有Boss给的Aura
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitBossAura()
-    return Wow.UnitAura():Map(function(unit)
-        local hasBossAura = false
+    __Static__() __AutoCache__()
+    function AshBlzSkinApi.UnitBossAura()
+        return Wow.UnitAura():Map(function(unit)
+            local hasBossAura = false
 
-        AuraUtil.ForEachAura(unit, "HARMFUL", 1, function(...)
-            if select(12, ...) then
-                hasBossAura = true
-                return true
-            end
-            return false
+            AuraUtil.ForEachAura(unit, "HARMFUL", 1, function(...)
+                if select(12, ...) then
+                    hasBossAura = true
+                    return true
+                end
+                return false
+            end)
+
+            if hasBossAura then return true end
+
+            AuraUtil.ForEachAura(unit, "HELPFUL", 1, function(...)
+                if select(12, ...) then
+                    hasBossAura = true
+                    return true
+                end
+                return false
+            end)
+
+            return hasBossAura
         end)
+    end
+else
+    local function isBossAura(...)
+        return select(1, ...), select(12, ...)
+    end
+    
+    __Static__() __AutoCache__()
+    function AshBlzSkinApi.UnitBossAura() 
+        return Wow.UnitAura():Map(function(unit)
+            local hasBossAura = false
 
-        if hasBossAura then return true end
-
-        AuraUtil.ForEachAura(unit, "HELPFUL", 1, function(...)
-            if select(12, ...) then
-                hasBossAura = true
-                return true
+            local index = 1
+            local name
+            while not hasBossAura and name do
+                name, hasBossAura = isBossAura(UnitAura(unit, index, "HARMFUL"))
+                index = index + 1
             end
-            return false
-        end)
 
-        return hasBossAura
-    end)
+            if hasBossAura then return true end
+
+            index = 1
+            name = nil
+            while not hasBossAura and name do
+                name, hasBossAura = isBossAura(UnitAura(unit, index, "HELPFUL"))
+                index = index + 1
+            end
+
+            return hasBossAura
+        end)
+    end
 end
 
 __Static__() __AutoCache__()
@@ -300,23 +380,20 @@ end
 -- 单位是否有玩家能驱散的debuff
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitDebuffCanDispell()
-    return Wow.UnitAura()
-        :Where(function(unit)
+    return Wow.UnitAura():Map(function(unit)
             -- 在副本内才工作
             local inInstance, instanceType = IsInInstance()
-            return inInstance and (instanceType == "party" or instanceType == "raid" or instanceType == "scenario")
-        end)
-        :Map(function(unit)
+            if not (inInstance and instanceType ~= "none") then return false end
             local canDispell, canDispellType
-                local specID = GetSpecializationInfo(GetSpecialization())
-                AuraUtil.ForEachAura(unit, "HARMFUL|RAID", 1, function(_, _, _, dType)
-                    if isDebuffCanDispell(specID, dType) then
-                        canDispell = true
-                        canDispellType = dType
-                        return true
-                    end
-                    return false
-                end)
+            local specID = GetSpecializationInfo(GetSpecialization())
+            AuraUtil.ForEachAura(unit, "HARMFUL|RAID", 1, function(_, _, _, dType)
+                if isDebuffCanDispell(specID, dType) then
+                    canDispell = true
+                    canDispellType = dType
+                    return true
+                end
+                return false
+            end)
             return canDispell or false, canDispellType
         end)
 end
@@ -366,69 +443,123 @@ AshBlzSkinApi.UnitInDistance():Subscribe(function(unit, inDistance)
     end
 end)
 
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitCenterStatusIconVisible()
-    return Wow.FromUnitEvent(centerStatusSubject):Map(function(unit)
-        if UnitInOtherParty(unit) or UnitHasIncomingResurrection(unit) or UnitPhaseReason(unit) then
-            return true
-        elseif C_IncomingSummon.HasIncomingSummon(unit) then
-            local staus = C_IncomingSummon.IncomingSummonStatus(unit)
-            return status == Enum.SummonStatus.Pending or staus == Enum.SummonStatus.Accepted or staus == Enum.SummonStatus.Declined
-        end
-    end)
-end
+if Scorpio.IsRetail then
+    __Static__() __AutoCache__()
+    function AshBlzSkinApi.UnitCenterStatusIconVisible()
+        return Wow.FromUnitEvent(centerStatusSubject):Map(function(unit)
+            if UnitInOtherParty(unit) or UnitHasIncomingResurrection(unit) or (unitInDistanceMap[unit] and UnitPhaseReason(unit)) then
+                return true
+            elseif C_IncomingSummon.HasIncomingSummon(unit) then
+                local staus = C_IncomingSummon.IncomingSummonStatus(unit)
+                return status == Enum.SummonStatus.Pending or staus == Enum.SummonStatus.Accepted or staus == Enum.SummonStatus.Declined
+            end
+            return false
+        end)
+    end
 
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitCenterStatusIconUpdate()
-    local texture = {}
-    local border = {}
-    local sRect = RectType()
-    local tooltip
-    return Wow.FromUnitEvent(centerStatusSubject):Map(function(unit)
-        wipe(texture)
-        wipe(border)
-        if UnitInOtherParty(unit) then
-            texture.file = "Interface\\LFGFrame\\LFG-Eye"
-            sRect.left, sRect.right, sRect.top, sRect.bottom = 0.125, 0.25, 0.25, 0.5
-            border.file = "Interface\\Common\\RingBorder"
-            border.visible = true
-            tooltip = PARTY_IN_PUBLIC_GROUP_MESSAGE
-        elseif UnitHasIncomingResurrection(unit) then
-            texture.file = "Interface\\RaidFrame\\Raid-Icon-Rez"
-            sRect.left, sRect.right, sRect.top, sRect.bottom = 0, 1, 0, 1
-            border.visible = false
-            tooltip = nil
-        elseif C_IncomingSummon.HasIncomingSummon(unit) then
-            if status == Enum.SummonStatus.Pending then
-                texture.atlas = "Raid-Icon-SummonPending"
+    __Static__() __AutoCache__()
+    function AshBlzSkinApi.UnitCenterStatusIconUpdate()
+        local texture = {}
+        local border = {}
+        local sRect = RectType()
+        local tooltip
+        return Wow.FromUnitEvent(centerStatusSubject):Map(function(unit)
+            wipe(texture)
+            wipe(border)
+            if UnitInOtherParty(unit) then
+                texture.file = "Interface\\LFGFrame\\LFG-Eye"
+                sRect.left, sRect.right, sRect.top, sRect.bottom = 0.125, 0.25, 0.25, 0.5
+                border.file = "Interface\\Common\\RingBorder"
+                border.visible = true
+                tooltip = PARTY_IN_PUBLIC_GROUP_MESSAGE
+            elseif UnitHasIncomingResurrection(unit) then
+                texture.file = "Interface\\RaidFrame\\Raid-Icon-Rez"
                 sRect.left, sRect.right, sRect.top, sRect.bottom = 0, 1, 0, 1
                 border.visible = false
-                tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_PENDING
-			elseif( status == Enum.SummonStatus.Accepted ) then
-                texture.atlas = "Raid-Icon-SummonAccepted"
+                tooltip = nil
+            elseif C_IncomingSummon.HasIncomingSummon(unit) then
+                if status == Enum.SummonStatus.Pending then
+                    texture.atlas = "Raid-Icon-SummonPending"
+                    sRect.left, sRect.right, sRect.top, sRect.bottom = 0, 1, 0, 1
+                    border.visible = false
+                    tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_PENDING
+    			elseif( status == Enum.SummonStatus.Accepted ) then
+                    texture.atlas = "Raid-Icon-SummonAccepted"
+                    sRect.left, sRect.right, sRect.top, sRect.bottom = 0, 1, 0, 1
+                    border.visible = false
+                    tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_ACCEPTED
+    			elseif( status == Enum.SummonStatus.Declined ) then
+                    texture.atlas = "Raid-Icon-SummonDeclined"
+                    sRect.left, sRect.right, sRect.top, sRect.bottom = 0, 1, 0, 1
+                    border.visible = false
+                    tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_DECLINED
+    			end
+            else
+                local phaseReason = UnitPhaseReason(unit);
+                if phaseReason then
+                    texture.file = "Interface\\TargetingFrame\\UI-PhasingIcon"
+                    sRect.left, sRect.right, sRect.top, sRect.bottom = 0.15625, 0.84375, 0.15625, 0.84375
+                    border.visible = false
+                    tooltip = PartyUtil.GetPhasedReasonString(phaseReason, unit)
+                end
+            end
+
+            texture.texCoords = sRect
+            return texture, border, tooltip
+        end)
+    end
+else
+    __Static__() __AutoCache__()
+    function AshBlzSkinApi.UnitCenterStatusIconVisible()
+        return Wow.FromUnitEvent(centerStatusSubject):Map(function(unit)
+            if UnitInOtherParty(unit) or UnitHasIncomingResurrection(unit) or (unitInDistanceMap[unit] and not UnitInPhase(unit))then
+                return true
+            end
+            return false
+        end)
+    end
+
+    __Static__() __AutoCache__()
+    function AshBlzSkinApi.UnitCenterStatusIconUpdate()
+        local texture = {}
+        local border = {}
+        local sRect = RectType()
+        local tooltip
+        return Wow.FromUnitEvent(centerStatusSubject):Map(function(unit)
+            wipe(texture)
+            wipe(border)
+            if UnitInOtherParty(unit) then
+                texture.file = "Interface\\LFGFrame\\LFG-Eye"
+                sRect.left, sRect.right, sRect.top, sRect.bottom = 0.125, 0.25, 0.25, 0.5
+                border.file = "Interface\\Common\\RingBorder"
+                border.visible = true
+                tooltip = PARTY_IN_PUBLIC_GROUP_MESSAGE
+            elseif UnitHasIncomingResurrection(unit) then
+                texture.file = "Interface\\RaidFrame\\Raid-Icon-Rez"
                 sRect.left, sRect.right, sRect.top, sRect.bottom = 0, 1, 0, 1
                 border.visible = false
-                tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_ACCEPTED
-			elseif( status == Enum.SummonStatus.Declined ) then
-                texture.atlas = "Raid-Icon-SummonDeclined"
-                sRect.left, sRect.right, sRect.top, sRect.bottom = 0, 1, 0, 1
-                border.visible = false
-                tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_DECLINED
-			end
-        else
-            local phaseReason = UnitPhaseReason(unit);
-            if phaseReason then
+                tooltip = nil
+            elseif UnitInPhase(unit) then
                 texture.file = "Interface\\TargetingFrame\\UI-PhasingIcon"
                 sRect.left, sRect.right, sRect.top, sRect.bottom = 0.15625, 0.84375, 0.15625, 0.84375
                 border.visible = false
-                tooltip = PartyUtil.GetPhasedReasonString(phaseReason, unit)
+                tooltip = PARTY_PHASED_MESSAGE
             end
-        end
 
-        texture.texCoords = sRect
-        return texture, border, tooltip
-    end)
+            texture.texCoords = sRect
+            return texture, border, tooltip
+        end)
+    end
 end
 -------------------------------------------------
 -- Center Status end
 -------------------------------------------------
+
+
+
+-------------------------------------------------
+-- Classic
+-------------------------------------------------
+if Scorpio.IsRetail then return end
+GetThreatStatusColor = _G.GetThreatStatusColor or function (index) if index == 3 then return 1, 0, 0 elseif index == 2 then return 1, 0.6, 0 elseif index == 1 then return 1, 1, 0.47 else return 0.69, 0.69, 0.69 end end
+UnitTreatAsPlayerForDisplay = Toolset.fakefunc
