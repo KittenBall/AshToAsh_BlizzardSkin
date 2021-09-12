@@ -90,6 +90,10 @@ class "DebuffPanel"(function()
 		isPriorityDebuff = function(spellID)
             return spellID == 6788
 		end
+    else
+        isPriorityDebuff = function()
+            return false
+        end
 	end
 
     local function shouldDisplayDebuff(unitCaster, spellID)

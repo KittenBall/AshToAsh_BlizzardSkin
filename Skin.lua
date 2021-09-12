@@ -68,7 +68,7 @@ SHARE_BOSSDEBUFFPANEL_SKIN                                                      
     topToBottom                                                                             = false,
     rowCount                                                                                = 1,
     columnCount                                                                             = 1,
-    marginLeft                                                                              = 3,
+    marginLeft                                                                              = 0,
     hSpacing                                                                                = 1.5,
     vSpacing                                                                                = 1,
     elementWidth                                                                            = resizeOnUnitFrameChanged(15),
@@ -449,7 +449,7 @@ SKIN_STYLE =                                                                    
             SHARE_BOSSDEBUFFPANEL_SKIN,
 
             location                                                                        = {
-                Anchor("BOTTOMLEFT", 0, 1.5, HEALTHBAR, "BOTTOMLEFT")
+                Anchor("BOTTOMLEFT", 3, 1.5, HEALTHBAR, "BOTTOMLEFT")
             }
         },
 
@@ -553,7 +553,7 @@ SKIN_STYLE =                                                                    
             SHARE_BUFFPANEL_SKIN,
 
             location                                                                        = {
-                Anchor("BOTTOMRIGHT", 0, 1.5, "HealthBar", "BOTTOMRIGHT") 
+                Anchor("BOTTOMRIGHT", 3, 1.5, "HealthBar", "BOTTOMRIGHT") 
             },
         },
         
