@@ -45,23 +45,170 @@ local relocationUnitFrameIconOnSizeChange = Wow.FromFrameSize(UnitFrame):Map(fun
     return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, h/3-4))
 end)
 
+-- Dispell debuf
+SHARE_DISPELLDEBUFFPANEL_SKIN                                                               = {
+    elementType                                                                             = AshBlzSkinDispellIcon,
+    leftToRight                                                                             = false,
+    topToBottom                                                                             = false,
+    rowCount                                                                                = 1,
+    columnCount                                                                             = 4,
+    hSpacing                                                                                = 1.5,
+    vSpacing                                                                                = 1,
+    marginRight                                                                             = 3,
+    marginTop                                                                               = 4.5,
+    elementWidth                                                                            = resizeOnUnitFrameChanged(8),
+    elementHeight                                                                           = resizeOnUnitFrameChanged(8)
+}
 
-local function isBossAura(...)
-	return select(12, ...)
-end
+-- Boss debuff
+SHARE_BOSSDEBUFFPANEL_SKIN                                                                  = {
+    elementType                                                                             = AshBlzSkinBossDebuffIcon,
+    orientation                                                                             = Orientation.HORIZONTAL,
+    leftToRight                                                                             = true,
+    topToBottom                                                                             = false,
+    rowCount                                                                                = 1,
+    columnCount                                                                             = 1,
+    marginLeft                                                                              = 3,
+    hSpacing                                                                                = 1.5,
+    vSpacing                                                                                = 1,
+    elementWidth                                                                            = resizeOnUnitFrameChanged(15),
+    elementHeight                                                                           = resizeOnUnitFrameChanged(15)
+}                                                             
 
--- 直接抄的，不想研究taint了 CompactUnitFrame_UtilShouldDisplayBuff
-local function shouldDisplayBuff(...)
-	local name, icon, count, debuffType, duration, expirationTime, unitCaster, canStealOrPurge, _, spellId, canApplyAura = ...
+-- Debuff
+SHARE_DEBUFFPANEL_SKIN                                                                      = {
+    elementType                                                                             = AshBlzSkinDebuffIcon,
+    orientation                                                                             = Orientation.HORIZONTAL,
+    leftToRight                                                                             = true,
+    topToBottom                                                                             = false,
+    rowCount                                                                                = 1,
+    columnCount                                                                             = AshBlzSkinApi.UnitBossAura():Map(function(val) return val and 1 or 3 end),
+    marginLeft                                                                              = 1.5,
+    hSpacing                                                                                = 1.5,
+    vSpacing                                                                                = 1,
+    elementWidth                                                                            = resizeOnUnitFrameChanged(),
+    elementHeight                                                                           = resizeOnUnitFrameChanged(),
+    location                                                                                = {
+        Anchor("BOTTOMLEFT", 0, 0, "AshBlzSkinBossDebuffPanel", "BOTTOMRIGHT")      
+    },      
+    auraFilter                                                                              = Wow.Unit():Map(function(unit)
+        return UnitCanAttack("player", unit) and "PLAYER|HARMFUL" or "HARMFUL"   
+    end),       
 
-	local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
+    customFilter                                                                            = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID)
+        return not (_AuraBlackList[spellID] or _EnlargeDebuffList[spellID]) 
+    end,
+}                                                                    
 
-	if ( hasCustom ) then
-		return showForMySpec or (alwaysShowMine and (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle"))
-	else
-		return (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle") and canApplyAura and not SpellIsSelfBuff(spellId)
-	end
-end
+-- Buff
+SHARE_BUFFPANEL_SKIN                                                                        = {
+    elementType                                                                             = AshBlzSkinBuffIcon,
+    orientation                                                                             = Orientation.HORIZONTAL,
+    elementWidth                                                                            = resizeOnUnitFrameChanged(),
+    elementHeight                                                                           = resizeOnUnitFrameChanged(),
+    marginRight                                                                             = 3,
+    rowCount                                                                                = 1,
+    columnCount                                                                             = 3,
+    leftToRight                                                                             = false,
+    topToBottom                                                                             = false,
+        
+    customFilter                                                                            = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID) return not _AuraBlackList[spellID] end,
+}
+
+-- 标记
+SHARE_RAIDTARGET_SKIN                                                                       = {
+    drawLayer                                                                               = "OVERLAY",
+    location                                                                                = {
+        Anchor("TOPRIGHT", -3, -2)      
+    },
+    size                                                                                    = resizeUnitFrameIconOnSizeChange(14)
+}
+
+-- 名字
+SHARE_NAMELABEL_SKIN                                                                        = {
+    fontObject                                                                              = GameFontHighlightSmall,
+    drawLayer                                                                               = "ARTWORK",
+    wordWrap                                                                                = false,
+    justifyH                                                                                = "LEFT",
+    textColor                                                                               = NIL
+}
+
+-- 施法条
+SHARE_CASTBAR_SKIN                                                                          = {
+    height                                                                                  = 8,
+    location                                                                                = {
+        Anchor("TOPLEFT", 0, 0, "PowerBar", "TOPLEFT"),     
+        Anchor("BOTTOMRIGHT", 0, 0, "PowerBar", "BOTTOMRIGHT")      
+    },      
+
+    Spark                                                                                   = {
+        size                                                                                = Size(24, 24),
+    }
+}
+
+--能量条
+SHARE_POWERBAR_SKIN                                                                         = {
+    useParentLevel                                                                          = true,
+    statusBarTexture                                                                        = {
+        file                                                                                = "Interface\\RaidFrame\\Raid-Bar-Resource-Fill",
+        drawLayer                                                                           = "BORDER"
+    }, 
+
+    BackgroundTexture                                                                       = {
+        file                                                                                = "Interface\\RaidFrame\\Raid-Bar-Resource-Background",
+        setAllPoints                                                                        = true,
+        subLevel                                                                            = 2,
+        drawLayer                                                                           = "BACKGROUND"
+    }
+}
+
+-- 血条
+SHARE_HEALTHBAR_SKIN                                                                        = {
+    useParentLevel                                                                          = true,
+    statusBarTexture                                                                        = {
+        file                                                                                = "Interface\\RaidFrame\\Raid-Bar-Hp-Fill",
+        drawLayer                                                                           = "BORDER"
+    },      
+    location                                                                                = {
+        Anchor("TOPLEFT", 1, -1),       
+        Anchor("BOTTOMRIGHT", -1, 9)        
+    },      
+    statusBarColor                                                                          = AshBlzSkinApi.UnitColor(),
+
+    BackgroundFrame                                                                         = NIL,
+
+    -- 拥有驱散debuff的能力     
+    IconTexture                                                                             = {
+        drawLayer                                                                           = "BORDER",
+        subLevel                                                                            = 2,
+        location                                                                            = {
+            Anchor("TOPLEFT"),      
+            Anchor("BOTTOMRIGHT")       
+        },      
+        ignoreParentAlpha                                                                   = true,
+        file                                                                                = "Interface\\RaidFrame\\Raid-Bar-Hp-Fill",
+        vertexColor                                                                         = AshBlzSkinApi.UnitDebuffCanDispellColor(),
+        visible                                                                             = AshBlzSkinApi.UnitDebuffCanDispell(),
+
+        AnimationGroup                                                                      = {
+            playing                                                                         = AshBlzSkinApi.UnitDebuffCanDispell(),
+            looping                                                                         = "REPEAT",
+
+            Alpha1                                                                          = {
+                order                                                                       = 1,
+                duration                                                                    = 0.5,
+                fromAlpha                                                                   = 0,
+                toAlpha                                                                     = 1
+            },      
+            Alpha2                                                                          = {
+                order                                                                       = 2,
+                duration                                                                    = 0.5,
+                fromAlpha                                                                   = 1,
+                toAlpha                                                                     = 0
+            }
+        }
+    }
+}
 SKIN_STYLE =                                                                                {
     [AshBlzSkinBuffIcon]                                                                    = {
         IconTexture                                                                         = {
@@ -101,7 +248,7 @@ SKIN_STYLE =                                                                    
 
     [AshBlzSkinDebuffIcon]                                                                  = {
         BackgroundTexture                                                                   = {
-            drawLayer                                                                       = "BORDER",
+            drawLayer                                                                       = "OVERLAY",
             file                                                                            = "Interface\\Buttons\\UI-Debuff-Overlays",
             location                                                                        = {
                 Anchor("TOPLEFT", -1, 1),
@@ -153,68 +300,21 @@ SKIN_STYLE =                                                                    
             drawLayer                                                                       = "BACKGROUND"
         },
 
-        -- 目标选中边框
-        AshBlzSkinSelectionHighlightTexture                                                 = {
-            drawLayer                                                                       = "OVERLAY",
-            subLevel                                                                        = 1,
-            file                                                                            = "Interface\\RaidFrame\\Raid-FrameHighlights",
-            texCoords                                                                       = RectType(0.00781250, 0.55468750, 0.28906250, 0.55468750),
-            setAllPoints                                                                    = true,
-            ignoreParentAlpha                                                               = true,
-            visible                                                                         = Wow.UnitIsTarget()
-        },
+        -- 选中
+        AshBlzSkinSelectionHighlightTexture                                                 = {},
 
         -- 仇恨指示器
-        AshBlzSkinAggroHighlight                                                            = {
-            drawLayer                                                                       = "ARTWORK",
-            file                                                                            = "Interface\\RaidFrame\\Raid-FrameHighlights",
-            texCoords                                                                       = RectType(0.00781250, 0.55468750, 0.00781250, 0.27343750),
-            setAllPoints                                                                    = true,
-            visible                                                                         = Wow.UnitThreatLevel():Map("l=> l>0"),
-            vertexColor                                                                     = Wow.UnitThreatLevel():Map(function(level)
-                shareColor.r, shareColor.g, shareColor.b, shareColor.a = GetThreatStatusColor(level)
-                return shareColor
-            end)
-        },
-
-        -- 拥有驱散debuff的能力
-        AshBlzSkinDispellAbilityHighlight                                                   = {
-            drawLayer                                                                       = "OVERLAY",
-            subLevel                                                                        = 2,
-            file                                                                            = "Interface\\RaidFrame\\Raid-FrameHighlights",
-            texCoords                                                                       = RectType(0.00781250, 0.55468750, 0.28906250, 0.55468750),
-            setAllPoints                                                                    = true,
-            ignoreParentAlpha                                                               = true,
-            vertexColor                                                                     = AshBlzSkinApi.UnitDebuffCanDispellColor(),
-            visible                                                                         = AshBlzSkinApi.UnitDebuffCanDispell(),
-
-            AnimationGroup                                                                  = {
-                playing                                                                     = AshBlzSkinApi.UnitDebuffCanDispell(),
-                looping                                                                     = "REPEAT",
-
-                Alpha1                                                                      = {
-                    order                                                                   = 1,
-                    duration                                                                = 0.2,
-                    fromAlpha                                                               = 0,
-                    toAlpha                                                                 = 1
-                },
-                Alpha2                                                                      = {
-                    order                                                                   = 2,
-                    duration                                                                = 0.2,
-                    fromAlpha                                                               = 1,
-                    toAlpha                                                                 = 0
-                }
-            }
-        },
+        AshBlzSkinAggroHighlight                                                            = {},
 
         -- 名字
         NameLabel                                                                           = {
-            fontObject                                                                      = GameFontHighlightSmall,
-            drawLayer                                                                       = "ARTWORK",
-            wordWrap                                                                        = false,
-            justifyH                                                                        = "LEFT",
-            textColor                                                                       = NIL,
-            location                                                                        = Scorpio.IsRetail and { Anchor("TOPLEFT", 0, -1, "RoleIcon", "TOPRIGHT"), Anchor("TOPRIGHT", -3, -3) } or { Anchor("TOPLEFT", 3, -2), Anchor("TOPRIGHT", -3, -2) }
+            SHARE_NAMELABEL_SKIN,
+
+            text                                                                            = Wow.UnitName(),
+            location                                                                        = {
+                Anchor("TOPLEFT", 0, -1, "RoleIcon", "TOPRIGHT"), 
+                Anchor("TOPRIGHT", -3, -3) 
+            }
         },
 
         -- 血量文本
@@ -233,13 +333,10 @@ SKIN_STYLE =                                                                    
         AshBlzSkinDeadIcon                                                                  = {
             size                                                                            = resizeUnitFrameIconOnSizeChange(),
             location                                                                        = relocationUnitFrameIconOnSizeChange,
-            file                                                                            = "Interface\\EncounterJournal\\UI-EJ-Icons",
-            texCoords                                                                       = RectType(0.375, 0.5, 0, 0.5),
-            visible                                                                         = AshBlzSkinApi.UnitIsDead()
         },
 
         -- 角色职责图标
-        RoleIcon                                                                            = Scorpio.IsRetail and {
+        RoleIcon                                                                            = {
             location                                                                        = {
                 Anchor("TOPLEFT", 3, -2)
             },
@@ -252,10 +349,10 @@ SKIN_STYLE =                                                                    
                 return shareSize
             end),
             visible                                                                         = true
-        } or nil,
+        },
 
         -- 载具图标
-        AshBlzSkinVehicleIcon                                                               = Scorpio.IsRetail and {
+        AshBlzSkinVehicleIcon                                                               = {
             location                                                                        = {
                 Anchor("TOPLEFT", 0, -1, "RoleIcon", "BOTTOMLEFT")
             },
@@ -263,7 +360,7 @@ SKIN_STYLE =                                                                    
             file                                                                            = "Interface\\Vehicles\\UI-Vehicles-Raid-Icon",
             texCoords                                                                       = RectType(0, 1, 0, 1),
             visible                                                                         = AshBlzSkinApi.UnitVehicleVisible()
-        } or NIL,
+        },
 
         -- 队长图标
         LeaderIcon                                                                          = {
@@ -285,13 +382,7 @@ SKIN_STYLE =                                                                    
         ResurrectIcon                                                                       = NIL,
 
         -- 标记图标
-        RaidTargetIcon                                                                      = {
-            drawLayer                                                                       = "OVERLAY",
-            location                                                                        = {
-                Anchor("TOPRIGHT")
-            },
-            size                                                                            = Size(24, 24)
-        },
+        RaidTargetIcon                                                                      = SHARE_RAIDTARGET_SKIN,
 
         -- 离线图标
         DisconnectIcon                                                                      = {
@@ -313,157 +404,50 @@ SKIN_STYLE =                                                                    
             end),
             size                                                                            = resizeUnitFrameIconOnSizeChange(22),
             visible                                                                         = AshBlzSkinApi.UnitCenterStatusIconVisible(),
-            tooltip                                                                         = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(_, _, tooltip) return tooltip end),
-
-            IconTexture                                                                     = {
-                setAllPoints                                                                = true,
-                drawLayer                                                                   = "ARTWORK",
-                file                                                                        = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(texture) return texture.file end),
-                texCoords                                                                   = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(texture) return texture.texCoords end),
-                visible                                                                     = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(texture) return texture.file and true or false end),
-            },
-
-            Texture                                                                         = {
-                atlas                                                                       = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(texture) return texture.atlas end),
-                texCoords                                                                   = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(texture) return texture.texCoords end),
-                visible                                                                     = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(texture) return texture.atlas and true or false end),
-            },
-
-            Border                                                                          = {
-                file                                                                        = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(_, border) return border.file end),
-                visible                                                                     = AshBlzSkinApi.UnitCenterStatusIconUpdate():Map(function(_, border) return border.visible end)
-            }
+            unit                                                                            = Wow.Unit()
         },
 
         -- 血条
-        [HEALTHBAR]                                                                         = {
-            useParentLevel                                                                  = true,
-            statusBarTexture                                                                = {
-                file                                                                        = "Interface\\RaidFrame\\Raid-Bar-Hp-Fill",
-                drawLayer                                                                   = "BORDER"
-            },
-            location                                                                        = {
-                Anchor("TOPLEFT", 1, -1),
-                Anchor("BOTTOMRIGHT", -1, 9)
-            },
-            statusBarColor                                                                  = AshBlzSkinApi.UnitColor(),
-
-            BackgroundFrame                                                                 = NIL
-        },
+        [HEALTHBAR]                                                                         = SHARE_HEALTHBAR_SKIN,
 
         -- 能量条
         PowerBar                                                                            = {
-            useParentLevel                                                                  = true,
-            statusBarTexture                                                                = {
-                file                                                                        = "Interface\\RaidFrame\\Raid-Bar-Resource-Fill",
-                drawLayer                                                                   = "BORDER"
-            },
-            location                                                                        = {
-                Anchor("TOPLEFT", 0, 0, HEALTHBAR, "BOTTOMLEFT"),
-                Anchor("BOTTOMRIGHT", -1, 1)
-            },
+            SHARE_POWERBAR_SKIN,
+
             value                                                                           = AshBlzSkinApi.UnitPower(),
             minMaxValues                                                                    = AshBlzSkinApi.UnitPowerMax(),
             statusBarColor                                                                  = AshBlzSkinApi.UnitPowerColor(),
-
-            BackgroundTexture                                                               = {
-                file                                                                        = "Interface\\RaidFrame\\Raid-Bar-Resource-Background",
-                setAllPoints                                                                = true,
-                subLevel                                                                    = 2,
-                drawLayer                                                                   = "BACKGROUND"
-            }
+            location                                                                        = {
+                Anchor("TOPLEFT", 0, 0, HEALTHBAR, "BOTTOMLEFT"),       
+                Anchor("BOTTOMRIGHT", -1, 1)
+            },
         },
 
         -- 施法条
-        AshBlzSkinCastBar                                                                   = {
-            useParentLevel                                                                  = true,
-            height                                                                          = 8,
-            location                                                                        = {
-                Anchor("TOPLEFT", 0, 0, "PowerBar", "TOPLEFT"),
-                Anchor("BOTTOMRIGHT", 0, 0, "PowerBar", "BOTTOMRIGHT")
-            },
-            statusBarTexture                                                                = {
-                file                                                                        = "Interface\\TargetingFrame\\UI-StatusBar"
-            },
-            statusBarColor                                                                  = AshBlzSkinApi.UnitCastBarColor(),
-            cooldown                                                                        = Wow.UnitCastCooldown(),
-            reverse                                                                         = Wow.UnitCastChannel(),
+        AshBlzSkinCastBar                                                                   = SHARE_CASTBAR_SKIN,
 
-            Spark                                                                           = {
-                size                                                                        = Size(24, 24),
-                drawLayer                                                                   = "OVERLAY",
-                file                                                                        = "Interface\\CastingBar\\UI-CastingBar-Spark",
-                alphaMode                                                                   = "ADD"
-            },
-
-            Label                                                                           = {
-                justifyH                                                                    = "CENTER",
-                drawLayer                                                                   = "OVERLAY",
-                fontObject                                                                  = GameFontWhiteTiny2,
-                text                                                                        = Wow.UnitCastName(),
-                setAllPoints                                                                = true
-            }
-        },
+        BuffPanel                                                                           = NIL,
 
         -- Buff
-        BuffPanel                                                                           = {
-            elementType                                                                     = AshBlzSkinBuffIcon,
-            orientation                                                                     = Orientation.HORIZONTAL,
-            elementWidth                                                                    = resizeOnUnitFrameChanged(),
-            elementHeight                                                                   = resizeOnUnitFrameChanged(),
-            marginRight                                                                     = 3,
-            rowCount                                                                        = 1,
-            columnCount                                                                     = 3,
-            leftToRight                                                                     = false,
-            topToBottom                                                                     = false,
+        AshBlzSkinBuffPanel                                                                 = {
+            SHARE_BUFFPANEL_SKIN,
+
             location                                                                        = {
-                Anchor("BOTTOMRIGHT", 0, 1.5, HEALTHBAR, "BOTTOMRIGHT")
+                Anchor("BOTTOMRIGHT", 0, 1.5, HEALTHBAR, "BOTTOMRIGHT") 
             },
-            customFilter                                                                    = function(...) return not isBossAura(...) and shouldDisplayBuff(...) and not _AuraBlackList[select(10, ...)] end,
         },
 
         DebuffPanel                                                                         = NIL,
 
         -- Debuff
-        AshBlzSkinDebuffPanel                                                               = {
-            elementType                                                                     = AshBlzSkinDebuffIcon,
-            orientation                                                                     = Orientation.HORIZONTAL,
-            leftToRight                                                                     = true,
-            topToBottom                                                                     = false,
-            rowCount                                                                        = 1,
-            columnCount                                                                     = AshBlzSkinApi.UnitBossAura():Map(function(val) return val and 1 or 3 end),
-            marginLeft                                                                      = 1.5,
-            hSpacing                                                                        = 1.5,
-            vSpacing                                                                        = 1,
-            elementWidth                                                                    = resizeOnUnitFrameChanged(),
-            elementHeight                                                                   = resizeOnUnitFrameChanged(),
-            location                                                                        = {
-                Anchor("BOTTOMLEFT", 0, 0, "AshBlzSkinBossDebuffPanel", "BOTTOMRIGHT")
-            },
-            auraFilter                                                                      = Wow.Unit():Map(function(unit)
-                return UnitCanAttack("player", unit) and "PLAYER|HARMFUL" or "HARMFUL"
-            end),
-            
-            customFilter                                                                    = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID)
-                return not (_AuraBlackList[spellID] or _EnlargeDebuffList[spellID]) 
-            end,
-        },
+        AshBlzSkinDebuffPanel                                                               = SHARE_DEBUFFPANEL_SKIN,
 
         EnlargeDebuffPanel                                                                  = NIL,
 
         --  Boss debuff
         AshBlzSkinBossDebuffPanel                                                           = {
-            elementType                                                                     = AshBlzSkinBossDebuffIcon,
-            orientation                                                                     = Orientation.HORIZONTAL,
-            leftToRight                                                                     = true,
-            topToBottom                                                                     = false,
-            rowCount                                                                        = 1,
-            columnCount                                                                     = 1,
-            marginLeft                                                                      = 3,
-            hSpacing                                                                        = 1.5,
-            vSpacing                                                                        = 1,
-            elementWidth                                                                    = resizeOnUnitFrameChanged(15),
-            elementHeight                                                                   = resizeOnUnitFrameChanged(15),
+            SHARE_BOSSDEBUFFPANEL_SKIN,
+
             location                                                                        = {
                 Anchor("BOTTOMLEFT", 0, 1.5, HEALTHBAR, "BOTTOMLEFT")
             }
@@ -482,23 +466,118 @@ SKIN_STYLE =                                                                    
 
         -- 可驱散debuff (是可驱散类型即可驱散debuff)
         AshBlzSkinDispellDebuffPanel                                                        = {
-            elementType                                                                     = AshBlzSkinDispellIcon,
-            leftToRight                                                                     = false,
-            topToBottom                                                                     = false,
-            rowCount                                                                        = 1,
-            columnCount                                                                     = 4,
-            hSpacing                                                                        = 1.5,
-            vSpacing                                                                        = 1,
-            marginRight                                                                     = 3,
-            marginTop                                                                       = 4.5,
+            SHARE_DISPELLDEBUFFPANEL_SKIN,
+
             visible                                                                         = AshBlzSkinApi.UnitIsPlayer(),
-            elementWidth                                                                    = resizeOnUnitFrameChanged(8),
-            elementHeight                                                                   = resizeOnUnitFrameChanged(8),
             location                                                                        = {
                 Anchor("TOPRIGHT", 0, 0, HEALTHBAR, "TOPRIGHT")
             }
         }
-    }
+    },
+
+    [AshPetUnitFrame]                                                                       = {
+        frameStrata                                                                         = "LOW",
+        alpha                                                                               = AshBlzSkinApi.UnitPetInRange():Map('v=> v and 1 or 0.55'), 
+
+        BackgroundTexture                                                                   = {
+            file                                                                            = "Interface\\RaidFrame\\Raid-Bar-Hp-Bg",
+            texCoords                                                                       = RectType(0, 1, 0, 0.53125),
+            setAllPoints                                                                    = true,
+            ignoreParentAlpha                                                               = true,
+            drawLayer                                                                       = "BACKGROUND"
+        },
+
+        -- 名字
+        NameLabel                                                                           = {
+            SHARE_NAMELABEL_SKIN,
+
+            text                                                                            = Wow.UnitName(),
+            location                                                                        = {
+                Anchor("TOPLEFT", 3, -3), 
+                Anchor("TOPRIGHT", -3, -3)
+            }
+        },
+
+        -- 主人名字
+        Label                                                                               = {
+            fontObject                                                                      = GameFontWhiteTiny,
+            drawLayer                                                                       = "ARTWORK",
+            wordWrap                                                                        = false,
+            justifyH                                                                        = "LEFT",
+            text                                                                            = AshBlzSkinApi.UnitPetOwnerName(),
+            location                                                                        = {
+                Anchor("TOPLEFT", 0, -select(2, GameFontHighlightSmall:GetFont()), "NameLabel", "TOPLEFT"),
+                Anchor("TOPRIGHT", 0, -select(2, GameFontHighlightSmall:GetFont()), "NameLabel", "TOPRIGHT"),
+            }
+        },
+
+        --死亡图标
+        AshBlzSkinDeadIcon                                                                  = {
+            size                                                                            = resizeUnitFrameIconOnSizeChange(),
+            location                                                                        = relocationUnitFrameIconOnSizeChange,
+        },
+
+        -- 仇恨指示器
+        AshBlzSkinAggroHighlight                                                            = {
+            visible                                                                         = AshBlzSkinApi.UnitPetThreatLevel():Map("l=> l>0"),
+            vertexColor                                                                     = AshBlzSkinApi.UnitPetThreatLevel():Map(function(level)
+                shareColor.r, shareColor.g, shareColor.b, shareColor.a = GetThreatStatusColor(level)
+                return shareColor
+            end)
+        },
+
+        -- 选中
+        AshBlzSkinSelectionHighlightTexture                                                 = {},
+        
+        -- 标记图标
+        RaidTargetIcon                                                                      = SHARE_RAIDTARGET_SKIN,
+
+        -- 血条
+        HealthBar                                                                           = SHARE_HEALTHBAR_SKIN,
+
+        -- 能量条
+        PowerBar                                                                            = {
+            SHARE_POWERBAR_SKIN,
+
+            location                                                                        = {
+                Anchor("TOPLEFT", 0, 0, "HealthBar", "BOTTOMLEFT"),
+                Anchor("BOTTOMRIGHT", -1, 1)
+            }
+        },
+
+        -- 施法条
+        AshBlzSkinCastBar                                                                   = SHARE_CASTBAR_SKIN,
+
+        -- Buff
+        AshBlzSkinBuffPanel                                                                 = {
+            SHARE_BUFFPANEL_SKIN,
+
+            location                                                                        = {
+                Anchor("BOTTOMRIGHT", 0, 1.5, "HealthBar", "BOTTOMRIGHT") 
+            },
+        },
+        
+        -- Debuff
+        AshBlzSkinDebuffPanel                                                               = SHARE_DEBUFFPANEL_SKIN,
+
+        --  Boss debuff
+        AshBlzSkinBossDebuffPanel                                                           = {
+            SHARE_BOSSDEBUFFPANEL_SKIN,
+
+            location                                                                        = {
+                Anchor("BOTTOMLEFT", 0, 1.5, "HealthBar", "BOTTOMLEFT")
+            }
+        },
+
+        -- 可驱散debuff (是可驱散类型即可驱散debuff)
+        AshBlzSkinDispellDebuffPanel                                                        = {
+           SHARE_DISPELLDEBUFFPANEL_SKIN,
+        
+           location                                                                         = {
+               Anchor("TOPRIGHT", 0, 0, "HealthBar", "TOPRIGHT")
+           }
+        }
+    },
 }
 
 Style.UpdateSkin(SKIN_NAME, SKIN_STYLE)
