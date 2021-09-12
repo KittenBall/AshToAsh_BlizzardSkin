@@ -211,10 +211,14 @@ SHARE_HEALTHBAR_SKIN                                                            
 }
 SKIN_STYLE =                                                                                {
     [AshBlzSkinBuffIcon]                                                                    = {
+        backdrop                                                                            = NIL,
+        backdropBorderColor                                                                 = NIL,
+
         IconTexture                                                                         = {
             drawLayer                                                                       = "ARTWORK",
             setAllPoints                                                                    = true,
-            file                                                                            = Wow.FromPanelProperty("AuraIcon")
+            file                                                                            = Wow.FromPanelProperty("AuraIcon"),
+            texCoords                                                                       = NIL
         },
 
         Label                                                                               = {

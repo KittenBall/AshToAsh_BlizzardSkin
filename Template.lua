@@ -33,7 +33,10 @@ __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinDeadIcon")
 class "DeadIcon" { Texture }
 
 -- Buff icon
-__Sealed__() class "AshBlzSkinBuffIcon" { AshAuraPanelIcon }
+__Template__(AshAuraPanelIcon)
+__Sealed__() class "AshBlzSkinBuffIcon"{
+    Icon                = Texture
+}
 
 -- Debuff icon
 __Sealed__() class "AshBlzSkinDebuffIcon" { AshBlzSkinBuffIcon }
