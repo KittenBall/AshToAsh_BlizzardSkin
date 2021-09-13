@@ -43,7 +43,7 @@ end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPetOwnerName()
-    return Wow.Unit():Map(function(unit)
+    return Wow.FromUnitEvent(Wow.FromEvent("UNIT_NAME_UPDATE", "GROUP_ROSTER_UPDATE"):Map("unit => unit or 'any'")):Next():Map(function(unit)
         if not unit then return end
         local getTipLines = GetGameTooltipLines("Unit", unit)
         local _, left = getTipLines(_, 1)

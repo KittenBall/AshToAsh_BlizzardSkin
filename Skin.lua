@@ -56,8 +56,8 @@ SHARE_DISPELLDEBUFFPANEL_SKIN                                                   
     vSpacing                                                                                = 1,
     marginRight                                                                             = 3,
     marginTop                                                                               = 4.5,
-    elementWidth                                                                            = resizeOnUnitFrameChanged(8),
-    elementHeight                                                                           = resizeOnUnitFrameChanged(8)
+    elementWidth                                                                            = resizeOnUnitFrameChanged(10),
+    elementHeight                                                                           = resizeOnUnitFrameChanged(10)
 }
 
 -- Boss debuff
