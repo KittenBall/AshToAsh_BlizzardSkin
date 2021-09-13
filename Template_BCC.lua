@@ -40,19 +40,26 @@ class "CenterStatusIcon"(function()
         if UnitInOtherParty(unit) then
             texture:SetTexture("Interface\\LFGFrame\\LFG-Eye")
             texture:SetTexCoord(0.125, 0.25, 0.25, 0.5)
+            texture:Show()
             border:SetTexure("Interface\\Common\\RingBorder")
             border:Show()
             self.tooltip = PARTY_IN_PUBLIC_GROUP_MESSAGE
         elseif UnitHasIncomingResurrection(unit) then
             texture:SetTexture("Interface\\RaidFrame\\Raid-Icon-Rez")
             texture:SetTexCoord(0, 1, 0, 1)
+            texture:Show()
             border:Hide()
             self.tooltip = nil
-        elseif UnitInPhase(unit) then
+        elseif not UnitInPhase(unit) then
             texture:SetTexture("Interface\\TargetingFrame\\UI-PhasingIcon")
             texture:SetTexCoord(0.15625, 0.84375, 0.15625, 0.84375)
+            texture:Show()
             border:Hide()
             self.tooltip = PARTY_PHASED_MESSAGE
+        else
+            texture:Hide()
+            border:Hide()
+            self.tooltip = nil
         end
     end
 
