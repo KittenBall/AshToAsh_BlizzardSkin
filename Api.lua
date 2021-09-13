@@ -133,12 +133,12 @@ DispellDebuffTypes    = { Magic = true, Curse = true, Disease = true, Poison = t
 -------------------------------------------------
 -- Center Status start
 -------------------------------------------------
-centerStatusSubject = BehaviorSubject()
-centerStatusSubject:OnNext("any")
+CenterStatusSubject = BehaviorSubject()
+CenterStatusSubject:OnNext("any")
 
 __SystemEvent__ "INCOMING_RESURRECT_CHANGED" "UNIT_OTHER_PARTY_CHANGED" "UNIT_PHASE" "UNIT_FLAGS" "UNIT_CTR_OPTIONS" "INCOMING_SUMMON_CHANGED"
 function UpdateCenterStatusIcon(unit)
-    centerStatusSubject:OnNext(unit)
+    CenterStatusSubject:OnNext(unit)
 end
 
 local function unitInDistance(unit)
