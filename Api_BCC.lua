@@ -131,17 +131,20 @@ end
 
 CLASS_DISPELL_TYPE              = {
     PALADIN                     = {
+        Magic                   = true,
         Disease                 = true,
         Poison                  = true
     },
     SHAMAN                      = {
-        Curse                   = true
+        Disease                 = true,
+        Poison                  = true
     },
     DRUID                       = {
         Curse                   = true,
         Poison                  = true
     },
     PRIEST                      = {
+        Magic                   = true,
         Disease                 = true
     },
     MAGE                        = {
