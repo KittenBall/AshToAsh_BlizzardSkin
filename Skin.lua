@@ -56,8 +56,8 @@ SHARE_DISPELLDEBUFFPANEL_SKIN                                                   
     vSpacing                                                                                = 1,
     marginRight                                                                             = 3,
     marginTop                                                                               = 4.5,
-    elementWidth                                                                            = resizeOnUnitFrameChanged(10),
-    elementHeight                                                                           = resizeOnUnitFrameChanged(10)
+    elementWidth                                                                            = resizeOnUnitFrameChanged(9),
+    elementHeight                                                                           = resizeOnUnitFrameChanged(9)
 }
 
 -- Boss debuff
@@ -71,8 +71,8 @@ SHARE_BOSSDEBUFFPANEL_SKIN                                                      
     marginLeft                                                                              = 0,
     hSpacing                                                                                = 1.5,
     vSpacing                                                                                = 1,
-    elementWidth                                                                            = resizeOnUnitFrameChanged(15),
-    elementHeight                                                                           = resizeOnUnitFrameChanged(15)
+    elementWidth                                                                            = resizeOnUnitFrameChanged(16),
+    elementHeight                                                                           = resizeOnUnitFrameChanged(16)
 }                                                             
 
 -- Debuff
@@ -86,8 +86,8 @@ SHARE_DEBUFFPANEL_SKIN                                                          
     marginLeft                                                                              = 1.5,
     hSpacing                                                                                = 1.5,
     vSpacing                                                                                = 1,
-    elementWidth                                                                            = resizeOnUnitFrameChanged(),
-    elementHeight                                                                           = resizeOnUnitFrameChanged(),
+    elementWidth                                                                            = resizeOnUnitFrameChanged(12),
+    elementHeight                                                                           = resizeOnUnitFrameChanged(12),
     location                                                                                = {
         Anchor("BOTTOMLEFT", 0, 0, "AshBlzSkinBossDebuffPanel", "BOTTOMRIGHT")      
     },      
@@ -104,8 +104,8 @@ SHARE_DEBUFFPANEL_SKIN                                                          
 SHARE_BUFFPANEL_SKIN                                                                        = {
     elementType                                                                             = AshBlzSkinBuffIcon,
     orientation                                                                             = Orientation.HORIZONTAL,
-    elementWidth                                                                            = resizeOnUnitFrameChanged(),
-    elementHeight                                                                           = resizeOnUnitFrameChanged(),
+    elementWidth                                                                            = resizeOnUnitFrameChanged(12),
+    elementHeight                                                                           = resizeOnUnitFrameChanged(12),
     marginRight                                                                             = 3,
     rowCount                                                                                = 1,
     columnCount                                                                             = 3,

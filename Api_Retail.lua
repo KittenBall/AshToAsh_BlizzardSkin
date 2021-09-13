@@ -127,14 +127,16 @@ end
 -- Center Status Icon start
 -------------------------------------------------
 
+SummonStatus = _G.Enum
+
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitCenterStatusIconVisible()
-    return Wow.FromUnitEvent(CenterStatusSubject):CombineLatest(AshBlzSkinApi.UnitInDistanceChanged()):Map(function(unit, inDistance)
-        if UnitInOtherParty(unit) or UnitHasIncomingResurrection(unit) or (inDistance and UnitPhaseReason(unit)) then
+    return Wow.FromUnitEvent(CenterStatusSubject):Next():Map(function(unit)
+        if UnitInOtherParty(unit) or UnitHasIncomingResurrection(unit) or (UnitIsInDistance(unit) and UnitPhaseReason(unit)) then
             return true
         elseif C_IncomingSummon.HasIncomingSummon(unit) then
             local staus = C_IncomingSummon.IncomingSummonStatus(unit)
-            return status == Enum.SummonStatus.Pending or staus == Enum.SummonStatus.Accepted or staus == Enum.SummonStatus.Declined
+            return status == SummonStatus.Pending or staus == SummonStatus.Accepted or staus == SummonStatus.Declined
         end
         return false
     end)

@@ -13,7 +13,7 @@ __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitColor()
     local shareColor = Color(1, 1, 1, 1)
     local tapDeniedColor = ColorType(0.9, 0.9, 0.9)
-    return Wow.FromUnitEvent("UNIT_CONNECTION", "UNIT_NAME_UPDATE"):Map(function(unit)
+    return Wow.FromUnitEvent(Wow.FromEvent("UNIT_CONNECTION", "UNIT_NAME_UPDATE", "GROUP_ROSTER_UPDATE"):Map("unit => unit or 'any'")):Next():Map(function(unit)
         if not UnitIsConnected(unit) then
             return Color.GRAY
         else
@@ -134,37 +134,25 @@ DispellDebuffTypes    = { Magic = true, Curse = true, Disease = true, Poison = t
 -- Center Status start
 -------------------------------------------------
 CenterStatusSubject = BehaviorSubject()
-CenterStatusSubject:OnNext("any")
+Observable.Interval(1):Subscribe(function() CenterStatusSubject:OnNext("any") end)
 
-__SystemEvent__ "INCOMING_RESURRECT_CHANGED" "UNIT_OTHER_PARTY_CHANGED" "UNIT_PHASE" "UNIT_FLAGS" "UNIT_CTR_OPTIONS" "INCOMING_SUMMON_CHANGED"
+__SystemEvent__ "INCOMING_RESURRECT_CHANGED" "UNIT_OTHER_PARTY_CHANGED" "UNIT_PHASE" "UNIT_FLAGS" "UNIT_CTR_OPTIONS" "INCOMING_SUMMON_CHANGED" "GROUP_ROSTER_UPDATE" "PLAYER_ENTERING_WORLD" "UNIT_PET"
 function UpdateCenterStatusIcon(unit)
-    CenterStatusSubject:OnNext(unit)
+    CenterStatusSubject:OnNext(unit or "any")
 end
 
-local function unitInDistance(unit)
-	local distance, checkedDistance = UnitDistanceSquared(unit);
+function UnitIsInDistance(unit)
+    if UnitIsUnit(unit, "player") then return true end
 
-	if ( checkedDistance ) then
-		return distance < DISTANCE_THRESHOLD_SQUARED
-	end
-end
+    if UnitIsPlayer(unit) then
+	    local distance, checkedDistance = UnitDistanceSquared(unit)
 
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitInDistance()
-    return Wow.FromUnitEvent(Observable.Interval(0.5):Map("=>'any'")):Map(function(unit)
-        return unit, UnitIsUnit(unit, "player") or not (UnitInParty(unit) or UnitInRaid(unit)) or unitInDistance(unit)
-    end)
-end
+	    if ( checkedDistance ) then
+	    	return distance < DISTANCE_THRESHOLD_SQUARED
+	    end
+    end
 
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitInDistanceChanged()
-    local unitInDistanceMap = {}
-    return AshBlzSkinApi.UnitInDistance():Where(function(unit, inDistance)
-        if unitInDistanceMap[unit] ~= inDistance then
-            unitInDistanceMap[unit] = inDistance
-            return true
-        end
-    end):Map(function(unit, inDistance) return inDistance end)
+    return false
 end
 
 -------------------------------------------------

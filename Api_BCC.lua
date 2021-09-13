@@ -113,8 +113,8 @@ end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitCenterStatusIconVisible()
-    return Wow.FromUnitEvent(CenterStatusSubject):CombineLatest(AshBlzSkinApi.UnitInDistanceChanged()):Map(function(unit, inDistance)
-        if UnitInOtherParty(unit) or UnitHasIncomingResurrection(unit) or (inDistance and not UnitInPhase(unit))then
+    return Wow.FromUnitEvent(CenterStatusSubject):Next():Map(function(unit)
+        if UnitInOtherParty(unit) or UnitHasIncomingResurrection(unit) or (UnitIsInDistance(unit) and not UnitInPhase(unit))then
             return true
         end
         return false
