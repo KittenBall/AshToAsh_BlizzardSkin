@@ -49,17 +49,17 @@ class "CenterStatusIcon"(function()
             border:Hide()
             self.tooltip = nil
         elseif C_IncomingSummon.HasIncomingSummon(unit) then
-            if status == Enum.SummonStatus.Pending then
+            if status == _G.Enum.SummonStatus.Pending then
                 texture:SetAltas("Raid-Icon-SummonPending")
                 texture:SetTexCoord(0, 1, 0, 1)
                 border:Hide()
                 self.tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_PENDING
-    		elseif( status == Enum.SummonStatus.Accepted ) then
+    		elseif( status == _G.Enum.SummonStatus.Accepted ) then
                 texture:SetAltas("Raid-Icon-SummonAccepted")
                 texture:SetTexCoord(0, 1, 0, 1)
                 border:Hide()
                 self.tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_ACCEPTED
-    		elseif( status == Enum.SummonStatus.Declined ) then
+    		elseif( status == _G.Enum.SummonStatus.Declined ) then
                 texture:SetAltas("Raid-Icon-SummonDeclined")
                 texture:SetTexCoord(0, 1, 0, 1)
                 border:Hide()
