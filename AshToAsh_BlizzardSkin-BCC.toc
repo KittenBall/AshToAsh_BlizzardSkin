@@ -13,6 +13,7 @@
 ## X-Wago-ID: Xb6XqBKp
 
 Api.lua
+PetApi.lua
 Api_BCC.lua
 Template.lua
 Template_BCC.lua

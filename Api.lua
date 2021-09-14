@@ -5,9 +5,67 @@ namespace "AshToAsh.Skin.Blizzard"
 SKIN_NAME = "AshToAsh.BlizzardSkin"
 Style.RegisterSkin(SKIN_NAME)
 
-
 __Sealed__()
 interface "AshBlzSkinApi" {}
+
+class "LruCache"(function(_ENV)
+
+    __Arguments__(NaturalNumber)
+    function __new(_, capacity)
+        if capacity <= 0 then
+            capacity = 1
+        end
+
+        local head = {}
+        local tail = {}
+        head.next = tail
+        tail.pre = head
+        return {Capacity = capacity, Cache = {}, Head = head, Tail = tail, CacheSize = 0}
+    end
+
+    __Arguments__(NEString)
+    function __index(self, key)
+        local cache = self.Cache
+        local node = cache[key]
+        if node then
+            node.pre.next = node.next
+            node.next.pre = node.pre
+
+            self.Tail.pre.next = node
+            node.next = self.Tail
+            node.pre = self.Tail.pre
+            self.Tail.pre = node
+            return node.value
+        end
+        return -1
+    end
+
+    __Arguments__{NEString, Any/nil}
+    function __newindex(self, key, value)
+        if self[key] ~= -1 then
+            self.Tail.pre.value = value
+        else
+            if self.CacheSize == self.Capacity then
+                self.Cache[self.Head.next.key] = nil
+                self.CacheSize = self.CacheSize - 1
+                self.Head.next = self.Head.next.next
+                self.Head.next.pre = self.Head 
+            end
+
+            local node  = {}
+            node.key = key
+            node.value = value
+            
+            self.Tail.pre.next = node
+            node.pre = self.Tail.pre
+            node.next = self.Tail
+            self.Tail.pre = node
+
+            self.Cache[key] = node
+            self.CacheSize = self.CacheSize + 1
+        end
+    end
+end)
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitColor()
@@ -42,35 +100,12 @@ function AshBlzSkinApi.UnitIsPlayer()
 end
 
 __Static__() __AutoCache__()
-function AshBlzSkinApi.UnitPetOwnerName()
-    return Wow.FromUnitEvent(Wow.FromEvent("UNIT_NAME_UPDATE", "GROUP_ROSTER_UPDATE"):Map("unit => unit or 'any'")):Next():Map(function(unit)
-        if not unit then return end
-        local getTipLines = GetGameTooltipLines("Unit", unit)
-        local _, left = getTipLines(_, 1)
-        return left
-    end)
-end
-
-__Static__() __AutoCache__()
 function AshBlzSkinApi.UnitInRange()
     return Wow.FromUnitEvent(Observable.Interval(0.5):Map("=>'any'")):Map(function(unit)
         return UnitIsUnit(unit, "player") or UnitInRange(Unit)
     end)
 end
 
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitPetInRange()
-    return Wow.FromUnitEvent(Observable.Interval(0.5):Map("=>'any'")):Map(function(unit)
-        return UnitInRange(unit) or not IsInGroup()
-    end)
-end
-
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitPetThreatLevel()
-    return Wow.FromUnitEvent("UNIT_THREAT_SITUATION_UPDATE"):Map(function(unit)
-        return UnitExists(unit) and UnitThreatSituation(unit) or 0
-    end)
-end
 -------------------------------------------------
 -- CastBar start
 -------------------------------------------------
