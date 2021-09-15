@@ -130,24 +130,9 @@ end
 -------------------------------------------------
 -- Dead start
 -------------------------------------------------
-local deadSubject = BehaviorSubject()
-
-__SystemEvent__ "UNIT_CONNECTION" "PLAYER_FLAGS_CHANGED" "UNIT_HEALTH"
-function UpdateDeadStatus(unit)
-    deadSubject:OnNext(unit)
-end
-
--- 抄的Scorpio UnitApi
-__CombatEvent__ "UNIT_DIED" "UNIT_DESTROYED" "UNIT_DISSIPATES"
-function COMBAT_UNIT_DIED(_, event, _, _, _, _, _, destGUID)
-    for unit in Scorpio.GetUnitsFromGUID(destGUID) do
-        deadSubject:OnNext(unit)
-    end
-end
-
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitIsDead()
-    return Wow.FromUnitEvent(deadSubject):Next():Map(function(unit)
+    return Wow.FromUnitEvent(Wow.FromEvent("UNIT_CONNECTION", "PLAYER_FLAGS_CHANGED", "UNIT_HEALTH")):Next():Map(function(unit)
         return UnitIsDeadOrGhost(unit) and UnitIsConnected(unit)
     end)
 end

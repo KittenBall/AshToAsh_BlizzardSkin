@@ -79,32 +79,24 @@ function AshBlzSkinApi.UnitPetColor()
 end
 
 __Static__() __AutoCache__()
-function AshBlzSkinApi.UnitPetName()
-    return Wow.FromUnitEvent(Wow.FromEvent("UNIT_NAME_UPDATE", "GROUP_ROSTER_UPDATE"):Map("unit => unit or 'any'")):Next():Map(function(unit)
-        if not unit then return end
-        
-        local guid = UnitGUID(unit)
-        if guid then
-            local petOwnerInfo = PetOwnerClassMap[guid]
-            if petOwnerInfo and petOwnerInfo ~= -1 and petOwnerInfo.subGroup then
-                return ("%s("..GROUP_NUMBER..")"):format(UnitName(unit), petOwnerInfo.subGroup)
-            end
-        end
-        return UnitName(unit)
-    end)
-end
-
-__Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPetOwnerName()
     return Wow.FromUnitEvent(Wow.FromEvent("UNIT_NAME_UPDATE", "GROUP_ROSTER_UPDATE"):Map("unit => unit or 'any'")):Next():Map(function(unit)
         if not unit then return end
         local guid = UnitGUID(unit)
         if guid then
             local petOwnerInfo = PetOwnerClassMap[guid]
-            if petOwnerInfo and petOwnerInfo ~= -1 and petOwnerInfo.name then
-                return petOwnerInfo.name
+            if petOwnerInfo and petOwnerInfo ~= -1 then
+                local name
+                if petOwnerInfo.name then
+                    name = petOwnerInfo.name
+                end
+                if name and petOwnerInfo.subGroup then
+                    name = name .. ("("..GROUP_NUMBER..")"):format(petOwnerInfo.subGroup)
+                end
+                if name then return name end
             end
         end
+        
         local getTipLines = GetGameTooltipLines("Unit", unit)
         local _, left = getTipLines(_, 1)
         return left
