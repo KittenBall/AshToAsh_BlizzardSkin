@@ -47,7 +47,8 @@ end)
 
 -- Enlarge debuff
 SHARE_ENLARGEDEBUFFPANEL_SKIN                                                               = {
-    elementType                                                                             = AshAuraPanelIcon,
+    topLevel                                                                                = true,
+    elementType                                                                             = AshBlzSkinDebuffIcon,
     rowCount                                                                                = 1,
     columnCount                                                                             = 2,
     elementWidth                                                                            = resizeOnUnitFrameChanged(16),
@@ -242,6 +243,41 @@ SHARE_HEALTHBAR_SKIN                                                            
     }
 }
 SKIN_STYLE =                                                                                {
+    -- 单位面板
+    [AshGroupPanel]                                                                         = {
+
+        Label                                                                               = {
+            fontObject                                                                      = GameFontNormal,
+            justifyH                                                                        = "CENTER",
+            text                                                                            = AshBlzSkinApi.UnitPanelLabel(),
+            visible                                                                         = AshBlzSkinApi.UnitPanelVisible(),
+            location                                                                        = AshBlzSkinApi.UnitPanelOrientation():Map(function(orientation)
+                if orientation == Orientation.HORIZONTAL then
+                    return getLocation(getAnchor(shareAnchor1, "RIGHT", 0, 0, nil, "LEFT"))
+                else
+                    return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, 3, nil, "TOP"))
+                end
+            end),
+        }
+    },
+
+    -- 宠物面板
+    [AshGroupPetPanel]                                                                      = {
+        Label                                                                               = {
+            fontObject                                                                      = GameFontNormal,
+            justifyH                                                                        = "CENTER",
+            text                                                                            = AshBlzSkinApi.UnitPetPanelLabel(),
+            visible                                                                         = AshBlzSkinApi.UnitPetPanelVisible(),
+            location                                                                        = AshBlzSkinApi.UnitPetPanelOrientation():Map(function(orientation)
+                if orientation == Orientation.HORIZONTAL then
+                    return getLocation(getAnchor(shareAnchor1, "RIGHT", 0, 0, nil, "LEFT"))
+                else
+                    return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, 3, nil, "TOP"))
+                end
+            end),
+        } 
+    },
+
     [AshBlzSkinBuffIcon]                                                                    = {
         backdrop                                                                            = NIL,
         backdropBorderColor                                                                 = NIL,
@@ -477,6 +513,7 @@ SKIN_STYLE =                                                                    
 
         -- 职业buff
         ClassBuffPanel                                                                      = {
+            topLevel                                                                        = true,
             elementType                                                                     = AshBlzSkinClassBuffIcon,
             location                                                                        = relocationUnitFrameIconOnSizeChange,
             rowCount                                                                        = 1,

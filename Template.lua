@@ -294,6 +294,7 @@ TEMPLATE_SKIN_STYLE                                                             
     -- 仇恨指示器
     [AggroHighlight]                                                                    = {
         drawLayer                                                                       = "ARTWORK",
+        subLevel                                                                        = 3,
         file                                                                            = "Interface\\RaidFrame\\Raid-FrameHighlights",
         texCoords                                                                       = RectType(0.00781250, 0.55468750, 0.00781250, 0.27343750),
         setAllPoints                                                                    = true,
