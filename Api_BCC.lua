@@ -84,7 +84,7 @@ function AshBlzSkinApi.UnitBossAura()
         local hasBossAura = false
 
         local index = 1
-        local name
+        local name = ""
         while not hasBossAura and name do
             name, hasBossAura = isBossAura(UnitAura(unit, index, "HARMFUL"))
             index = index + 1
@@ -93,7 +93,7 @@ function AshBlzSkinApi.UnitBossAura()
         if hasBossAura then return true end
 
         index = 1
-        name = nil
+        name = ""
         while not hasBossAura and name do
             name, hasBossAura = isBossAura(UnitAura(unit, index, "HELPFUL"))
             index = index + 1
@@ -153,12 +153,14 @@ CLASS_DISPELL_TYPE              = {
 }
 
 -- 可驱散Debuff类型
-local function isDebuffCanDispell(class, name, _, _, dType)
-    if not dType then return name, false end
+local function isDebuffCanDispell(class, ...)
+    local name = select(1, ...)
+    local dType = select(4, ...)
+    if not name or not dType then return false, name end
     if DispellDebuffTypes[dType] and CLASS_DISPELL_TYPE[class] and CLASS_DISPELL_TYPE[class][dType] then
-        return name, true
+        return true, name, dType
     end
-    return name, false
+    return false, name
 end
 
 -- 单位是否有玩家能驱散的debuff
@@ -167,15 +169,15 @@ function AshBlzSkinApi.UnitDebuffCanDispell()
     return Wow.UnitAura():Map(function(unit)
             -- 在副本内才工作
             local inInstance, instanceType = IsInInstance()
-            if not inInstance or instanceType ~= "none" then return false end
+            if not inInstance or instanceType == "none" then return false end
 
             local class = UnitClassBase(unit)
             local canDispell, canDispellType
             local index = 1
-            local name
+            local name = ""
 
             while not canDispell and name do
-                name, canDispell = isDebuffCanDispell(class, UnitAura(unit, index, "HARMFUL|RAID"))
+                canDispell, name, canDispellType = isDebuffCanDispell(class, UnitAura(unit, index, "HARMFUL|RAID"))
                 index = index + 1
             end
 

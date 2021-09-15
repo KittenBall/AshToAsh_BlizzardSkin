@@ -214,8 +214,8 @@ SHARE_HEALTHBAR_SKIN                                                            
         drawLayer                                                                           = "BORDER",
         subLevel                                                                            = 2,
         location                                                                            = {
-            Anchor("TOPLEFT"),      
-            Anchor("BOTTOMRIGHT")       
+            Anchor("TOPLEFT", 0, 0, "$parent.statusBarTexture", "TOPLEFT"), 
+            Anchor("BOTTOMRIGHT", 0, 0, "$parent.statusBarTexture", "BOTTOMRIGHT")
         },      
         ignoreParentAlpha                                                                   = true,
         file                                                                                = "Interface\\RaidFrame\\Raid-Bar-Hp-Fill",
@@ -557,7 +557,7 @@ SKIN_STYLE =                                                                    
         -- 血条
         [HEALTHBAR]                                                                         = {
             SHARE_HEALTHBAR_SKIN,
-            statusBarColor                                                                  = AshBlzSkinApi.UnitPetColor(),   
+            statusBarColor                                                                  = AshBlzSkinApi.UnitPetColor(),
         },
 
         -- 能量条
