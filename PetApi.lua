@@ -101,18 +101,10 @@ function AshBlzSkinApi.UnitPetOwnerName()
         local guid = UnitGUID(unit)
         if guid then
             local petOwnerInfo = PetOwnerClassMap[guid]
-            if petOwnerInfo and petOwnerInfo ~= -1 then
-                local name
-                if petOwnerInfo.name then
-                    name = petOwnerInfo.name
-                end
-                if name and petOwnerInfo.subGroup then
-                    name = name .. ("("..GROUP_NUMBER..")"):format(petOwnerInfo.subGroup)
-                end
-                if name then return name end
+            if petOwnerInfo and petOwnerInfo ~= -1 and petOwnerInfo.name then
+                return petOwnerInfo.name
             end
         end
-        
         local getTipLines = GetGameTooltipLines("Unit", unit)
         local _, left = getTipLines(_, 1)
         return left

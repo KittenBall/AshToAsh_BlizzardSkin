@@ -488,24 +488,24 @@ SKIN_STYLE =                                                                    
             drawLayer                                                                       = "BACKGROUND"
         },
 
-        -- 名字
+        -- 主人名字
         NameLabel                                                                           = {
             SHARE_NAMELABEL_SKIN,
 
-            text                                                                            = Wow.UnitName(),
+            text                                                                            = AshBlzSkinApi.UnitPetOwnerName(),
             location                                                                        = {
                 Anchor("TOPLEFT", 3, -3), 
                 Anchor("TOPRIGHT", -3, -3)
             }
         },
 
-        -- 主人名字
+        -- 宠物名字
         Label                                                                               = {
             fontObject                                                                      = GameFontWhiteTiny,
             drawLayer                                                                       = "ARTWORK",
             wordWrap                                                                        = false,
             justifyH                                                                        = "LEFT",
-            text                                                                            = AshBlzSkinApi.UnitPetOwnerName(),
+            text                                                                            = AshBlzSkinApi.UnitPetName(),
             location                                                                        = {
                 Anchor("TOPLEFT", 0, -select(2, GameFontHighlightSmall:GetFont()), "NameLabel", "TOPLEFT"),
                 Anchor("TOPRIGHT", 0, -select(2, GameFontHighlightSmall:GetFont()), "NameLabel", "TOPRIGHT"),
