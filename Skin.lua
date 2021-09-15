@@ -45,7 +45,23 @@ local relocationUnitFrameIconOnSizeChange = Wow.FromFrameSize(UnitFrame):Map(fun
     return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, h/3-4))
 end)
 
--- Dispell debuf
+-- Enlarge debuff
+SHARE_ENLARGEDEBUFFPANEL_SKIN                                                               = {
+    elementType                                                                             = AshAuraPanelIcon,
+    rowCount                                                                                = 1,
+    columnCount                                                                             = 2,
+    elementWidth                                                                            = resizeOnUnitFrameChanged(16),
+    elementHeight                                                                           = resizeOnUnitFrameChanged(16),
+    marginLeft                                                                              = 3,
+    marginTop                                                                               = 3,
+    leftToRight                                                                             = true,
+    topToBottom                                                                             = false,
+    location                                                                                = {
+        Anchor("TOPLEFT", 0, 0, HEALTHBAR, "TOPLEFT")
+    }
+}
+
+-- Dispell debuff
 SHARE_DISPELLDEBUFFPANEL_SKIN                                                               = {
     elementType                                                                             = AshBlzSkinDispellIcon,
     leftToRight                                                                             = false,
@@ -55,7 +71,7 @@ SHARE_DISPELLDEBUFFPANEL_SKIN                                                   
     hSpacing                                                                                = 1.5,
     vSpacing                                                                                = 1,
     marginRight                                                                             = 3,
-    marginTop                                                                               = 4.5,
+    marginTop                                                                               = 4,
     elementWidth                                                                            = resizeOnUnitFrameChanged(9),
     elementHeight                                                                           = resizeOnUnitFrameChanged(9),
     location                                                                                = {
@@ -78,7 +94,11 @@ SHARE_BOSSDEBUFFPANEL_SKIN                                                      
     elementHeight                                                                           = resizeOnUnitFrameChanged(16),
     location                                                                                = {
         Anchor("BOTTOMLEFT", 3, 1.5, HEALTHBAR, "BOTTOMLEFT")
-    }
+    },
+
+    customFilter                                                                            = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID)
+        return not _EnlargeDebuffList[spellID]
+    end
 }                                                             
 
 -- Debuff
@@ -287,6 +307,7 @@ SKIN_STYLE =                                                                    
         auraFilter                                                                          = Wow.FromPanelProperty("AuraFilter")
     },
 
+    -- Dispell debuff Icon
     [AshBlzSkinDispellIcon]                                                                 = {
         IconTexture                                                                         = {
             drawLayer                                                                       = "ARTWORK",
@@ -451,9 +472,7 @@ SKIN_STYLE =                                                                    
         -- Debuff
         AshBlzSkinDebuffPanel                                                               = SHARE_DEBUFFPANEL_SKIN,
 
-        EnlargeDebuffPanel                                                                  = NIL,
-
-        --  Boss debuff
+        -- Boss debuff
         AshBlzSkinBossDebuffPanel                                                           = SHARE_BOSSDEBUFFPANEL_SKIN,
 
         -- 职业buff
@@ -472,8 +491,10 @@ SKIN_STYLE =                                                                    
             SHARE_DISPELLDEBUFFPANEL_SKIN,
 
             visible                                                                         = AshBlzSkinApi.UnitIsPlayer(),
-            
-        }
+        },
+
+        -- 重要Debuff
+        EnlargeDebuffPanel                                                                  = EnlargeDebuffPanel
     },
 
     [AshPetUnitFrame]                                                                       = {
@@ -536,8 +557,7 @@ SKIN_STYLE =                                                                    
         -- 血条
         [HEALTHBAR]                                                                         = {
             SHARE_HEALTHBAR_SKIN,
-            statusBarColor                                                                  = AshBlzSkinApi.UnitPetColor(),
-            
+            statusBarColor                                                                  = AshBlzSkinApi.UnitPetColor(),   
         },
 
         -- 能量条
@@ -557,6 +577,9 @@ SKIN_STYLE =                                                                    
 
         -- 可驱散debuff (是可驱散类型即可驱散debuff)
         AshBlzSkinDispellDebuffPanel                                                        = SHARE_DISPELLDEBUFFPANEL_SKIN,
+
+        -- 重要Debuff
+        EnlargeDebuffPanel                                                                  = EnlargeDebuffPanel
     },
 }
 

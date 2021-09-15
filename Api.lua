@@ -132,7 +132,7 @@ end
 -------------------------------------------------
 local deadSubject = BehaviorSubject()
 
-__SystemEvent__ "UNIT_CONNECTION" "PLAYER_FLAGS_CHANGED"
+__SystemEvent__ "UNIT_CONNECTION" "PLAYER_FLAGS_CHANGED" "UNIT_HEALTH"
 function UpdateDeadStatus(unit)
     deadSubject:OnNext(unit)
 end
@@ -147,7 +147,7 @@ end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitIsDead()
-    return Wow.FromUnitEvent(deadSubject):Map(function(unit)
+    return Wow.FromUnitEvent(deadSubject):Next():Map(function(unit)
         return UnitIsDeadOrGhost(unit) and UnitIsConnected(unit)
     end)
 end

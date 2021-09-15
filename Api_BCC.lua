@@ -176,6 +176,7 @@ function AshBlzSkinApi.UnitDebuffCanDispell()
 
             while not canDispell and name do
                 name, canDispell = isDebuffCanDispell(class, UnitAura(unit, index, "HARMFUL|RAID"))
+                index = index + 1
             end
 
             return canDispell or false, canDispellType
