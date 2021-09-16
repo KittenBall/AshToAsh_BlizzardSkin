@@ -53,12 +53,13 @@ SHARE_ENLARGEDEBUFFPANEL_SKIN                                                   
     columnCount                                                                             = 2,
     elementWidth                                                                            = resizeOnUnitFrameChanged(16),
     elementHeight                                                                           = resizeOnUnitFrameChanged(16),
-    marginLeft                                                                              = 3,
-    marginTop                                                                               = 3,
+    marginLeft                                                                              = 0,
+    marginTop                                                                               = 0,
+    frameStrata                                                                             = "MEDIUM",
     leftToRight                                                                             = true,
     topToBottom                                                                             = false,
     location                                                                                = {
-        Anchor("TOPLEFT", 0, 0, HEALTHBAR, "TOPLEFT")
+        Anchor("CENTER")
     }
 }
 

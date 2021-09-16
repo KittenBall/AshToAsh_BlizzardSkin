@@ -2,7 +2,7 @@ Scorpio "AshToAsh.BlizzardSkin.Template" ""
 
 import "Scorpio.Secure.UnitFrame"
 
-UI.Property         {
+UI.Property             {
     name                = "UseParentLevel",
     type                = Boolean,
     require             = Frame,
@@ -33,10 +33,7 @@ __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinDeadIcon")
 class "DeadIcon" { Texture }
 
 -- Buff icon
-__Template__(AshAuraPanelIcon)
-__Sealed__() class "AshBlzSkinBuffIcon"{
-    Icon                = Texture
-}
+__Sealed__() class "AshBlzSkinBuffIcon"{ AshAuraPanelIcon }
 
 -- Debuff icon
 __Sealed__() class "AshBlzSkinDebuffIcon" { AshBlzSkinBuffIcon }

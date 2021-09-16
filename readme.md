@@ -2,7 +2,7 @@
 
 This addon provide a skin look like blizzard style to AshToAsh
 
-Support all indicators which blizzard CompactRaidFrame supported, and show castbar, leaderIcon,etc
+Support all indicators which blizzard CompactRaidFrame supported, and show castbar, leaderIcon, etc
 
 The auras display rules are the same as blz
 
