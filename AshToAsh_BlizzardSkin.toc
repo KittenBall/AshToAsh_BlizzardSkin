@@ -15,6 +15,7 @@
 
 Api.lua
 PetApi.lua
+PanelApi.lua
 Api_Retail.lua
 Template.lua
 Template_Retail.lua

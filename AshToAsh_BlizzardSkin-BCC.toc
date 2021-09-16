@@ -14,6 +14,7 @@
 
 Api.lua
 PetApi.lua
+PanelApi.lua
 Api_BCC.lua
 Template.lua
 Template_BCC.lua

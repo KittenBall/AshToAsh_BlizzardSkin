@@ -18,10 +18,10 @@ local function mapPetGuidToUnit(unit, petGuid, raidIndex)
             petOwnerInfo = {}
         end
         petOwnerInfo.class = UnitClassBase(unit)
-        petOwnerInfo.name = UnitName(unit)
+        petOwnerInfo.name = GetUnitName(unit)
         if raidIndex then
             local _, _, subGroup = GetRaidRosterInfo(raidIndex)
-            petOwnerInfo.subGroup = subGroup or nil
+            petOwnerInfo.subGroup = subGroup
         else
             petOwnerInfo.subGroup = nil
         end
