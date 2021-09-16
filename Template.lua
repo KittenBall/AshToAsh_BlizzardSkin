@@ -2,6 +2,8 @@ Scorpio "AshToAsh.BlizzardSkin.Template" ""
 
 import "Scorpio.Secure.UnitFrame"
 
+local _Addon = _Addon
+
 UI.Property             {
     name                = "UseParentLevel",
     type                = Boolean,
@@ -43,6 +45,35 @@ __Sealed__() class "AshBlzSkinClassBuffIcon" { AshBlzSkinBuffIcon }
 
 -- 可驱散类型
 __Sealed__() class "AshBlzSkinDispellIcon" { Scorpio.Secure.UnitFrame.AuraPanelIcon  }
+
+-- 解锁按钮
+__Sealed__() __ChildProperty__(AshGroupPanel, "AshBlzSkinUnlockButton")
+class "UnlockButton"(function()
+    inherit "Button"
+
+    local function OnClick(self)
+        if _Addon.UNLOCK_PANELS then
+            LockPanels()
+        else
+            UnlockPanels()
+        end
+    end
+
+    local function OnEnter(self)
+        self:SetAlpha(100)
+    end
+
+    local function OnLeave(self)
+        self:SetAlpha(0)
+    end
+
+    function __ctor(self)
+        self:SetAlpha(0)
+        self.OnClick = self.OnClick + OnClick
+        self.OnEnter = self.OnEnter + OnEnter
+        self.OnLeave = self.OnLeave + OnLeave
+    end
+end)
 
 -- 专用于BossDebuffPanel
 class "AshBlzSkinBossDebuffIcon"(function()
@@ -308,6 +339,23 @@ TEMPLATE_SKIN_STYLE                                                             
         texCoords                                                                       = RectType(0.375, 0.5, 0, 0.5),
         visible                                                                         = AshBlzSkinApi.UnitIsDead()
     },
+
+    -- 解锁按钮
+    [UnlockButton]                                                                      = {
+        normalTexture                                                                   = {
+            file                                                                        = "Interface\\Buttons\\LockButton-Locked-Up",
+            setAllPoints                                                                = true
+        },
+        pushedTexture                                                                   = {
+            file                                                                        = "Interface\\Buttons\\LockButton-Unlocked-Down",
+            setAllPoints                                                                = true
+        },
+        highlightTexture                                                                = {
+            file                                                                        = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
+            alphaMode                                                                   = "ADD",
+            setAllPoints                                                                = true
+        }
+    }
 }
 
 Style.UpdateSkin(SKIN_NAME, TEMPLATE_SKIN_STYLE)

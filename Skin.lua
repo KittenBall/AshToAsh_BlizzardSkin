@@ -112,7 +112,7 @@ SHARE_DEBUFFPANEL_SKIN                                                          
     rowCount                                                                                = 1,
     columnCount                                                                             = AshBlzSkinApi.UnitBossAura():Map(function(val) return val and 1 or 3 end),
     marginLeft                                                                              = 1,
-    hSpacing                                                                                = 1.5,
+    hSpacing                                                                                = 0.5,
     vSpacing                                                                                = 1,
     elementWidth                                                                            = resizeOnUnitFrameChanged(12),
     elementHeight                                                                           = resizeOnUnitFrameChanged(12),
@@ -120,7 +120,7 @@ SHARE_DEBUFFPANEL_SKIN                                                          
         Anchor("BOTTOMLEFT", 0, 0, "AshBlzSkinBossDebuffPanel", "BOTTOMRIGHT")      
     },      
     auraFilter                                                                              = Wow.Unit():Map(function(unit)
-        return UnitCanAttack("player", unit) and "PLAYER|HARMFUL" or "HARMFUL"   
+        return UnitCanAttack("player", unit) and "PLAYER|HARMFUL" or "HARMFUL"
     end),
 
     customFilter                                                                            = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID)
@@ -137,6 +137,7 @@ SHARE_BUFFPANEL_SKIN                                                            
     marginRight                                                                             = 3,
     rowCount                                                                                = 1,
     columnCount                                                                             = 3,
+    hSpacing                                                                                = 0,
     leftToRight                                                                             = false,
     topToBottom                                                                             = false,
     location                                                                                = {
@@ -157,7 +158,6 @@ SHARE_RAIDTARGET_SKIN                                                           
 
 -- 名字
 SHARE_NAMELABEL_SKIN                                                                        = {
-    fontObject                                                                              = GameFontHighlightSmall,
     drawLayer                                                                               = "ARTWORK",
     wordWrap                                                                                = false,
     justifyH                                                                                = "LEFT",
@@ -259,6 +259,15 @@ SKIN_STYLE =                                                                    
                     return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, 3, nil, "TOP"))
                 end
             end),
+        },
+
+        -- 解锁按钮
+        AshBlzSkinUnlockButton                                                              = {
+            size                                                                            = Size(24, 24),
+            visible                                                                         = AshBlzSkinApi.UnitPanelVisible(),
+            location                                                                        = {
+                Anchor("BOTTOMRIGHT", 2, -1, nil, "TOPRIGHT")
+            }
         }
     },
 
@@ -384,6 +393,7 @@ SKIN_STYLE =                                                                    
         NameLabel                                                                           = {
             SHARE_NAMELABEL_SKIN,
 
+            fontObject                                                                      = GameFontHighlightSmall,
             text                                                                            = Wow.UnitName(),
             location                                                                        = {
                 Anchor("TOPLEFT", 0, -1, "RoleIcon", "TOPRIGHT"), 
@@ -551,6 +561,7 @@ SKIN_STYLE =                                                                    
         NameLabel                                                                           = {
             SHARE_NAMELABEL_SKIN,
 
+            fontObject                                                                      = GameFontWhiteSmall,
             text                                                                            = Wow.UnitName(),
             location                                                                        = {
                 Anchor("TOPLEFT", 3, -3), 
