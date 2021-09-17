@@ -248,10 +248,16 @@ SKIN_STYLE =                                                                    
     [AshGroupPanel]                                                                         = {
 
         Label                                                                               = {
-            fontObject                                                                      = GameFontNormal,
+            fontObject                                                                      = AshBlzSkinApi.UnitPanelOrientation():Map(function(Orientation)
+                if orientation == Orientation.HORIZONTAL then
+                    return GameFontNormalTiny
+                else
+                    return GameFontNormalSmall
+                end
+            end),
             justifyH                                                                        = "CENTER",
             text                                                                            = AshBlzSkinApi.UnitPanelLabel(),
-            visible                                                                         = AshBlzSkinApi.UnitPanelVisible(),
+            visible                                                                         = AshBlzSkinApi.UnitPanelLabelVisible(),
             location                                                                        = AshBlzSkinApi.UnitPanelOrientation():Map(function(orientation)
                 if orientation == Orientation.HORIZONTAL then
                     return getLocation(getAnchor(shareAnchor1, "RIGHT", 0, 0, nil, "LEFT"))
@@ -266,7 +272,7 @@ SKIN_STYLE =                                                                    
             size                                                                            = Size(24, 24),
             visible                                                                         = AshBlzSkinApi.UnitPanelVisible(),
             location                                                                        = {
-                Anchor("BOTTOMRIGHT", 2, -1, nil, "TOPRIGHT")
+                Anchor("BOTTOMLEFT", -2, -1, nil, "TOPLEFT")
             }
         }
     },
@@ -274,10 +280,16 @@ SKIN_STYLE =                                                                    
     -- 宠物面板
     [AshGroupPetPanel]                                                                      = {
         Label                                                                               = {
-            fontObject                                                                      = GameFontNormal,
+            fontObject                                                                      = AshBlzSkinApi.UnitPanelOrientation():Map(function(Orientation)
+                if orientation == Orientation.HORIZONTAL then
+                    return GameFontNormalTiny
+                else
+                    return GameFontNormalSmall
+                end
+            end),
             justifyH                                                                        = "CENTER",
             text                                                                            = AshBlzSkinApi.UnitPetPanelLabel(),
-            visible                                                                         = AshBlzSkinApi.UnitPetPanelVisible(),
+            visible                                                                         = AshBlzSkinApi.UnitPetPanelLabelVisible(),
             location                                                                        = AshBlzSkinApi.UnitPetPanelOrientation():Map(function(orientation)
                 if orientation == Orientation.HORIZONTAL then
                     return getLocation(getAnchor(shareAnchor1, "RIGHT", 0, 0, nil, "LEFT"))

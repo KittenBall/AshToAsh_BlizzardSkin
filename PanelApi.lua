@@ -105,6 +105,30 @@ function AshBlzSkinApi.UnitPanelOrientation()
 end
 
 __Static__() __AutoCache__()
+function AshBlzSkinApi.UnitPanelLabelVisible()
+    return Wow.GetFrame(AshGroupPanel, "OnSizeChanged"):Map(function(panel)
+        local w, h = panel:GetSize()
+        if panel.Orientation == Orientation.HORIZONTAL then
+            return h >= 40 and w > 20
+        else
+            return w >= 50 and h > 20
+        end
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.UnitPetPanelLabelVisible()
+    return Wow.GetFrame(AshGroupPetPanel, "OnSizeChanged"):Map(function(panel)
+        local w, h = panel:GetSize()
+        if panel.Orientation == Orientation.HORIZONTAL then
+            return h >= 40
+        else
+            return w >= 50
+        end
+    end)
+end
+
+__Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPanelVisible()
     return Wow.FromFrameSize(AshGroupPanel):Map(function(w, h)
         return w > 20 and h > 20
