@@ -248,7 +248,7 @@ SKIN_STYLE =                                                                    
     [AshGroupPanel]                                                                         = {
 
         Label                                                                               = {
-            fontObject                                                                      = AshBlzSkinApi.UnitPanelOrientation():Map(function(Orientation)
+            fontObject                                                                      = AshBlzSkinApi.UnitPanelOrientation():Map(function(orientation)
                 if orientation == Orientation.HORIZONTAL then
                     return GameFontNormalTiny
                 else
@@ -280,7 +280,7 @@ SKIN_STYLE =                                                                    
     -- 宠物面板
     [AshGroupPetPanel]                                                                      = {
         Label                                                                               = {
-            fontObject                                                                      = AshBlzSkinApi.UnitPanelOrientation():Map(function(Orientation)
+            fontObject                                                                      = AshBlzSkinApi.UnitPanelOrientation():Map(function(orientation)
                 if orientation == Orientation.HORIZONTAL then
                     return GameFontNormalTiny
                 else
@@ -463,6 +463,8 @@ SKIN_STYLE =                                                                    
             location                                                                        = {
                 Anchor("TOPRIGHT", -3, -2)
             },
+            drawLayer                                                                       = "ARTWORK",
+            subLevel                                                                        = 2,
             size                                                                            = Size(12, 12)
         },
 
@@ -471,6 +473,8 @@ SKIN_STYLE =                                                                    
             location                                                                        = {
                 Anchor("TOPRIGHT", -1, 0, "LeaderIcon", "TOPLEFT")
             },
+            drawLayer                                                                       = "ARTWORK",
+            subLevel                                                                        = 2,
             size                                                                            = Size(12, 12),
         },
 
