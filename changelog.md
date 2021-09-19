@@ -1,3 +1,6 @@
+## 1.4.15
+- You can now configure some simple options in ata menu 
+
 ## 1.4.13
 - 解锁按钮放置在面板左上角
 - 开始添加配置面板，进度0.1%

@@ -1,7 +1,5 @@
 Scorpio "AshToAsh.BlizzardSkin.Template" ""
 
-import "Scorpio.Secure.UnitFrame"
-
 local _Addon = _Addon
 
 UI.Property             {
@@ -33,6 +31,10 @@ class "VehicleIcon" { Texture }
 -- 死亡
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinDeadIcon")
 class "DeadIcon" { Texture }
+
+-- 血量文本
+__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinHealthLabel")
+class "HealthLabel" { FontString }
 
 -- Buff icon
 __Sealed__() class "AshBlzSkinBuffIcon"{ AshAuraPanelIcon }
@@ -326,8 +328,8 @@ TEMPLATE_SKIN_STYLE                                                             
         file                                                                            = "Interface\\RaidFrame\\Raid-FrameHighlights",
         texCoords                                                                       = RectType(0.00781250, 0.55468750, 0.00781250, 0.27343750),
         setAllPoints                                                                    = true,
-        visible                                                                         = Wow.UnitThreatLevel():Map("l=> l>0"),
-        vertexColor                                                                     = Wow.UnitThreatLevel():Map(function(level)
+        visible                                                                         = AshBlzSkinApi.UnitThreatLevel():Map("l=> l>0"),
+        vertexColor                                                                     = AshBlzSkinApi.UnitThreatLevel():Map(function(level)
             shareColor.r, shareColor.g, shareColor.b, shareColor.a = GetThreatStatusColor(level)
             return shareColor
         end)
@@ -339,6 +341,18 @@ TEMPLATE_SKIN_STYLE                                                             
         texCoords                                                                       = RectType(0.375, 0.5, 0, 0.5),
         visible                                                                         = AshBlzSkinApi.UnitIsDead()
     },
+
+    -- 血量文本
+    -- [HealthLabel]                                                                       = {
+    --     location                                                                        = {
+    --         Anchor("CENTER"),
+    --         Anchor("TOP", 0, -2, "NameLabel", "BOTTOM")
+    --     },
+    --     text                                                                            = NIL,
+    --     fontObject                                                                      = SystemFont_Small,
+    --     textColor                                                                       = Color.RED,
+    --     visible                                                                         = AshBlzSkinApi.HealthLableVisible()
+    -- },
 
     -- 解锁按钮
     [UnlockButton]                                                                      = {

@@ -9,6 +9,7 @@
 ## Dependices: AshToAsh
 ## DefaultState: enabled
 ## SavedVariables: AshToAsh_BlizzardSkin_DB
+## SavedVariablesPerCharacter: AshToAsh_BlizzardSkin_CharDB
 
 ## X-WebSite: https://github.com/GreenhairTurtle/AshToAsh_BlizzardSkin
 ## X-Credit: Kurapica

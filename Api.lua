@@ -1,5 +1,9 @@
 Scorpio "AshToAsh.BlizzardSkin.Api " ""
 
+-------------------------------------------------
+-- Unit
+-------------------------------------------------
+
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitColor()
     local shareColor = Color(1, 1, 1, 1)
@@ -35,12 +39,12 @@ end
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitInRange()
     return Wow.FromUnitEvent(Observable.Interval(0.5):Map("=>'any'")):Map(function(unit)
-        return UnitIsUnit(unit, "player") or UnitInRange(Unit)
+        return UnitIsUnit(unit, "player") or UnitInRange(unit)
     end)
 end
 
 -------------------------------------------------
--- CastBar start
+-- CastBar
 -------------------------------------------------
 
 __Static__() __AutoCache__()
@@ -56,19 +60,8 @@ function AshBlzSkinApi.UnitCastBarColor()
     end)
 end
 
-__Static__() __AutoCache__()
-function AshBlzSkinApi.CastBarVisibilityChanged()
-    return AshBlzSkinApi.OnConfigChanged():Map(function()
-        return DB.Appearance.CastBar.Visibility
-    end)
-end
-
 -------------------------------------------------
--- CastBar end
--------------------------------------------------
-
--------------------------------------------------
--- Dead start
+-- Dead
 -------------------------------------------------
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitIsDead()
@@ -76,23 +69,17 @@ function AshBlzSkinApi.UnitIsDead()
         return UnitIsDeadOrGhost(unit) and UnitIsConnected(unit)
     end)
 end
--------------------------------------------------
--- Dead end
--------------------------------------------------
 
 -------------------------------------------------
--- Dispell start
+-- Dispell
 -------------------------------------------------
 
 DispellDebuffTypes    = { Magic = true, Curse = true, Disease = true, Poison = true }
 
 -------------------------------------------------
--- Dispell end
+-- Center Status
 -------------------------------------------------
 
--------------------------------------------------
--- Center Status start
--------------------------------------------------
 CenterStatusSubject = BehaviorSubject()
 Observable.Interval(1):Subscribe(function() CenterStatusSubject:OnNext("any") end)
 
@@ -116,12 +103,37 @@ function UnitIsInDistance(unit)
 end
 
 -------------------------------------------------
--- Center Status end
+-- Aggro
 -------------------------------------------------
 
+__Static__() __AutoCache__()
+function AshBlzSkinApi.UnitThreatLevel()
+    return Wow.UnitThreatLevel():Where(function(threatLevel)
+        return DB.Appearance.DisplayAggroHighlight or threatLevel <= 0
+    end)
+end
+
 -------------------------------------------------
--- Classic
+-- Option
 -------------------------------------------------
-if Scorpio.IsRetail then return end
-GetThreatStatusColor = _G.GetThreatStatusColor or function (index) if index == 3 then return 1, 0, 0 elseif index == 2 then return 1, 0.6, 0 elseif index == 1 then return 1, 1, 0.47 else return 0.69, 0.69, 0.69 end end
-UnitTreatAsPlayerForDisplay = Toolset.fakefunc
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.CastBarVisibilityChanged()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
+        return DB.Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS and DB.Appearance.CastBar.Visibility or Visibility.HIDE
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.PowerBarVisible()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
+        return DB.Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.HealthLableVisible()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
+        return DB.Appearance.Health.Style ~= HealthTextStyle.NONE
+    end)
+end

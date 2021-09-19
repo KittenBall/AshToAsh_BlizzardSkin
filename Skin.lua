@@ -2,6 +2,9 @@ Scorpio "AshToAsh.BlizzardSkin.Active" ""
 
 HEALTHBAR           = (Scorpio.IsRetail or Scorpio.IsBCC or IsAddOnLoaded("LibHealComm-4.0") or pcall(_G.LibStub, "LibHealComm-4.0")) and "PredictionHealthBar" or "HealthBar"
 
+-- 能量条高度
+POWERBAR_HEIGHT     = 9
+
 local shareColor    = ColorType(0, 0, 0, 1)
 local shareSize     = Size(1, 1)
 
@@ -22,6 +25,7 @@ local function resizeUnitFrameIconOnSizeChange(size)
 end
 
 local shareAnchor1 = Anchor("TOP")
+local shareAnchor2 = Anchor("TOP")
 local shareLocation = {}
 
 local function getAnchor(anchor, point, x, y, relativeTo, relativePoint)
@@ -36,7 +40,7 @@ end
 local function getLocation(...)
     wipe(shareLocation)
     for i = 1, select("#", ...) do
-        tinsert(shareLocation, select(i, ...))
+        shareLocation[i] = select(i, ...)
     end
     return shareLocation
 end
@@ -51,8 +55,8 @@ SHARE_ENLARGEDEBUFFPANEL_SKIN                                                   
     elementType                                                                             = AshBlzSkinDebuffIcon,
     rowCount                                                                                = 1,
     columnCount                                                                             = 2,
-    elementWidth                                                                            = resizeOnUnitFrameChanged(16),
-    elementHeight                                                                           = resizeOnUnitFrameChanged(16),
+    elementWidth                                                                            = resizeOnUnitFrameChanged(15),
+    elementHeight                                                                           = resizeOnUnitFrameChanged(15),
     marginLeft                                                                              = 0,
     marginTop                                                                               = 0,
     frameStrata                                                                             = "MEDIUM",
@@ -92,8 +96,8 @@ SHARE_BOSSDEBUFFPANEL_SKIN                                                      
     marginLeft                                                                              = 0,
     hSpacing                                                                                = 1.5,
     vSpacing                                                                                = 1,
-    elementWidth                                                                            = resizeOnUnitFrameChanged(16),
-    elementHeight                                                                           = resizeOnUnitFrameChanged(16),
+    elementWidth                                                                            = resizeOnUnitFrameChanged(15),
+    elementHeight                                                                           = resizeOnUnitFrameChanged(15),
     location                                                                                = {
         Anchor("BOTTOMLEFT", 3, 1.5, HEALTHBAR, "BOTTOMLEFT")
     },
@@ -114,8 +118,8 @@ SHARE_DEBUFFPANEL_SKIN                                                          
     marginLeft                                                                              = 1,
     hSpacing                                                                                = 0.5,
     vSpacing                                                                                = 1,
-    elementWidth                                                                            = resizeOnUnitFrameChanged(12),
-    elementHeight                                                                           = resizeOnUnitFrameChanged(12),
+    elementWidth                                                                            = resizeOnUnitFrameChanged(11),
+    elementHeight                                                                           = resizeOnUnitFrameChanged(11),
     location                                                                                = {
         Anchor("BOTTOMLEFT", 0, 0, "AshBlzSkinBossDebuffPanel", "BOTTOMRIGHT")      
     },      
@@ -132,8 +136,8 @@ SHARE_DEBUFFPANEL_SKIN                                                          
 SHARE_BUFFPANEL_SKIN                                                                        = {
     elementType                                                                             = AshBlzSkinBuffIcon,
     orientation                                                                             = Orientation.HORIZONTAL,
-    elementWidth                                                                            = resizeOnUnitFrameChanged(12),
-    elementHeight                                                                           = resizeOnUnitFrameChanged(12),
+    elementWidth                                                                            = resizeOnUnitFrameChanged(11),
+    elementHeight                                                                           = resizeOnUnitFrameChanged(11),
     marginRight                                                                             = 3,
     rowCount                                                                                = 1,
     columnCount                                                                             = 3,
@@ -168,8 +172,8 @@ SHARE_NAMELABEL_SKIN                                                            
 SHARE_CASTBAR_SKIN                                                                          = {
     height                                                                                  = 8,
     location                                                                                = {
-        Anchor("TOPLEFT", 0, 0, "PowerBar", "TOPLEFT"),     
-        Anchor("BOTTOMRIGHT", 0, 0, "PowerBar", "BOTTOMRIGHT")      
+        Anchor("TOPLEFT", 0, 0, "PowerBar", "TOPLEFT"),
+        Anchor("BOTTOMRIGHT", 0, 0, "PowerBar", "BOTTOMRIGHT") 
     },
     visibility                                                                              = AshBlzSkinApi.CastBarVisibilityChanged(),
 
@@ -186,9 +190,10 @@ SHARE_POWERBAR_SKIN                                                             
         drawLayer                                                                           = "BORDER"
     },
     location                                                                                = {
-        Anchor("TOPLEFT", 0, 0, HEALTHBAR, "BOTTOMLEFT"),       
+        Anchor("TOPLEFT", 0, 0, HEALTHBAR, "BOTTOMLEFT"),
         Anchor("BOTTOMRIGHT", -1, 1)
     },
+    visible                                                                                 = AshBlzSkinApi.PowerBarVisible(),
 
     BackgroundTexture                                                                       = {
         file                                                                                = "Interface\\RaidFrame\\Raid-Bar-Resource-Background",
@@ -204,15 +209,18 @@ SHARE_HEALTHBAR_SKIN                                                            
     statusBarTexture                                                                        = {
         file                                                                                = "Interface\\RaidFrame\\Raid-Bar-Hp-Fill",
         drawLayer                                                                           = "BORDER"
-    },      
-    location                                                                                = {
-        Anchor("TOPLEFT", 1, -1),       
-        Anchor("BOTTOMRIGHT", -1, 9)        
     },
+    location                                                                                = AshBlzSkinApi.PowerBarVisible():Map(function(powerBarVisible)
+        if powerBarVisible then
+            return getLocation(getAnchor(shareAnchor1, "TOPLEFT", 1, -1), getAnchor(shareAnchor2, "BOTTOMRIGHT", -1, POWERBAR_HEIGHT))
+        else
+            return getLocation(getAnchor(shareAnchor1, "TOPLEFT", 1, -1), getAnchor(shareAnchor2, "BOTTOMRIGHT", -1, 1))
+        end
+    end),
 
     BackgroundFrame                                                                         = NIL,
 
-    -- 拥有驱散debuff的能力     
+    -- 拥有驱散debuff的能力
     IconTexture                                                                             = {
         drawLayer                                                                           = "BORDER",
         subLevel                                                                            = 2,
@@ -384,7 +392,7 @@ SKIN_STYLE =                                                                    
         inherit                                                                             = "default",
 
         frameStrata                                                                         = "LOW",
-        alpha                                                                               = Wow.UnitInRange():Map('v=>v and 1 or 0.55'),
+        alpha                                                                               = AshBlzSkinApi.UnitInRange():Map('v=>v and 1 or 0.55'),
         
         -- 去除默认皮肤的目标指示器
         Label2                                                                              = NIL,
@@ -417,16 +425,7 @@ SKIN_STYLE =                                                                    
         },
 
         -- 血量文本
-        HealthLabel                                                                         = {
-            location                                                                        = {
-                Anchor("CENTER"),
-                Anchor("TOP", 0, -2, "NameLabel", "BOTTOM")
-            },
-            text                                                                            = Wow.UnitHealthPercent():Map(function(percent) return percent.."%" end),
-            fontObject                                                                      = SystemFont_Small,
-            textColor                                                                       = Color.RED,
-            visible                                                                         = Wow.UnitHealthPercent():Map(function(percent) return percent <= 35 and percent > 0 end)
-        },
+        AshBlzSkinHealthLabel                                                               = {},
 
         -- 死亡图标
         AshBlzSkinDeadIcon                                                                  = {
@@ -653,3 +652,66 @@ SKIN_STYLE =                                                                    
 
 Style.UpdateSkin(SKIN_NAME, SKIN_STYLE)
 Style.ActiveSkin(SKIN_NAME)
+
+-------------------------------------------------
+-- Dynamic Style
+-------------------------------------------------
+
+
+function UpdateAll()
+    UpdateHealthTextStyle()
+end
+
+-- 生命值
+SHARE_HEALTHLABEL_SKIN                                                                       = {
+    location                                                                                 = {
+        Anchor("CENTER"),
+        Anchor("TOP", 0, -2, "NameLabel", "BOTTOM")
+    },
+    fontObject                                                                               = SystemFont_Small,
+    visible                                                                                  = AshBlzSkinApi.HealthLableVisible()
+}
+
+local function formatHealth(health)
+    if health and health > 0 then
+        if DB.Appearance.Health.TextFormat == HealthTextFormat.TEN_THOUSAND then
+            return health >= 10000 and ("%.1fW"):format(health/10000) or health
+        elseif DB.Appearance.Health.TextFormat == HealthTextFormat.KILO then
+            return health >= 1000 and ("%.1fK"):format(health/1000) or health
+        else
+            return BreakUpLargeNumbers(health)
+        end
+    end
+end
+
+function UpdateHealthTextStyle()
+    local healthTextStyle = DB.Appearance.Health.Style
+    local healthTextValue
+    if healthTextStyle == HealthTextStyle.HEALTH then
+        healthTextValue = Wow.UnitHealthFrequent():Map(formatHealth)
+    elseif healthTextStyle == HealthTextStyle.LOSTHEALTH then
+        healthTextValue = Wow.UnitHealthLostFrequent():Map(formatHealth)
+    elseif healthTextStyle == HealthTextStyle.PERCENT then
+        healthTextValue = Wow.UnitHealthPercentFrequent():Map(function(percent)
+            return percent.."%"
+        end)
+    else
+        healthTextValue = NIL
+    end
+
+    SHARE_HEALTHLABEL_SKIN.text = healthTextValue
+    SHARE_HEALTHLABEL_SKIN.textColor = (healthTextStyle == HealthTextStyle.LOSTHEALTH and Color.RED or Color.WHITE)
+    Style.UpdateSkin(SKIN_NAME, {
+        [HealthLabel]           = SHARE_HEALTHLABEL_SKIN
+    })
+end
+
+function OnConfigChanged(type)
+    if type == "ALL" then
+        UpdateAll()
+    elseif type == "HealthTextStyle" then
+        UpdateHealthTextStyle()
+    end
+end
+
+Wow.FromEvent("AshToAsh_Blizzard_Skin_Config_Changed"):Subscribe(OnConfigChanged)
