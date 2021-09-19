@@ -1,4 +1,4 @@
-Scorpio "AshToAsh.BlizzardSkin.PanelApi" ""
+Scorpio "AshToAsh.BlizzardSkin.Api.Panel" ""
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPanelConfigChanged()

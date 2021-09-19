@@ -1,4 +1,4 @@
-Scorpio "AshToAsh.BlizzardSkin.Api_BCC" ""
+Scorpio "AshToAsh.BlizzardSkin.Api.BCC" ""
 
 if not Scorpio.IsBCC then return end
 

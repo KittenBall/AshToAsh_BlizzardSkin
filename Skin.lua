@@ -170,7 +170,8 @@ SHARE_CASTBAR_SKIN                                                              
     location                                                                                = {
         Anchor("TOPLEFT", 0, 0, "PowerBar", "TOPLEFT"),     
         Anchor("BOTTOMRIGHT", 0, 0, "PowerBar", "BOTTOMRIGHT")      
-    },      
+    },
+    visibility                                                                              = AshBlzSkinApi.CastBarVisibilityChanged(),
 
     Spark                                                                                   = {
         size                                                                                = Size(24, 24),
@@ -229,12 +230,14 @@ SHARE_HEALTHBAR_SKIN                                                            
             looping                                                                         = "REPEAT",
 
             Alpha1                                                                          = {
+                smoothing                                                                   = "OUT",
                 order                                                                       = 1,
                 duration                                                                    = 0.5,
                 fromAlpha                                                                   = 0,
                 toAlpha                                                                     = 1
             },      
             Alpha2                                                                          = {
+                smoothing                                                                   = "IN",
                 order                                                                       = 2,
                 duration                                                                    = 0.5,
                 fromAlpha                                                                   = 1,

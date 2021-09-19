@@ -1,4 +1,4 @@
-Scorpio "AshToAsh.BlizzardSkin.Api_Retail" ""
+Scorpio "AshToAsh.BlizzardSkin.Api.Retail" ""
 
 if not Scorpio.IsRetail then return end 
 

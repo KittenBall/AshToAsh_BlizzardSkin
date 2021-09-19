@@ -183,6 +183,11 @@ __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinCastBar")
 class "CastBar" (function(_ENV)
     inherit "CooldownStatusBar"
 
+    property "Visibility"           {
+        type                = Visibility,
+        default             = Visibility.SHOW_ONLY_PARTY
+    }
+
     local function OnUpdate(self, elapsed)
         self.value = self.value + elapsed
         if self.value >= self.maxValue then
@@ -199,6 +204,13 @@ class "CastBar" (function(_ENV)
     end
 
     function SetCooldown(self, start, duration)
+        local visibility = self.Visibility
+        if visibility == Visibility.HIDE then
+            return
+        elseif visibility == Visibility == Visibility.SHOW_ONLY_PARTY and IsInRaid() then
+            return
+        end
+
         if duration <= 0 then
             self:Hide()
             return

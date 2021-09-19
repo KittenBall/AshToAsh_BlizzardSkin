@@ -215,6 +215,11 @@ class "CastBar" (function(_ENV)
         end
     }
 
+    property "Visibility"           {
+        type                = Visibility,
+        default             = Visibility.SHOW_ONLY_PARTY
+    }
+
     function UpdateStatusBarColor(self)
         local color = self.Interruptible and self.NormalColor or self.NonInterruptColor
         self:SetStatusBarColor(color.r, color.g, color.b)
@@ -236,6 +241,13 @@ class "CastBar" (function(_ENV)
     end
 
     function SetCooldown(self, start, duration)
+        local visibility = self.Visibility
+        if visibility == Visibility.HIDE then
+            return
+        elseif visibility == Visibility.SHOW_ONLY_PARTY and IsInRaid() then
+            return
+        end
+
         if duration <= 0 then
             self:Hide()
             return
