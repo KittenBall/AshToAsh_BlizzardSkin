@@ -207,7 +207,7 @@ class "CastBar" (function(_ENV)
         local visibility = self.Visibility
         if visibility == Visibility.HIDE then
             return
-        elseif visibility == Visibility == Visibility.SHOW_ONLY_PARTY and IsInRaid() then
+        elseif visibility == Visibility.SHOW_ONLY_PARTY and IsInRaid() then
             return
         end
 
