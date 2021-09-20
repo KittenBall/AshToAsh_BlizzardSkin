@@ -1,3 +1,6 @@
+## 1.4.16
+-- Add friends name coloring feature
+
 ## 1.4.15
 - You can now configure some simple options in ata menu 
 

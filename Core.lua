@@ -86,11 +86,21 @@ enum "HealthTextStyle" {
     "PERCENT"
 }
 
+__Sealed__() __AutoIndex__()
 enum "HealthTextFormat" {
     "NORMAL",
     "KILO", -- 千
     "TEN_THOUSAND" -- 万
 }
+
+__Sealed__() __AutoIndex__()
+enum "NameStyle" {
+    "PLAYERNAME",
+    "PLAYERNAME_SERVER_SHORTHAND",
+    "PLAYERNAME_SERVER"
+}
+
+GuildColor = Color(0.25, 1, 0.25, 1)
 
 function OnLoad()
     DB = SVManager("AshToAsh_BlizzardSkin_DB", "AshToAsh_BlizzardSkin_CharDB").Char
@@ -110,7 +120,15 @@ function OnLoad()
             Health                                                                                                          = {
                 Style                                                                                                       = HealthTextStyle.NONE,
                 TextFormat                                                                                                  = HealthTextFormat.KILO
-            }
+            },
+            -- 名字
+            Name                                                                                                            = {
+                Style                                                                                                       = NameStyle.PLAYERNAME_SERVER_SHORTHAND,
+                FriendsNameColoring                                                                                         = false,
+                GuildColor                                                                                                  = GuildColor,
+                FriendColor                                                                                                 = Color.NORMAL,
+                BNFriendColor                                                                                               = Color.BATTLENET
+            }                                         
         }
     }
 
@@ -258,6 +276,103 @@ local function GetAppearanceMenu()
                     }
                 }
             }
+        },
+        -- 名字
+        {
+            text                                                                                                            = NAME,
+            submenu                                                                                                         = {
+                -- 格式
+                {
+                    text                                                                                                    = L["name_format"],
+                    submenu                                                                                                 = {
+                        check                                                                                               = {
+                            get                                                                                             = function()
+                                return DB.Appearance.Name.Style
+                            end,
+                            set                                                                                             = function(value)
+                                DB.Appearance.Name.Style = value
+                                FireSystemEvent("UNIT_NAME_UPDATE", 'any')
+                            end
+                        },
+                        {
+                            text                                                                                            = L["name_format_noserver"],
+                            checkvalue                                                                                      = NameStyle.PLAYERNAME
+                        },
+                        {
+                            text                                                                                            = L["name_format_server_shorthand"],
+                            checkvalue                                                                                      = NameStyle.PLAYERNAME_SERVER_SHORTHAND
+                        },
+                        {
+                            text                                                                                            = L["name_format_withserver"],
+                            checkvalue                                                                                      = NameStyle.PLAYERNAME_SERVER
+                        }
+                    }
+                },
+                -- 好友名字染色
+                {
+                    text                                                                                                    = L["friends_name_coloring"],
+                    check                                                                                                   = {
+                        get                                                                                                 = function()
+                            return DB.Appearance.Name.FriendsNameColoring
+                        end,
+                        set                                                                                                 = function(value)
+                            DB.Appearance.Name.FriendsNameColoring = value
+                            FireSystemEvent("UNIT_NAME_UPDATE", 'any')
+                        end
+                    }
+                    -- 不允许更改颜色
+                    -- submenu                                                                                                 = {
+                    --     {
+                    --         text                                                                                            = ENABLE,
+                    --         check                                                                                           = {
+                    --             get                                                                                         = function()
+                    --                 return DB.Appearance.Name.FriendsNameColoring
+                    --             end,
+                    --             set                                                                                         = function(value)
+                    --                 DB.Appearance.Name.FriendsNameColoring = value
+                    --                 FireSystemEvent("UNIT_NAME_UPDATE", 'any')
+                    --             end
+                    --         }
+                    --     },
+                    --     {
+                    --         text                                                                                            = L["battle_net_friend_color"],
+                    --         color                                                                                           = {
+                    --             get                                                                                         = function()
+                    --                 return DB.Appearance.Name.BNFriendColor
+                    --             end,
+                    --             set                                                                                         = function(value)
+                    --                 DB.Appearance.Name.BNFriendColor = value
+                    --                 FireSystemEvent("UNIT_NAME_UPDATE", 'any')
+                    --             end
+                    --         }
+                    --     },
+                    --     {
+                    --         text                                                                                            = L["guild_friend_color"],
+                    --         color                                                                                           = {
+                    --             get                                                                                         = function()
+                    --                 return DB.Appearance.Name.GuildColor
+                    --             end,
+                    --             set                                                                                         = function(value)
+                    --                 DB.Appearance.Name.GuildColor = value
+                    --                 FireSystemEvent("UNIT_NAME_UPDATE", 'any')
+                    --             end
+                    --         }
+                    --     },
+                    --     {
+                    --         text                                                                                            = L["friend_color"],
+                    --         color                                                                                           = {
+                    --             get                                                                                         = function()
+                    --                 return DB.Appearance.Name.FriendColor
+                    --             end,
+                    --             set                                                                                         = function(value)
+                    --                 DB.Appearance.Name.FriendColor = value
+                    --                 FireSystemEvent("UNIT_NAME_UPDATE", 'any')
+                    --             end
+                    --         }
+                    --     }
+                    -- }
+                }
+            } 
         },
         -- 仇恨指示器
         {

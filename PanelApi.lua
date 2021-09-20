@@ -104,6 +104,7 @@ function AshBlzSkinApi.UnitPanelOrientation()
     end)
 end
 
+
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPanelLabelVisible()
     return Wow.GetFrame(AshGroupPanel, "OnSizeChanged"):Map(function(panel)
@@ -121,9 +122,9 @@ function AshBlzSkinApi.UnitPetPanelLabelVisible()
     return Wow.GetFrame(AshGroupPetPanel, "OnSizeChanged"):Map(function(panel)
         local w, h = panel:GetSize()
         if panel.Orientation == Orientation.HORIZONTAL then
-            return h >= 40
+            return h >= 40 and w > 20
         else
-            return w >= 50
+            return w >= 50 and h > 20
         end
     end)
 end

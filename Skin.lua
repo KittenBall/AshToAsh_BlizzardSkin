@@ -165,7 +165,7 @@ SHARE_NAMELABEL_SKIN                                                            
     drawLayer                                                                               = "ARTWORK",
     wordWrap                                                                                = false,
     justifyH                                                                                = "LEFT",
-    textColor                                                                               = NIL
+    textColor                                                                               = AshBlzSkinApi.UnitNameColor()
 }
 
 -- 施法条
@@ -417,7 +417,7 @@ SKIN_STYLE =                                                                    
             SHARE_NAMELABEL_SKIN,
 
             fontObject                                                                      = GameFontHighlightSmall,
-            text                                                                            = Wow.UnitName(),
+            text                                                                            = AshBlzSkinApi.UnitName(),
             location                                                                        = {
                 Anchor("TOPLEFT", 0, -1, "RoleIcon", "TOPRIGHT"), 
                 Anchor("TOPRIGHT", -3, -3) 
@@ -706,12 +706,11 @@ function UpdateHealthTextStyle()
     })
 end
 
-function OnConfigChanged(type)
+__SystemEvent__()
+function AshToAsh_Blizzard_Skin_Config_Changed(type)
     if type == "ALL" then
         UpdateAll()
     elseif type == "HealthTextStyle" then
         UpdateHealthTextStyle()
     end
 end
-
-Wow.FromEvent("AshToAsh_Blizzard_Skin_Config_Changed"):Subscribe(OnConfigChanged)
