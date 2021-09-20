@@ -124,11 +124,15 @@ function OnLoad()
             -- 名字
             Name                                                                                                            = {
                 Style                                                                                                       = NameStyle.PLAYERNAME_SERVER_SHORTHAND,
+                Nickname                                                                                                    = nil,
+                ShowNicknameOwns                                                                                            = true,
+                ShowNicknameOthers                                                                                          = true,
+                ShowNicknameToOthers                                                                                        = true,
                 FriendsNameColoring                                                                                         = false,
                 GuildColor                                                                                                  = GuildColor,
                 FriendColor                                                                                                 = Color.NORMAL,
                 BNFriendColor                                                                                               = Color.BATTLENET
-            }                                         
+            }                                       
         }
     }
 
@@ -308,6 +312,69 @@ local function GetAppearanceMenu()
                         }
                     }
                 },
+                -- 昵称
+                {
+                    text                                                                                                    = L["nick_name"],
+                    submenu                                                                                                 = {
+                        -- 设置昵称
+                        {
+                            text                                                                                            = DB.Appearance.Name.Nickname and L["nick_name_format"]:format(DB.Appearance.Name.Nickname) or L["nick_name_setting"],
+                            tiptitle                                                                                        = L["tips"],
+                            tiptext                                                                                         = L["nick_name_setting"],
+                            click                                                                                           = function()
+                                local nickname = Input(L["nick_name_setting"])
+                                if nickname and strlen(nickname) > 25 then
+                                    ShowError(L["err_nickname_too_long"])
+                                    return
+                                end
+                                DB.Appearance.Name.Nickname = nickname
+                                FireSystemEvent("ASHTOASH_BLZ_SKIN_NICK_NAME_UPDATE", 'any')
+                                FireSystemEvent("ASHTOASH_BLZ_SKIN_NICK_NAME_REFRESH", 'any')
+                            end
+                        },
+                        -- 显示自己的昵称
+                        {
+                            text                                                                                            = L["show_nick_name_owns"],
+                            check                                                                                           = {
+                                get                                                                                         = function()
+                                    return DB.Appearance.Name.ShowNicknameOwns
+                                end,
+                                set                                                                                         = function(value)
+                                    DB.Appearance.Name.ShowNicknameOwns = value
+                                    FireSystemEvent("ASHTOASH_BLZ_SKIN_NICK_NAME_UPDATE", 'any')
+                                end
+                            }
+                        },
+                        -- 显示他人的昵称
+                        {
+                            text                                                                                            = L["show_nick_name_others"],
+                            check                                                                                           = {
+                                get                                                                                         = function()
+                                    return DB.Appearance.Name.ShowNicknameOthers
+                                end,
+                                set                                                                                         = function(value)
+                                    DB.Appearance.Name.ShowNicknameOthers = value
+                                    FireSystemEvent("ASHTOASH_BLZ_SKIN_NICK_NAME_UPDATE", 'any')
+                                end
+                            }
+                        },
+                        -- 对他人显示我的昵称
+                        {
+                            text                                                                                            = L["show_nick_name_to_others"],
+                            tiptitle                                                                                        = L["tips"],
+                            tiptext                                                                                         = L["show_nick_name_to_others_tips"],
+                            check                                                                                           = {
+                                get                                                                                         = function()
+                                    return DB.Appearance.Name.ShowNicknameToOthers
+                                end,
+                                set                                                                                         = function(value)
+                                    DB.Appearance.Name.ShowNicknameToOthers = value
+                                    FireSystemEvent("ASHTOASH_BLZ_SKIN_NICK_NAME_REFRESH", 'any')
+                                end
+                            }
+                        }
+                    }
+                },
                 -- 好友名字染色
                 {
                     text                                                                                                    = L["friends_name_coloring"],
@@ -417,6 +484,10 @@ function ASHTOASH_OPEN_MENU(panel, menu)
     for _, v in ipairs(skinMenu) do
         tinsert(menu, v)
     end
+end
+
+function ShowError(text)
+    UIErrorsFrame:AddMessage(text, 1.0, 0.0, 0.0, 1, 4)
 end
 
 -------------------------------------------------

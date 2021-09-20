@@ -1,3 +1,6 @@
+## 1.4.17
+-- Add Nickname feature
+
 ## 1.4.16
 -- Add friends name coloring feature
 

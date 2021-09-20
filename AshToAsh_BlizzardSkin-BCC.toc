@@ -21,6 +21,7 @@ Core.lua
 Api.lua
 PetApi.lua
 PanelApi.lua
+NameApi.lua
 FriendApi.lua
 Api_BCC.lua
 Template.lua

@@ -43,19 +43,6 @@ function AshBlzSkinApi.UnitInRange()
     end)
 end
 
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitName()
-    return Wow.FromUnitEvent(Wow.FromEvent("UNIT_NAME_UPDATE", "GROUP_ROSTER_UPDATE")):Next():Map(function(unit)
-        if DB.Appearance.Name.Style == NameStyle.PLAYERNAME_SERVER_SHORTHAND then
-            return GetUnitName(unit)
-        elseif DB.Appearance.Name.Style == NameStyle.PLAYERNAME_SERVER then
-            return GetUnitName(unit, true)
-        else
-            return UnitName(unit)
-        end
-    end)
-end
-
 -------------------------------------------------
 -- CastBar
 -------------------------------------------------
