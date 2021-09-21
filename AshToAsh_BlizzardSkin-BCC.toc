@@ -17,6 +17,10 @@
 
 Localization\Localization.xml
 
+# LibCustomGlow's Scorpio version
+# Credit:doez, Stanzilla
+GlowAnimation.lua
+
 Core.lua
 Api.lua
 PetApi.lua
@@ -25,8 +29,5 @@ NameApi.lua
 FriendApi.lua
 Api_BCC.lua
 Template.lua
-# LibCustomGlow's Scorpio version
-# Credit:doez, Stanzilla
-GlowAnimation.lua
 Template_BCC.lua
 Skin.lua

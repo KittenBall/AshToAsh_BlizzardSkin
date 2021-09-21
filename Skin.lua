@@ -15,7 +15,7 @@ local function resizeOnUnitFrameChanged(size)
     end)
 end
 
-local function resizeUnitFrameIconOnSizeChange(size)
+local function resizeUnitFrameIconOnSizeChanged(size)
     return Wow.FromFrameSize(UnitFrame):Map(function(w, h)
         local componentScale = min(w / 72, h / 36)
         shareSize.width = (size or 15) * componentScale
@@ -45,7 +45,7 @@ local function getLocation(...)
     return shareLocation
 end
 
-local relocationUnitFrameIconOnSizeChange = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
+local relocationUnitFrameIconOnSizeChanged = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
     return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, h/3-4))
 end)
 
@@ -157,7 +157,7 @@ SHARE_RAIDTARGET_SKIN                                                           
     location                                                                                = {
         Anchor("TOPRIGHT", -3, -2)      
     },
-    size                                                                                    = resizeUnitFrameIconOnSizeChange(14)
+    size                                                                                    = resizeUnitFrameIconOnSizeChanged(14)
 }
 
 -- 名字
@@ -393,8 +393,8 @@ SKIN_STYLE =                                                                    
 
         -- 死亡图标
         AshBlzSkinDeadIcon                                                                  = {
-            size                                                                            = resizeUnitFrameIconOnSizeChange(),
-            location                                                                        = relocationUnitFrameIconOnSizeChange,
+            size                                                                            = resizeUnitFrameIconOnSizeChanged(),
+            location                                                                        = relocationUnitFrameIconOnSizeChanged,
         },
 
         -- 角色职责图标
@@ -452,15 +452,15 @@ SKIN_STYLE =                                                                    
 
         -- 离线图标
         DisconnectIcon                                                                      = {
-            location                                                                        = relocationUnitFrameIconOnSizeChange,
-            size                                                                            = resizeUnitFrameIconOnSizeChange()
+            location                                                                        = relocationUnitFrameIconOnSizeChanged,
+            size                                                                            = resizeUnitFrameIconOnSizeChanged()
         },
 
         -- 准备就绪
         ReadyCheckIcon                                                                      = {
             drawLayer                                                                       = "OVERLAY",
-            location                                                                        = relocationUnitFrameIconOnSizeChange,
-            size                                                                            = resizeUnitFrameIconOnSizeChange()
+            location                                                                        = relocationUnitFrameIconOnSizeChanged,
+            size                                                                            = resizeUnitFrameIconOnSizeChanged()
         },
 
         -- 中间状态图标
@@ -468,7 +468,7 @@ SKIN_STYLE =                                                                    
             location                                                                        = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
                 return getLocation(getAnchor(shareAnchor1, "CENTER", 0, h / 3 + 2, nil, "BOTTOM"))
             end),
-            size                                                                            = resizeUnitFrameIconOnSizeChange(22),
+            size                                                                            = resizeUnitFrameIconOnSizeChanged(22),
             visible                                                                         = AshBlzSkinApi.UnitCenterStatusIconVisible(),
             unit                                                                            = Wow.Unit()
         },
@@ -508,7 +508,7 @@ SKIN_STYLE =                                                                    
         ClassBuffPanel                                                                      = {
             topLevel                                                                        = true,
             elementType                                                                     = AshBlzSkinClassBuffIcon,
-            location                                                                        = relocationUnitFrameIconOnSizeChange,
+            location                                                                        = relocationUnitFrameIconOnSizeChanged,
             rowCount                                                                        = 1,
             columnCount                                                                     = 1,
             visible                                                                         = AshBlzSkinApi.UnitIsPlayer(),
@@ -566,8 +566,8 @@ SKIN_STYLE =                                                                    
 
         --死亡图标
         AshBlzSkinDeadIcon                                                                  = {
-            size                                                                            = resizeUnitFrameIconOnSizeChange(),
-            location                                                                        = relocationUnitFrameIconOnSizeChange,
+            size                                                                            = resizeUnitFrameIconOnSizeChanged(),
+            location                                                                        = relocationUnitFrameIconOnSizeChanged,
         },
 
         -- 仇恨指示器

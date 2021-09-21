@@ -128,7 +128,7 @@ function OnLoad()
                 ShowNicknameOwns                                                                                            = true,
                 ShowNicknameOthers                                                                                          = true,
                 ShowNicknameToOthers                                                                                        = true,
-                FriendsNameColoring                                                                                         = false,
+                FriendsNameColoring                                                                                         = true,
                 GuildColor                                                                                                  = GuildColor,
                 FriendColor                                                                                                 = Color.NORMAL,
                 BNFriendColor                                                                                               = Color.BATTLENET

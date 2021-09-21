@@ -33,14 +33,14 @@ function AshBlzSkinApi.UnitName()
     return Wow.FromUnitEvent(Wow.FromEvent("UNIT_NAME_UPDATE", "GROUP_ROSTER_UPDATE", "ASHTOASH_BLZ_SKIN_NICK_NAME_UPDATE")):Next():Map(function(unit)
         -- 显示自己的昵称
         if DB.Appearance.Name.ShowNicknameOwns and DB.Appearance.Name.Nickname and UnitIsUnit("player", unit) then
-            return "@" .. DB.Appearance.Name.Nickname
+            return DB.Appearance.Name.Nickname
         elseif not UnitIsUnit("player", unit) and DB.Appearance.Name.ShowNicknameOthers then
             -- 显示他人的昵称
             local guid = UnitGUID(unit)
             if guid then
                 local nickname = NicknameGUIDMap[guid]
                 if nickname and nickname ~= -1 then
-                    return "@" .. nickname
+                    return nickname
                 end
             end
         end
