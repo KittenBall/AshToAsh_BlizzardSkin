@@ -3,7 +3,7 @@ Scorpio "AshToAsh.BlizzardSkin.Api.Retail" ""
 if not Scorpio.IsRetail then return end 
 
 -------------------------------------------------
--- Power start
+-- Power
 -------------------------------------------------
 
 local function getDisplayedPowerID(unit)
@@ -69,11 +69,7 @@ function AshBlzSkinApi.UnitPowerColor()
 end
 
 -------------------------------------------------
--- Power end
--------------------------------------------------
-
--------------------------------------------------
--- Vehicle start
+-- Vehicle
 -------------------------------------------------
 
 __Static__() __AutoCache__()
@@ -84,11 +80,7 @@ function AshBlzSkinApi.UnitVehicleVisible()
 end
 
 -------------------------------------------------
--- Vehicle end
--------------------------------------------------
-
--------------------------------------------------
--- Aura start
+-- Aura
 -------------------------------------------------
 
 -- 是否有Boss给的Aura
@@ -120,11 +112,7 @@ function AshBlzSkinApi.UnitBossAura()
 end
 
 -------------------------------------------------
--- Aura end
--------------------------------------------------
-
--------------------------------------------------
--- Center Status Icon start
+-- Center Status Icon
 -------------------------------------------------
 
 SummonStatus = _G.Enum
@@ -143,11 +131,7 @@ function AshBlzSkinApi.UnitCenterStatusIconVisible()
 end
 
 -------------------------------------------------
--- Center Status Icon end
--------------------------------------------------
-
--------------------------------------------------
--- Dispell start
+-- Dispell
 -------------------------------------------------
 -- 职业可驱散debuff类型
 CLASS_DISPELL_TYPE              = {
@@ -284,7 +268,3 @@ function AshBlzSkinApi.UnitDebuffCanDispellColor()
         return DebuffTypeColor[dType or ""]
     end)
 end
-
--------------------------------------------------
--- Dispell end
--------------------------------------------------

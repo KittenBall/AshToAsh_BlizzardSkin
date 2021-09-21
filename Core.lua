@@ -132,15 +132,17 @@ function OnLoad()
                 GuildColor                                                                                                  = GuildColor,
                 FriendColor                                                                                                 = Color.NORMAL,
                 BNFriendColor                                                                                               = Color.BATTLENET
-            }                                       
+            },
+            -- 显示面板标签
+            DisplayPanelLabel                                                                                               = true,
         }
     }
 
     -- 初始化推送值
-    OnConfigChanged("ALL")
+    SendConfigChanged("ALL")
 end
 
-function OnConfigChanged(type)
+function SendConfigChanged(type)
     FireSystemEvent("AshToAsh_Blizzard_Skin_Config_Changed", type)
 end
 
@@ -169,7 +171,7 @@ local function GetAppearanceMenu()
                             end,
                             set                                                                                             = function(value)
                                 DB.Appearance.CastBar.Visibility = value
-                                OnConfigChanged()
+                                SendConfigChanged()
                             end
                         },
                         {
@@ -202,7 +204,7 @@ local function GetAppearanceMenu()
                             end,
                             set                                                                                             = function(value)
                                 DB.Appearance.PowerBar.Visibility = value
-                                OnConfigChanged()
+                                SendConfigChanged()
                             end
                         },
                         {
@@ -231,7 +233,7 @@ local function GetAppearanceMenu()
                             end,
                             set                                                                                             = function(value)
                                 DB.Appearance.Health.Style = value
-                                OnConfigChanged("HealthTextStyle")
+                                SendConfigChanged("HealthTextStyle")
                             end
                         },
                         {
@@ -450,6 +452,21 @@ local function GetAppearanceMenu()
                 end,
                 set                                                                                                         = function(value)
                     DB.Appearance.DisplayAggroHighlight = value
+                end
+            }
+        },
+        -- 显示面板标签
+        {
+            text                                                                                                            = L["show_panel_label"],
+            tiptitle                                                                                                        = L["tips"],
+            tiptext                                                                                                         = L["show_panel_label_tips"],
+            check                                                                                                           = {
+                get                                                                                                         = function()
+                    return DB.Appearance.DisplayPanelLabel and true or false
+                end,
+                set                                                                                                         = function(value)
+                    DB.Appearance.DisplayPanelLabel = value
+                    SendConfigChanged("PanelLabel")
                 end
             }
         },

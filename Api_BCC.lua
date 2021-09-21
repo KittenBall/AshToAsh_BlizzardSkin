@@ -3,7 +3,7 @@ Scorpio "AshToAsh.BlizzardSkin.Api.BCC" ""
 if not Scorpio.IsBCC then return end
 
 -------------------------------------------------
--- Power start
+-- Power
 -------------------------------------------------
 
 local function getDisplayedPowerID(unit)
@@ -52,11 +52,7 @@ function AshBlzSkinApi.UnitPowerColor()
 end
 
 -------------------------------------------------
--- Power end
--------------------------------------------------
-
--------------------------------------------------
--- Vehicle start
+-- Vehicle
 -------------------------------------------------
 
 __Static__() __AutoCache__()
@@ -67,11 +63,7 @@ function AshBlzSkinApi.UnitVehicleVisible()
 end
 
 -------------------------------------------------
--- Vehicle end
--------------------------------------------------
-
--------------------------------------------------
--- Aura start
+-- Aura
 -------------------------------------------------
 
 local function isBossAura(...)
@@ -104,11 +96,7 @@ function AshBlzSkinApi.UnitBossAura()
 end
 
 -------------------------------------------------
--- Aura end
--------------------------------------------------
-
--------------------------------------------------
--- Center Status start
+-- Center Status
 -------------------------------------------------
 
 __Static__() __AutoCache__()
@@ -122,11 +110,7 @@ function AshBlzSkinApi.UnitCenterStatusIconVisible()
 end
 
 -------------------------------------------------
--- Center Status end
--------------------------------------------------
-
--------------------------------------------------
--- Dispell start
+-- Dispell
 -------------------------------------------------
 
 CLASS_DISPELL_TYPE              = {
@@ -193,7 +177,3 @@ function AshBlzSkinApi.UnitDebuffCanDispellColor()
         return DebuffTypeColor[dType or ""]
     end)
 end
-
--------------------------------------------------
--- Dispell end
--------------------------------------------------

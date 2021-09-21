@@ -104,7 +104,6 @@ function AshBlzSkinApi.UnitPanelOrientation()
     end)
 end
 
-
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPanelLabelVisible()
     return Wow.GetFrame(AshGroupPanel, "OnSizeChanged"):Map(function(panel)

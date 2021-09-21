@@ -36,6 +36,14 @@ class "DeadIcon" { Texture }
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinHealthLabel")
 class "HealthLabel" { FontString }
 
+-- 面板标题
+__Sealed__() __ChildProperty__(AshGroupPanel, "AshBlzSkinPanelLabel")
+class "PanelLabel" { FontString }
+
+-- 宠物面板标题
+__Sealed__() __ChildProperty__(AshGroupPetPanel, "AshBlzSkinPanelLabel")
+class "PetPanelLabel" { FontString }
+
 -- Buff icon
 __Sealed__() class "AshBlzSkinBuffIcon"{ AshAuraPanelIcon }
 

@@ -63,7 +63,7 @@ SHARE_ENLARGEDEBUFFPANEL_SKIN                                                   
     leftToRight                                                                             = true,
     topToBottom                                                                             = false,
     location                                                                                = {
-        Anchor("CENTER")
+        Anchor("TOPLEFT", 3, -3, HEALTHBAR, "TOPLEFT")
     }
 }
 
@@ -258,25 +258,7 @@ SKIN_STYLE =                                                                    
     -- 单位面板
     [AshGroupPanel]                                                                         = {
 
-        Label                                                                               = {
-            fontObject                                                                      = AshBlzSkinApi.UnitPanelOrientation():Map(function(orientation)
-                if orientation == Orientation.HORIZONTAL then
-                    return GameFontNormalTiny
-                else
-                    return GameFontNormalSmall
-                end
-            end),
-            justifyH                                                                        = "CENTER",
-            text                                                                            = AshBlzSkinApi.UnitPanelLabel(),
-            visible                                                                         = AshBlzSkinApi.UnitPanelLabelVisible(),
-            location                                                                        = AshBlzSkinApi.UnitPanelOrientation():Map(function(orientation)
-                if orientation == Orientation.HORIZONTAL then
-                    return getLocation(getAnchor(shareAnchor1, "RIGHT", 0, 0, nil, "LEFT"))
-                else
-                    return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, 3, nil, "TOP"))
-                end
-            end),
-        },
+        AshBlzSkinPanelLabel                                                                = {},
 
         -- 解锁按钮
         AshBlzSkinUnlockButton                                                              = {
@@ -290,25 +272,7 @@ SKIN_STYLE =                                                                    
 
     -- 宠物面板
     [AshGroupPetPanel]                                                                      = {
-        Label                                                                               = {
-            fontObject                                                                      = AshBlzSkinApi.UnitPanelOrientation():Map(function(orientation)
-                if orientation == Orientation.HORIZONTAL then
-                    return GameFontNormalTiny
-                else
-                    return GameFontNormalSmall
-                end
-            end),
-            justifyH                                                                        = "CENTER",
-            text                                                                            = AshBlzSkinApi.UnitPetPanelLabel(),
-            visible                                                                         = AshBlzSkinApi.UnitPetPanelLabelVisible(),
-            location                                                                        = AshBlzSkinApi.UnitPetPanelOrientation():Map(function(orientation)
-                if orientation == Orientation.HORIZONTAL then
-                    return getLocation(getAnchor(shareAnchor1, "RIGHT", 0, 0, nil, "LEFT"))
-                else
-                    return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, 3, nil, "TOP"))
-                end
-            end),
-        } 
+        AshBlzSkinPanelLabel                                                                = {}
     },
 
     [AshBlzSkinBuffIcon]                                                                    = {
@@ -343,7 +307,7 @@ SKIN_STYLE =                                                                    
             setAllPoints                                                                    = true,
             enableMouse                                                                     = false,
             cooldown                                                                        = Wow.FromPanelProperty("AuraCooldown"),
-            reverse                                                                         = true
+            reverse                                                                         = true,
         },
     },
 
@@ -657,11 +621,6 @@ Style.ActiveSkin(SKIN_NAME)
 -- Dynamic Style
 -------------------------------------------------
 
-
-function UpdateAll()
-    UpdateHealthTextStyle()
-end
-
 -- 生命值
 SHARE_HEALTHLABEL_SKIN                                                                       = {
     location                                                                                 = {
@@ -671,6 +630,51 @@ SHARE_HEALTHLABEL_SKIN                                                          
     fontObject                                                                               = SystemFont_Small,
     visible                                                                                  = AshBlzSkinApi.HealthLableVisible()
 }
+
+-- 面板标题
+GROUP_PANEL_LABEL_SKIN                                                                       = {
+    fontObject                                                                               = AshBlzSkinApi.UnitPanelOrientation():Map(function(orientation)
+        if orientation == Orientation.HORIZONTAL then
+            return GameFontNormalTiny
+        else
+            return GameFontNormalSmall
+        end
+    end),
+    justifyH                                                                                 = "CENTER",
+    text                                                                                     = AshBlzSkinApi.UnitPanelLabel(),
+    location                                                                                 = AshBlzSkinApi.UnitPanelOrientation():Map(function(orientation)
+        if orientation == Orientation.HORIZONTAL then
+            return getLocation(getAnchor(shareAnchor1, "RIGHT", 0, 0, nil, "LEFT"))
+        else
+            return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, 3, nil, "TOP"))
+        end
+    end),
+}
+
+-- 宠物面板标题
+GROUP_PET_PANEL_LABEL_SKIN                                                                  = {
+    fontObject                                                                              = AshBlzSkinApi.UnitPanelOrientation():Map(function(orientation)
+        if orientation == Orientation.HORIZONTAL then
+            return GameFontNormalTiny
+        else
+            return GameFontNormalSmall
+        end
+    end),
+    justifyH                                                                                = "CENTER",
+    text                                                                                    = AshBlzSkinApi.UnitPetPanelLabel(),
+    location                                                                                = AshBlzSkinApi.UnitPetPanelOrientation():Map(function(orientation)
+        if orientation == Orientation.HORIZONTAL then
+            return getLocation(getAnchor(shareAnchor1, "RIGHT", 0, 0, nil, "LEFT"))
+        else
+            return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, 3, nil, "TOP"))
+        end
+    end),
+}
+
+function UpdateAll()
+    UpdateHealthTextStyle()
+    UpdatePanelLabel()
+end
 
 local function formatHealth(health)
     if health and health > 0 then
@@ -706,11 +710,28 @@ function UpdateHealthTextStyle()
     })
 end
 
+function UpdatePanelLabel()
+    if DB.Appearance.DisplayPanelLabel  then
+        GROUP_PANEL_LABEL_SKIN.visible = AshBlzSkinApi.UnitPanelLabelVisible()
+        GROUP_PET_PANEL_LABEL_SKIN.visible = AshBlzSkinApi.UnitPetPanelLabelVisible()
+    else
+        GROUP_PANEL_LABEL_SKIN.visible = false
+        GROUP_PET_PANEL_LABEL_SKIN.visible = false
+    end
+
+    Style.UpdateSkin(SKIN_NAME, {
+        [PanelLabel]        = GROUP_PANEL_LABEL_SKIN,
+        [PetPanelLabel]     = GROUP_PET_PANEL_LABEL_SKIN
+    })
+end
+
 __SystemEvent__()
 function AshToAsh_Blizzard_Skin_Config_Changed(type)
     if type == "ALL" then
         UpdateAll()
     elseif type == "HealthTextStyle" then
         UpdateHealthTextStyle()
+    elseif type == "PanelLabel" then
+        UpdatePanelLabel()
     end
 end

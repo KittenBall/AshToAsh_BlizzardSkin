@@ -1,3 +1,6 @@
+## 1.4.18
+-- You can now configure panel label visibility
+
 ## 1.4.17
 -- Add Nickname feature
 

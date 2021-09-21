@@ -26,5 +26,8 @@ NameApi.lua
 FriendApi.lua
 Api_Retail.lua
 Template.lua
+# LibCustomGlow's Scorpio version
+# Credit:doez, Stanzilla
+GlowAnimation.lua
 Template_Retail.lua
 Skin.lua
