@@ -135,6 +135,8 @@ function OnLoad()
             },
             -- 显示面板标签
             DisplayPanelLabel                                                                                               = true,
+            -- 显示宠物面板标签
+            DisplayPetPanelLabel                                                                                            = true,
         }
     }
 
@@ -467,6 +469,19 @@ local function GetAppearanceMenu()
                 set                                                                                                         = function(value)
                     DB.Appearance.DisplayPanelLabel = value
                     SendConfigChanged("PanelLabel")
+                end
+            }
+        },
+        -- 显示宠物面板标签
+        {
+            text                                                                                                            = L["show_pet_panel_label"],
+            check                                                                                                           = {
+                get                                                                                                         = function()
+                    return DB.Appearance.DisplayPetPanelLabel and true or false
+                end,
+                set                                                                                                         = function(value)
+                    DB.Appearance.DisplayPetPanelLabel = value
+                    SendConfigChanged("PetPanelLabel")
                 end
             }
         },

@@ -674,6 +674,7 @@ GROUP_PET_PANEL_LABEL_SKIN                                                      
 function UpdateAll()
     UpdateHealthTextStyle()
     UpdatePanelLabel()
+    UpdatePetPanelLabel()
 end
 
 local function formatHealth(health)
@@ -713,14 +714,23 @@ end
 function UpdatePanelLabel()
     if DB.Appearance.DisplayPanelLabel  then
         GROUP_PANEL_LABEL_SKIN.visible = AshBlzSkinApi.UnitPanelLabelVisible()
-        GROUP_PET_PANEL_LABEL_SKIN.visible = AshBlzSkinApi.UnitPetPanelLabelVisible()
     else
         GROUP_PANEL_LABEL_SKIN.visible = false
+    end
+
+    Style.UpdateSkin(SKIN_NAME, {
+        [PanelLabel]        = GROUP_PANEL_LABEL_SKIN
+    })
+end
+
+function UpdatePetPanelLabel()
+    if DB.Appearance.DisplayPetPanelLabel  then
+        GROUP_PET_PANEL_LABEL_SKIN.visible = AshBlzSkinApi.UnitPetPanelLabelVisible()
+    else
         GROUP_PET_PANEL_LABEL_SKIN.visible = false
     end
 
     Style.UpdateSkin(SKIN_NAME, {
-        [PanelLabel]        = GROUP_PANEL_LABEL_SKIN,
         [PetPanelLabel]     = GROUP_PET_PANEL_LABEL_SKIN
     })
 end
@@ -733,5 +743,7 @@ function AshToAsh_Blizzard_Skin_Config_Changed(type)
         UpdateHealthTextStyle()
     elseif type == "PanelLabel" then
         UpdatePanelLabel()
+    elseif type == "PetPanelLabel" then
+        UpdatePetPanelLabel()
     end
 end

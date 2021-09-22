@@ -242,12 +242,12 @@ end
 -- 单位是否有玩家能驱散的debuff
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitDebuffCanDispell()
+    local specID = GetSpecializationInfo(GetSpecialization())
     return Wow.UnitAura():Map(function(unit)
             -- 在副本内才工作
             local inInstance, instanceType = IsInInstance()
             if not inInstance or instanceType == "none" then return false end
             local canDispell, canDispellType
-            local specID = GetSpecializationInfo(GetSpecialization())
             AuraUtil.ForEachAura(unit, "HARMFUL|RAID", 1, function(_, _, _, dType)
                 if isDebuffCanDispell(specID, dType) then
                     canDispell = true

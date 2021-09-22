@@ -150,12 +150,12 @@ end
 -- 单位是否有玩家能驱散的debuff
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitDebuffCanDispell()
+    local class = UnitClassBase("player")
     return Wow.UnitAura():Map(function(unit)
             -- 在副本内才工作
             local inInstance, instanceType = IsInInstance()
             if not inInstance or instanceType == "none" then return false end
 
-            local class = UnitClassBase(unit)
             local canDispell, canDispellType
             local index = 1
             local name = ""

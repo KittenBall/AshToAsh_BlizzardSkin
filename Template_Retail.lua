@@ -66,7 +66,7 @@ class "CenterStatusIcon"(function()
                 self.tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_DECLINED
     		end
         else
-            local phaseReason = UnitPhaseReason(unit);
+            local phaseReason = UnitPhaseReason(unit)
             if phaseReason then
                 texture:SetTexture("Interface\\TargetingFrame\\UI-PhasingIcon")
                 texture:SetTexCoord(0.15625, 0.84375, 0.15625, 0.84375)
