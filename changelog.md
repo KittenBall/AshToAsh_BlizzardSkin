@@ -1,3 +1,7 @@
+## 1.4.19
+-- Fix dispell healthbar coloring bug in bcc
+-- Add GlowAnimation feature, most of the code is copied from LibCustomGlow, thanks doez, Stanzilla
+
 ## 1.4.18
 -- You can now configure panel label visibility
 

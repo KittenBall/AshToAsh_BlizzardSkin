@@ -56,7 +56,6 @@ function AshBlzSkinApi.UnitNameColor()
     return Wow.FromUnitEvent(Wow.FromEvent("UNIT_NAME_UPDATE", "GROUP_ROSTER_UPDATE")):Next():Map(function(unit)
         if not DB.Appearance.Name.FriendsNameColoring or  not UnitIsPlayer(unit) or UnitIsUnit("player", unit) then return Color.WHITE end
         local guid = UnitGUID(unit)
-        print(Toolset.tostring(FriendList, UnitName(unit), guid))
         if tContains(BNFriendList, guid) then
             return Color.BATTLENET
         elseif tContains(FriendList, guid) then

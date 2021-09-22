@@ -35,6 +35,10 @@ function GlowFramePool:OnInit(frame)
 end
 
 function GlowFramePool:OnPush(frame)
+    frame.OnHide = nil
+    frame.key = nil
+    frame.container = nil
+
     frame.OnUpdate = nil
 
     local parent = frame:GetParent()
@@ -69,14 +73,30 @@ end
 -- Add Glow
 -------------------------------------------------
 
+-- When glow target frame hide, auto recycle
+local function autoRecycleOnHide(self)
+    if self.key and self.container  then
+        self.container[self.key] = nil
+        self.key = nil
+        self.container = nil
+        GlowFramePool(self)
+    end
+end
+
 -- Add glow to target frame, or set glow
-function AddOrSetGlow(self, glowContainer, key, color, textureNumber, paddingHorizontal, paddingVertical, texture, texCoord, desaturated, frameLevel)
+function AddOrSetGlow(self, glowContainer, key, color, textureNumber, paddingHorizontal, paddingVertical, texture, texCoord, desaturated, frameLevel, recycleOnHide, alphaMode)
     key = key or ""
     local frame = glowContainer[key]
     if not frame then
         frame = GlowFramePool()
         frame:SetParent(self)
         glowContainer[key] = frame
+    end
+
+    if recycleOnHide then
+        frame.key = key
+        frame.container = glowContainer
+        frame.OnHide = autoRecycleOnHide
     end
 
     frame:SetFrameLevel(self:GetFrameLevel() + frameLevel)
@@ -93,6 +113,9 @@ function AddOrSetGlow(self, glowContainer, key, color, textureNumber, paddingHor
         frame.textures[i]:SetTexCoord(texCoord.left, texCoord.right, texCoord.top, texCoord.bottom)
         frame.textures[i]:SetDesaturated(desaturated)
         frame.textures[i]:SetVertexColor(color.r, color.g, color.b, color.a)
+        if alphaMode then
+            frame.textures[i]:SetBlendMode(alphaMode)
+        end
         frame.textures[i]:Show()
     end
 
@@ -128,14 +151,17 @@ __Sealed__() struct "AutoCastGlowOption" {
     { name = "Key",                 type = String },
     -- FrameLevel of glow
     { name = "FrameLevel",          type = NaturalNumber,           default = 8 },
+    -- Whether recycle on glow hide
+    { name = "recycleOnHide",       type = Boolean,                 default = true },
     -- Start or stop glow
     { name = "Stop",                type = Boolean,                 default = false }
 }
 
 do
     DefaultAutoCastGlowOPtion       = AutoCastGlowOption()
-    AutoCastGlowTexture             = [[Interface\Artifacts\Artifacts]]
-    AutoCastGlowTexCoords           = RectType(0.8115234375, 0.9169921875, 0.8798828125, 0.9853515625)
+    AutoCastGlowTexture             = Scorpio.IsRetail and [[Interface\Artifacts\Artifacts]] or [[Interface\ItemSocketingFrame\UI-ItemSockets]]
+    AutoCastGlowTexCoords           = Scorpio.IsRetail and RectType(0.8115234375, 0.9169921875, 0.8798828125, 0.9853515625) or RectType(0.3984375, 0.4453125, 0.40234375, 0.44921875)
+    AutoCastGlowAlphaMode           = Scorpio.IsRetail and nil or "ADD"
     AutoCastGlowSizes               = { 7, 6, 5, 4 }
 
     function StopAutoCastGlow(self, key)
@@ -143,12 +169,13 @@ do
             if key then
                 local glow = self._AutoCastGlow[key]
                 if glow then
+                    self._AutoCastGlow[key] = nil
                     GlowFramePool(glow)
                 end
             else
                 for k, glow in pairs(self._AutoCastGlow) do
-                    GlowFramePool(glow)
                     self._AutoCastGlow[k] = nil
+                    GlowFramePool(glow)
                 end
             end
         end
@@ -188,6 +215,7 @@ do
     end
 
     function StartAutoCastGlow(self, option)
+        if not self:IsVisible() then return end
         if not self._AutoCastGlow then
             self._AutoCastGlow = {}
         end
@@ -195,7 +223,7 @@ do
         local period = (option.Period ~= 0) and option.Period or 8
         local particleGroupNumber = (option.ParticleGroupNumber > 0) and option.ParticleGroupNumber or 4
         local textureNumber = particleGroupNumber * 4
-        local frame = AddOrSetGlow(self, self._AutoCastGlow, option.Key, option.Color, textureNumber, option.PaddingHorizontal, option.PaddingVertical, AutoCastGlowTexture, AutoCastGlowTexCoords, true, option.FrameLevel)
+        local frame = AddOrSetGlow(self, self._AutoCastGlow, option.Key, option.Color, textureNumber, option.PaddingHorizontal, option.PaddingVertical, AutoCastGlowTexture, AutoCastGlowTexCoords, true, option.FrameLevel, option.recycleOnHide, AutoCastGlowAlphaMode)
 
         for k, size in pairs(AutoCastGlowSizes) do
             for i = 1, particleGroupNumber do

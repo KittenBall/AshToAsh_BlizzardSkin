@@ -357,6 +357,7 @@ SKIN_STYLE =                                                                    
 
         frameStrata                                                                         = "LOW",
         alpha                                                                               = AshBlzSkinApi.UnitInRange():Map('v=>v and 1 or 0.55'),
+        autoCastGlow                                                                        = AshBlzSkinApi.UnitDebuffCanDispell(),
         
         -- 去除默认皮肤的目标指示器
         Label2                                                                              = NIL,
