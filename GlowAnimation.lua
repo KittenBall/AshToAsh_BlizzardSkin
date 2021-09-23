@@ -35,18 +35,14 @@ function GlowFramePool:OnInit(frame)
 end
 
 function GlowFramePool:OnPush(frame)
+    -- clear recyle on hide
     frame.OnHide = nil
     frame.key = nil
     frame.container = nil
 
     frame.OnUpdate = nil
 
-    local parent = frame:GetParent()
-    local name = frame:GetName()
-    if parent[name] then
-        parent[name] = nil
-    end
-
+    -- clear textures
     if frame.textures then
         for _, texture in pairs(frame.textures) do
             GlowTexturePool(texture)
@@ -83,8 +79,8 @@ local function autoRecycleOnHide(self)
     end
 end
 
--- Add glow to target frame, or set glow
-function AddOrSetGlow(self, glowContainer, key, color, textureNumber, paddingHorizontal, paddingVertical, texture, texCoord, desaturated, frameLevel, recycleOnHide, alphaMode)
+-- Add glow to target frame, or re set glow
+function AddOrSetGlow(self, glowContainer, key, color, textureNumber, paddingHorizontal, paddingVertical, texture, texCoord, desaturated, frameLevel, recycleOnHide)
     key = key or ""
     local frame = glowContainer[key]
     if not frame then
@@ -97,6 +93,10 @@ function AddOrSetGlow(self, glowContainer, key, color, textureNumber, paddingHor
         frame.key = key
         frame.container = glowContainer
         frame.OnHide = autoRecycleOnHide
+    else
+        frame.OnHide = nil
+        frame.container = nil
+        frame.key = nil
     end
 
     frame:SetFrameLevel(self:GetFrameLevel() + frameLevel)
@@ -113,9 +113,6 @@ function AddOrSetGlow(self, glowContainer, key, color, textureNumber, paddingHor
         frame.textures[i]:SetTexCoord(texCoord.left, texCoord.right, texCoord.top, texCoord.bottom)
         frame.textures[i]:SetDesaturated(desaturated)
         frame.textures[i]:SetVertexColor(color.r, color.g, color.b, color.a)
-        if alphaMode then
-            frame.textures[i]:SetBlendMode(alphaMode)
-        end
         frame.textures[i]:Show()
     end
 
@@ -144,24 +141,24 @@ __Sealed__() struct "AutoCastGlowOption" {
     -- Scale of particles
     { name = "Scale",               type = Number,                  default = 1 },
     -- Corresponding to the frequency param of the LibCustomGlow.AutoCastGlow_Start
+    -- Set to negative to inverse direction of rotation
     { name = "Period",              type = Number,                  default = 8 },
-    -- AutoCastGlow color
+    -- Glow color
     { name = "Color",               type = ColorType,               default = Color(0.95, 0.95, 0.32) },
     -- Key of glow, allows for multiple glows on one frame
     { name = "Key",                 type = String },
     -- FrameLevel of glow
     { name = "FrameLevel",          type = NaturalNumber,           default = 8 },
     -- Whether recycle on glow hide
-    { name = "recycleOnHide",       type = Boolean,                 default = true },
+    { name = "RecycleOnHide",       type = Boolean,                 default = true },
     -- Start or stop glow
     { name = "Stop",                type = Boolean,                 default = false }
 }
 
 do
-    DefaultAutoCastGlowOPtion       = AutoCastGlowOption()
+    DefaultAutoCastGlowOption       = AutoCastGlowOption()
     AutoCastGlowTexture             = Scorpio.IsRetail and [[Interface\Artifacts\Artifacts]] or [[Interface\ItemSocketingFrame\UI-ItemSockets]]
     AutoCastGlowTexCoords           = Scorpio.IsRetail and RectType(0.8115234375, 0.9169921875, 0.8798828125, 0.9853515625) or RectType(0.3984375, 0.4453125, 0.40234375, 0.44921875)
-    AutoCastGlowAlphaMode           = Scorpio.IsRetail and nil or "ADD"
     AutoCastGlowSizes               = { 7, 6, 5, 4 }
 
     function StopAutoCastGlow(self, key)
@@ -216,6 +213,7 @@ do
 
     function StartAutoCastGlow(self, option)
         if not self:IsVisible() then return end
+
         if not self._AutoCastGlow then
             self._AutoCastGlow = {}
         end
@@ -223,7 +221,7 @@ do
         local period = (option.Period ~= 0) and option.Period or 8
         local particleGroupNumber = (option.ParticleGroupNumber > 0) and option.ParticleGroupNumber or 4
         local textureNumber = particleGroupNumber * 4
-        local frame = AddOrSetGlow(self, self._AutoCastGlow, option.Key, option.Color, textureNumber, option.PaddingHorizontal, option.PaddingVertical, AutoCastGlowTexture, AutoCastGlowTexCoords, true, option.FrameLevel, option.recycleOnHide, AutoCastGlowAlphaMode)
+        local frame = AddOrSetGlow(self, self._AutoCastGlow, option.Key, option.Color, textureNumber, option.PaddingHorizontal, option.PaddingVertical, AutoCastGlowTexture, AutoCastGlowTexCoords, true, option.FrameLevel, option.recycleOnHide)
 
         for k, size in pairs(AutoCastGlowSizes) do
             for i = 1, particleGroupNumber do
@@ -244,20 +242,146 @@ do
         require             = Frame,
         type                = AutoCastGlowOption + Boolean,
         default             = nil,
-        set                 = function(self, info)
-            if type(info) == "boolean" then
-                if info then
-                    StartAutoCastGlow(self, DefaultAutoCastGlowOPtion)
+        set                 = function(self, option)
+            if type(option) == "boolean" then
+                if option then
+                    StartAutoCastGlow(self, DefaultAutoCastGlowOption)
                 else
                     StopAutoCastGlow(self)
                 end
             else
-                if not info or info.Stop then
-                    StopAutoCastGlow(self, info.Key)
+                if not option or option.Stop then
+                    StopAutoCastGlow(self, option.Key)
                 else
-                    StartAutoCastGlow(self, info)
+                    StartAutoCastGlow(self, option)
                 end
             end
         end
     }
 end
+
+-------------------------------------------------
+-- PixelGlow
+-------------------------------------------------
+
+__Sealed__() struct "PixelGlowOption" {
+    -- Corresponding to the N param of the LibCustomGlow.PixelGlow_Start
+    -- Number of lines
+    { name = "LineNumber",          type = NaturalNumber,           default = 8 },
+    -- Corresponding to the xoffset param of the LibCustomGlow.PixelGlow_Start
+    -- Horizontal margin between glow and target frame
+    { name = "PaddingHorizontal",   type = Number,                  default = 0 },
+    -- Corresponding to the yoffset param of the LibCustomGlow.PixelGlow_Start
+    -- Vertical margin between glow and target frame
+    { name = "PaddingVertical",     type = Number,                  default = 0 },
+    -- Length of lines
+    -- Default value depends on region size and number of lines
+    { name = "Length",              type = Number },
+    -- Thickness of lines
+    { name = "Thickness",           type = Number,                  default = 2 },
+    -- Corresponding to the frequency param of the LibCustomGlow.PixelGlow_Start
+    -- Set to negative to inverse direction of rotation
+    { name = "Period",              type = Number,                  default = 8 },
+    -- Glow color
+    { name = "Color",               type = ColorType,               default = Color(0.95, 0.95, 0.32) },
+    -- Key of glow, allows for multiple glows on one frame
+    { name = "Key",                 type = String },
+    -- Whether show border
+    { name = "Border",              type = Boolean,                 default = true },
+    -- FrameLevel of glow
+    { name = "FrameLevel",          type = NaturalNumber,           default = 8 },
+    -- Whether recycle on glow hide
+    { name = "RecycleOnHide",       type = Boolean,                 default = true },
+    -- Start or stop glow
+    { name = "Stop",                type = Boolean,                 default = false }
+}
+
+__Sealed__()
+class "AutoCastGlow"(function(_ENV)
+    inherit "Frame"
+
+    local recycle                   = Recycle()
+    
+    function recycle:New()
+        self.maxSize = (self.maxSize or 0) + 1
+        return Texure("AutoCastGlowTexture" .. self.maxSize)
+    end
+
+    function recycler:OnPush(texture)
+        texture:Hide()
+        texture:ClearAllPoints()
+    end
+
+    local function OnShow(self)
+    end
+
+    local function OnHide(self)
+    end
+
+    __Static__()
+    property "TexturePool" { set = false, default = recycle }
+
+    -- Corresponding to the N param of the LibCustomGlow.AutoCastGlow_Start
+    -- Number of particle groups. Each group contains 4 particles
+    property "GroupNumber"          {
+        type        = NaturalNumber,
+        default     = 4
+    }
+
+    -- Corresponding to the xoffset param of the LibCustomGlow.AutoCastGlow_Start
+    -- Horizontal margin between glow and target frame
+    property "PaddingHorizontal"    {
+        type        = Number,
+        default     = 0
+    }
+
+    -- Corresponding to the yoffset param of the LibCustomGlow.AutoCastGlow_Start
+    -- Vertical margin between glow and target frame    
+    property "PaddingVertical"      {
+        type        = Number,
+        default     = 0
+    }
+
+    -- Scale of particles
+    property "Scale"                {
+        type        = Number,
+        default     = 1
+    }
+
+    -- Corresponding to the frequency param of the LibCustomGlow.AutoCastGlow_Start
+    -- Set to negative to inverse direction of rotation
+    property "Period"               {
+        type        = Number,
+        default     = 8
+    }
+
+    -- Glow color
+    property "Color"                {
+        type        = ColorType,
+        default     = Color(0.95, 0.95, 0.32)
+    }
+
+    -- FrameLevel of glow
+    property "FrameLevel"           {
+        type        = NaturalNumber,
+        default     = 8
+    }
+
+    -- Texture of particle
+    property "Texture"              {
+        type        = String + Number,
+        default     = Scorpio.IsRetail and [[Interface\Artifacts\Artifacts]] or [[Interface\ItemSocketingFrame\UI-ItemSockets]]
+    }
+
+    -- TexCoords of particle
+    property "TexCoords"            {
+        type        = RectType,
+        default     = Scorpio.IsRetail and RectType(0.8115234375, 0.9169921875, 0.8798828125, 0.9853515625) or RectType(0.3984375, 0.4453125, 0.40234375, 0.44921875)
+    }
+
+    function __ctor(self)
+        self.OnShow = self.OnShow + OnShow
+        self.OnHide = self.OnHide + OnHide
+    end
+
+end)
