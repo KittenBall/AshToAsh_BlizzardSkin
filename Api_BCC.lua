@@ -174,6 +174,6 @@ end
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitDebuffCanDispellColor()
     return AshBlzSkinApi.UnitDebuffCanDispell():Map(function(_, dType)
-        return DebuffTypeColor[dType or ""]
+        return GetDispellDebuffColor(dType or "")
     end)
 end

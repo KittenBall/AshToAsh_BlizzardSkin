@@ -61,6 +61,8 @@ function UpdateGroupPetMap(unit)
     end
 end
 
+PetColor = {}
+
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPetColor()
     return Wow.FromUnitEvent(Wow.FromEvent("UNIT_CONNECTION", "UNIT_NAME_UPDATE", "GROUP_ROSTER_UPDATE"):Map("unit => unit or 'any'")):Next():Map(function(unit)
@@ -70,8 +72,17 @@ function AshBlzSkinApi.UnitPetColor()
         if guid then
             local petOwnerInfo = PetOwnerClassMap[guid]
             if petOwnerInfo and petOwnerInfo ~= -1 then
-                local h, s, v = Color[petOwnerInfo.class or "GREEN"]:ToHSV()
-                return Color.FromHSV(h, s*0.85, v*0.85)
+                local key = petOwnerInfo.class or "GREEN"
+                local color = PetColor[key]
+
+                if not color then
+                    color = Color[key]
+                    local h, s, v = color:ToHSV()
+                    color = Color.FromHSV(h, s*0.85, v*0.85)
+                    PetColor[key] = color
+                end
+
+                return color
             end
         end
         return Color[UnitClassBase(unit) or "GREEN"]

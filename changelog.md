@@ -1,3 +1,6 @@
+## 1.4.21
+- Pet color will be cached now
+- Increase dispell debuff color lightness
 ## 1.4.20
 - Fix error when send nickname message in raid
 - Performance improvement:The data source will now be disabled after the feature is closed

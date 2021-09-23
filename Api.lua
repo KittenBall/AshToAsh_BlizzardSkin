@@ -75,6 +75,20 @@ end
 -------------------------------------------------
 
 DispellDebuffTypes    = { Magic = true, Curse = true, Disease = true, Poison = true }
+DispellDebuffColor    = {}
+
+-- Increase debuff color's Lightness
+function GetDispellDebuffColor(dType)
+    local color = DispellDebuffColor[dType]
+    if not color then
+        local r, g, b = DebuffTypeColor[dType]
+        local h, s, l = Color(r, g, b):ToHSL()
+        color = Color.FromHSL(h, s, l * 1.3)
+        DispellDebuffColor[dType] = color
+    end
+
+    return color
+end
 
 -------------------------------------------------
 -- Center Status
