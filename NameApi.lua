@@ -21,7 +21,7 @@ function ASHTOASH_BLIZZARD_SKIN_SHOW_NICKNAME_TO_OTHERS()
     if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
         channel = "INSTANCE_CHAT"
     elseif IsInGroup(LE_PARTY_CATEGORY_HOME) then
-        channel = IsInRaid() and "RIAD" or "PARTY"
+        channel = IsInRaid() and "RAID" or "PARTY"
     end
     if channel then
         SendAddonMessage("ATA_BLZ_SKIN_NICKNAME", { guid = UnitGUID("player"), nickname = DB.Appearance.Name.Nickname }, channel)
@@ -32,7 +32,7 @@ __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitName()
     return Wow.FromUnitEvent(Wow.FromEvent("UNIT_NAME_UPDATE", "GROUP_ROSTER_UPDATE", "ASHTOASH_BLZ_SKIN_NICK_NAME_UPDATE")):Next():Map(function(unit)
         -- 显示自己的昵称
-        if DB.Appearance.Name.ShowNicknameOwns and DB.Appearance.Name.Nickname and UnitIsUnit("player", unit) then
+        if UnitIsUnit("player", unit) and DB.Appearance.Name.ShowNicknameOwns and DB.Appearance.Name.Nickname then
             return DB.Appearance.Name.Nickname
         elseif not UnitIsUnit("player", unit) and DB.Appearance.Name.ShowNicknameOthers then
             -- 显示他人的昵称

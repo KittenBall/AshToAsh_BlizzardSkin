@@ -1,15 +1,20 @@
+## 1.4.20
+- Fix error when send nickname message in raid
+- Performance improvement:The data source will now be disabled after the feature is closed
+- Temporarily disable AutoCastGlow, it will be reworked
+
 ## 1.4.19
--- Fix dispell healthbar coloring bug in bcc
--- Add GlowAnimation feature, most of the code is copied from LibCustomGlow, thanks doez, Stanzilla
+- Fix dispell healthbar coloring bug in bcc
+- Add GlowAnimation feature, most of the code is copied from LibCustomGlow, thanks doez, Stanzilla
 
 ## 1.4.18
--- You can now configure panel label visibility
+- You can now configure panel label visibility
 
 ## 1.4.17
--- Add Nickname feature
+- Add Nickname feature
 
 ## 1.4.16
--- Add friends name coloring feature
+- Add friends name coloring feature
 
 ## 1.4.15
 - You can now configure some simple options in ata menu 

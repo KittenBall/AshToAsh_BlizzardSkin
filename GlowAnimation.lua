@@ -300,22 +300,11 @@ __Sealed__()
 class "AutoCastGlow"(function(_ENV)
     inherit "Frame"
 
-    local recycle                   = Recycle()
+    local recycle                   = Recycle(Texture, "AutoCastGlowTexture%d")
     
-    function recycle:New()
-        self.maxSize = (self.maxSize or 0) + 1
-        return Texure("AutoCastGlowTexture" .. self.maxSize)
-    end
-
-    function recycler:OnPush(texture)
+    function recycle:OnPush(texture)
         texture:Hide()
         texture:ClearAllPoints()
-    end
-
-    local function OnShow(self)
-    end
-
-    local function OnHide(self)
     end
 
     __Static__()
@@ -379,9 +368,25 @@ class "AutoCastGlow"(function(_ENV)
         default     = Scorpio.IsRetail and RectType(0.8115234375, 0.9169921875, 0.8798828125, 0.9853515625) or RectType(0.3984375, 0.4453125, 0.40234375, 0.44921875)
     }
 
+    local function OnShow(self)
+        local parent = self:GetParent()
+        self:SetFrameLevel(parent:GetFrameLevel() + self.FrameLevel)
+        self:SetPoint("TOPLEFT", parent, "TOPLEFT", -self.PaddingHorizontal + 0.05, self.PaddingVertical + 0.05)
+        self:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", self.PaddingHorizontal, -self.PaddingVertical + 0.05)
+
+        
+    end
+
+    local function OnHide(self)
+    end
+
+    local function OnUpdate(self, elapsed)
+    end
+
     function __ctor(self)
         self.OnShow = self.OnShow + OnShow
         self.OnHide = self.OnHide + OnHide
+        self.OnUpdate = self.OnUpdate + OnUpdate
     end
 
 end)

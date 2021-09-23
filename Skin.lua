@@ -49,6 +49,224 @@ local relocationUnitFrameIconOnSizeChanged = Wow.FromFrameSize(UnitFrame):Map(fu
     return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, h/3-4))
 end)
 
+-------------------------------------------------
+-- Dynamic Style
+-------------------------------------------------
+-- 生命值
+SHARE_HEALTHLABEL_SKIN                                                                       = {
+    location                                                                                 = {
+        Anchor("CENTER"),
+        Anchor("TOP", 0, -2, "NameLabel", "BOTTOM")
+    },
+    fontObject                                                                               = SystemFont_Small
+}
+
+local function formatHealth(health)
+    if health and health > 0 then
+        if DB.Appearance.Health.TextFormat == HealthTextFormat.TEN_THOUSAND then
+            return health >= 10000 and ("%.1fW"):format(health/10000) or health
+        elseif DB.Appearance.Health.TextFormat == HealthTextFormat.KILO then
+            return health >= 1000 and ("%.1fK"):format(health/1000) or health
+        else
+            return BreakUpLargeNumbers(health)
+        end
+    end
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.HealthLabelSkin()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
+        local healthTextStyle = DB.Appearance.Health.Style
+        if healthTextStyle == HealthTextStyle.HEALTH then
+            SHARE_HEALTHLABEL_SKIN.text  = Wow.UnitHealthFrequent():Map(formatHealth)
+        elseif healthTextStyle == HealthTextStyle.LOSTHEALTH then
+            SHARE_HEALTHLABEL_SKIN.text  = Wow.UnitHealthLostFrequent():Map(formatHealth)
+        elseif healthTextStyle == HealthTextStyle.PERCENT then
+            SHARE_HEALTHLABEL_SKIN.text  = Wow.UnitHealthPercentFrequent():Map(function(percent)
+                return percent.."%"
+            end)
+        else
+            return nil
+        end
+    
+        SHARE_HEALTHLABEL_SKIN.textColor = (healthTextStyle == HealthTextStyle.LOSTHEALTH and Color.RED or Color.WHITE)
+
+        return SHARE_HEALTHLABEL_SKIN
+    end)
+end
+
+-- 面板标题
+GROUP_PANEL_LABEL_SKIN                                                                       = {
+    fontObject                                                                               = AshBlzSkinApi.UnitPanelOrientation():Map(function(orientation)
+        if orientation == Orientation.HORIZONTAL then
+            return GameFontNormalTiny
+        else
+            return GameFontNormalSmall
+        end
+    end),
+    justifyH                                                                                 = "CENTER",
+    text                                                                                     = AshBlzSkinApi.UnitPanelLabel(),
+    visible                                                                                  = AshBlzSkinApi.UnitPanelLabelVisible(),
+    location                                                                                 = AshBlzSkinApi.UnitPanelOrientation():Map(function(orientation)
+        if orientation == Orientation.HORIZONTAL then
+            return getLocation(getAnchor(shareAnchor1, "RIGHT", 0, 0, nil, "LEFT"))
+        else
+            return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, 3, nil, "TOP"))
+        end
+    end),
+}
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.PanelLableSkin()
+    return Wow.FromEvent("AshToAsh_Blizzard_Skin_Config_Changed", "ASHTOASH_CONFIG_CHANGED"):Map(function()
+        return DB.Appearance.DisplayPanelLabel and GROUP_PANEL_LABEL_SKIN or nil
+    end)
+end
+
+-- 宠物面板标题
+GROUP_PET_PANEL_LABEL_SKIN                                                                  = {
+    fontObject                                                                              = AshBlzSkinApi.UnitPanelOrientation():Map(function(orientation)
+        if orientation == Orientation.HORIZONTAL then
+            return GameFontNormalTiny
+        else
+            return GameFontNormalSmall
+        end
+    end),
+    justifyH                                                                                = "CENTER",
+    text                                                                                    = AshBlzSkinApi.UnitPetPanelLabel(),
+    visible                                                                                 = AshBlzSkinApi.UnitPetPanelLabelVisible(),
+    location                                                                                = AshBlzSkinApi.UnitPetPanelOrientation():Map(function(orientation)
+        if orientation == Orientation.HORIZONTAL then
+            return getLocation(getAnchor(shareAnchor1, "RIGHT", 0, 0, nil, "LEFT"))
+        else
+            return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, 3, nil, "TOP"))
+        end
+    end),
+}
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.PetPanelLableSkin()
+    return Wow.FromEvent("AshToAsh_Blizzard_Skin_Config_Changed", "ASHTOASH_CONFIG_CHANGED"):Map(function()
+        return DB.Appearance.DisplayPetPanelLabel and GROUP_PET_PANEL_LABEL_SKIN or nil
+    end)
+end
+
+
+--能量条
+SHARE_POWERBAR_SKIN                                                                         = {
+    useParentLevel                                                                          = true,
+    statusBarTexture                                                                        = {
+        file                                                                                = "Interface\\RaidFrame\\Raid-Bar-Resource-Fill",
+        drawLayer                                                                           = "BORDER"
+    },
+    location                                                                                = {
+        Anchor("TOPLEFT", 0, 0, HEALTHBAR, "BOTTOMLEFT"),
+        Anchor("BOTTOMRIGHT", -1, 1)
+    },
+
+    BackgroundTexture                                                                       = {
+        file                                                                                = "Interface\\RaidFrame\\Raid-Bar-Resource-Background",
+        setAllPoints                                                                        = true,
+        subLevel                                                                            = 2,
+        drawLayer                                                                           = "BACKGROUND"
+    }
+}
+
+
+-- 玩家能量条
+POWER_BAR_SKIN                                                                              = {
+    SHARE_POWERBAR_SKIN,
+
+    value                                                                                   = AshBlzSkinApi.UnitPower(),
+    minMaxValues                                                                            = AshBlzSkinApi.UnitPowerMax(),
+    statusBarColor                                                                          = AshBlzSkinApi.UnitPowerColor()
+}
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.PowerBarSkin()
+    return AshBlzSkinApi.PowerBarVisible():Map(function()
+        return DB.Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS and POWER_BAR_SKIN or nil
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.PetPowerBarSkin()
+    return AshBlzSkinApi.PowerBarVisible():Map(function()
+        return DB.Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS and SHARE_POWERBAR_SKIN or nil
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.CastBarVisibilityChanged()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
+        return DB.Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS and DB.Appearance.CastBar.Visibility or Visibility.HIDE
+    end)
+end
+
+-- 施法条
+SHARE_CASTBAR_SKIN                                                                          = {
+    height                                                                                  = 8,
+    location                                                                                = {
+        Anchor("TOPLEFT", 0, 0, "PowerBar", "TOPLEFT"),
+        Anchor("BOTTOMRIGHT", 0, 0, "PowerBar", "BOTTOMRIGHT") 
+    },
+    visibility                                                                              = AshBlzSkinApi.CastBarVisibilityChanged(),
+
+    Spark                                                                                   = {
+        size                                                                                = Size(24, 24),
+    }
+}
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.CastBarSkin()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
+        return (DB.Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS and DB.Appearance.CastBar.Visibility) and SHARE_CASTBAR_SKIN or nil
+    end)
+end
+
+-- 仇恨皮肤
+AGGRO_SKIN                                                                                  = {
+    drawLayer                                                                               = "ARTWORK",
+    subLevel                                                                                = 3,
+    file                                                                                    = "Interface\\RaidFrame\\Raid-FrameHighlights",
+    texCoords                                                                               = RectType(0.00781250, 0.55468750, 0.00781250, 0.27343750),
+    setAllPoints                                                                            = true,
+    visible                                                                                 = Wow.UnitThreatLevel():Map("l=> l>0"),
+    vertexColor                                                                             = Wow.UnitThreatLevel():Map(function(level)
+        shareColor.r, shareColor.g, shareColor.b, shareColor.a = GetThreatStatusColor(level)
+        return shareColor
+    end)
+}
+
+-- 宠物仇恨指示器
+PET_AGGRO_SKIN                                                                              = {
+    AGGRO_SKIN,
+
+    visible                                                                                 = AshBlzSkinApi.UnitPetThreatLevel():Map("l=> l>0"),
+    vertexColor                                                                             = AshBlzSkinApi.UnitPetThreatLevel():Map(function(level)
+        shareColor.r, shareColor.g, shareColor.b, shareColor.a = GetThreatStatusColor(level)
+        return shareColor
+    end)
+}
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.AggroSkin()
+    return  AshBlzSkinApi.OnConfigChanged():Map(function()
+        return DB.Appearance.DisplayAggroHighlight and AGGRO_SKIN or nil
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.PetAggroSkin()
+    return  AshBlzSkinApi.OnConfigChanged():Map(function()
+        return DB.Appearance.DisplayAggroHighlight and PET_AGGRO_SKIN or nil
+    end)
+end
+
+-------------------------------------------------
+-- Share Skin
+-------------------------------------------------
+
 -- Enlarge debuff
 SHARE_ENLARGEDEBUFFPANEL_SKIN                                                               = {
     topLevel                                                                                = true,
@@ -168,41 +386,6 @@ SHARE_NAMELABEL_SKIN                                                            
     textColor                                                                               = AshBlzSkinApi.UnitNameColor()
 }
 
--- 施法条
-SHARE_CASTBAR_SKIN                                                                          = {
-    height                                                                                  = 8,
-    location                                                                                = {
-        Anchor("TOPLEFT", 0, 0, "PowerBar", "TOPLEFT"),
-        Anchor("BOTTOMRIGHT", 0, 0, "PowerBar", "BOTTOMRIGHT") 
-    },
-    visibility                                                                              = AshBlzSkinApi.CastBarVisibilityChanged(),
-
-    Spark                                                                                   = {
-        size                                                                                = Size(24, 24),
-    }
-}
-
---能量条
-SHARE_POWERBAR_SKIN                                                                         = {
-    useParentLevel                                                                          = true,
-    statusBarTexture                                                                        = {
-        file                                                                                = "Interface\\RaidFrame\\Raid-Bar-Resource-Fill",
-        drawLayer                                                                           = "BORDER"
-    },
-    location                                                                                = {
-        Anchor("TOPLEFT", 0, 0, HEALTHBAR, "BOTTOMLEFT"),
-        Anchor("BOTTOMRIGHT", -1, 1)
-    },
-    visible                                                                                 = AshBlzSkinApi.PowerBarVisible(),
-
-    BackgroundTexture                                                                       = {
-        file                                                                                = "Interface\\RaidFrame\\Raid-Bar-Resource-Background",
-        setAllPoints                                                                        = true,
-        subLevel                                                                            = 2,
-        drawLayer                                                                           = "BACKGROUND"
-    }
-}
-
 -- 血条
 SHARE_HEALTHBAR_SKIN                                                                        = {
     useParentLevel                                                                          = true,
@@ -243,7 +426,7 @@ SHARE_HEALTHBAR_SKIN                                                            
                 duration                                                                    = 0.5,
                 fromAlpha                                                                   = 0,
                 toAlpha                                                                     = 1
-            },      
+            },
             Alpha2                                                                          = {
                 smoothing                                                                   = "IN",
                 order                                                                       = 2,
@@ -254,11 +437,16 @@ SHARE_HEALTHBAR_SKIN                                                            
         }
     }
 }
+
+-------------------------------------------------
+-- Skin
+-------------------------------------------------
+
 SKIN_STYLE =                                                                                {
     -- 单位面板
     [AshGroupPanel]                                                                         = {
 
-        AshBlzSkinPanelLabel                                                                = {},
+        Label                                                                               = AshBlzSkinApi.PanelLableSkin(),
 
         -- 解锁按钮
         AshBlzSkinUnlockButton                                                              = {
@@ -272,7 +460,7 @@ SKIN_STYLE =                                                                    
 
     -- 宠物面板
     [AshGroupPetPanel]                                                                      = {
-        AshBlzSkinPanelLabel                                                                = {}
+        Label                                                                               = AshBlzSkinApi.PetPanelLableSkin()
     },
 
     [AshBlzSkinBuffIcon]                                                                    = {
@@ -357,7 +545,6 @@ SKIN_STYLE =                                                                    
 
         frameStrata                                                                         = "LOW",
         alpha                                                                               = AshBlzSkinApi.UnitInRange():Map('v=>v and 1 or 0.55'),
-        autoCastGlow                                                                        = AshBlzSkinApi.UnitDebuffCanDispell(),
         
         -- 去除默认皮肤的目标指示器
         Label2                                                                              = NIL,
@@ -375,7 +562,7 @@ SKIN_STYLE =                                                                    
         AshBlzSkinSelectionHighlightTexture                                                 = {},
 
         -- 仇恨指示器
-        AshBlzSkinAggroHighlight                                                            = {},
+        AshBlzSkinAggroHighlight                                                            = AshBlzSkinApi.AggroSkin(),
 
         -- 名字
         NameLabel                                                                           = {
@@ -390,7 +577,7 @@ SKIN_STYLE =                                                                    
         },
 
         -- 血量文本
-        AshBlzSkinHealthLabel                                                               = {},
+        HealthLabel                                                                         = AshBlzSkinApi.HealthLabelSkin(),
 
         -- 死亡图标
         AshBlzSkinDeadIcon                                                                  = {
@@ -481,16 +668,10 @@ SKIN_STYLE =                                                                    
         },
 
         -- 能量条
-        PowerBar                                                                            = {
-            SHARE_POWERBAR_SKIN,
-
-            value                                                                           = AshBlzSkinApi.UnitPower(),
-            minMaxValues                                                                    = AshBlzSkinApi.UnitPowerMax(),
-            statusBarColor                                                                  = AshBlzSkinApi.UnitPowerColor()
-        },
+        PowerBar                                                                            = AshBlzSkinApi.PowerBarSkin(),
 
         -- 施法条
-        AshBlzSkinCastBar                                                                   = SHARE_CASTBAR_SKIN,
+        AshBlzSkinCastBar                                                                   = AshBlzSkinApi.CastBarSkin(),
 
         BuffPanel                                                                           = NIL,
 
@@ -572,13 +753,7 @@ SKIN_STYLE =                                                                    
         },
 
         -- 仇恨指示器
-        AshBlzSkinAggroHighlight                                                            = {
-            visible                                                                         = AshBlzSkinApi.UnitPetThreatLevel():Map("l=> l>0"),
-            vertexColor                                                                     = AshBlzSkinApi.UnitPetThreatLevel():Map(function(level)
-                shareColor.r, shareColor.g, shareColor.b, shareColor.a = GetThreatStatusColor(level)
-                return shareColor
-            end)
-        },
+        AshBlzSkinAggroHighlight                                                            = AshBlzSkinApi.PetAggroSkin(),
 
         -- 选中
         AshBlzSkinSelectionHighlightTexture                                                 = {},
@@ -593,10 +768,10 @@ SKIN_STYLE =                                                                    
         },
 
         -- 能量条
-        PowerBar                                                                            = SHARE_POWERBAR_SKIN,
+        PowerBar                                                                            = AshBlzSkinApi.PetPowerBarSkin(),
 
         -- 施法条
-        AshBlzSkinCastBar                                                                   = SHARE_CASTBAR_SKIN,
+        AshBlzSkinCastBar                                                                   = AshBlzSkinApi.CastBarSkin(),
 
         -- Buff
         AshBlzSkinBuffPanel                                                                 = SHARE_BUFFPANEL_SKIN,
@@ -617,134 +792,3 @@ SKIN_STYLE =                                                                    
 
 Style.UpdateSkin(SKIN_NAME, SKIN_STYLE)
 Style.ActiveSkin(SKIN_NAME)
-
--------------------------------------------------
--- Dynamic Style
--------------------------------------------------
-
--- 生命值
-SHARE_HEALTHLABEL_SKIN                                                                       = {
-    location                                                                                 = {
-        Anchor("CENTER"),
-        Anchor("TOP", 0, -2, "NameLabel", "BOTTOM")
-    },
-    fontObject                                                                               = SystemFont_Small,
-    visible                                                                                  = AshBlzSkinApi.HealthLableVisible()
-}
-
--- 面板标题
-GROUP_PANEL_LABEL_SKIN                                                                       = {
-    fontObject                                                                               = AshBlzSkinApi.UnitPanelOrientation():Map(function(orientation)
-        if orientation == Orientation.HORIZONTAL then
-            return GameFontNormalTiny
-        else
-            return GameFontNormalSmall
-        end
-    end),
-    justifyH                                                                                 = "CENTER",
-    text                                                                                     = AshBlzSkinApi.UnitPanelLabel(),
-    location                                                                                 = AshBlzSkinApi.UnitPanelOrientation():Map(function(orientation)
-        if orientation == Orientation.HORIZONTAL then
-            return getLocation(getAnchor(shareAnchor1, "RIGHT", 0, 0, nil, "LEFT"))
-        else
-            return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, 3, nil, "TOP"))
-        end
-    end),
-}
-
--- 宠物面板标题
-GROUP_PET_PANEL_LABEL_SKIN                                                                  = {
-    fontObject                                                                              = AshBlzSkinApi.UnitPanelOrientation():Map(function(orientation)
-        if orientation == Orientation.HORIZONTAL then
-            return GameFontNormalTiny
-        else
-            return GameFontNormalSmall
-        end
-    end),
-    justifyH                                                                                = "CENTER",
-    text                                                                                    = AshBlzSkinApi.UnitPetPanelLabel(),
-    location                                                                                = AshBlzSkinApi.UnitPetPanelOrientation():Map(function(orientation)
-        if orientation == Orientation.HORIZONTAL then
-            return getLocation(getAnchor(shareAnchor1, "RIGHT", 0, 0, nil, "LEFT"))
-        else
-            return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, 3, nil, "TOP"))
-        end
-    end),
-}
-
-function UpdateAll()
-    UpdateHealthTextStyle()
-    UpdatePanelLabel()
-    UpdatePetPanelLabel()
-end
-
-local function formatHealth(health)
-    if health and health > 0 then
-        if DB.Appearance.Health.TextFormat == HealthTextFormat.TEN_THOUSAND then
-            return health >= 10000 and ("%.1fW"):format(health/10000) or health
-        elseif DB.Appearance.Health.TextFormat == HealthTextFormat.KILO then
-            return health >= 1000 and ("%.1fK"):format(health/1000) or health
-        else
-            return BreakUpLargeNumbers(health)
-        end
-    end
-end
-
-function UpdateHealthTextStyle()
-    local healthTextStyle = DB.Appearance.Health.Style
-    local healthTextValue
-    if healthTextStyle == HealthTextStyle.HEALTH then
-        healthTextValue = Wow.UnitHealthFrequent():Map(formatHealth)
-    elseif healthTextStyle == HealthTextStyle.LOSTHEALTH then
-        healthTextValue = Wow.UnitHealthLostFrequent():Map(formatHealth)
-    elseif healthTextStyle == HealthTextStyle.PERCENT then
-        healthTextValue = Wow.UnitHealthPercentFrequent():Map(function(percent)
-            return percent.."%"
-        end)
-    else
-        healthTextValue = NIL
-    end
-
-    SHARE_HEALTHLABEL_SKIN.text = healthTextValue
-    SHARE_HEALTHLABEL_SKIN.textColor = (healthTextStyle == HealthTextStyle.LOSTHEALTH and Color.RED or Color.WHITE)
-    Style.UpdateSkin(SKIN_NAME, {
-        [HealthLabel]           = SHARE_HEALTHLABEL_SKIN
-    })
-end
-
-function UpdatePanelLabel()
-    if DB.Appearance.DisplayPanelLabel  then
-        GROUP_PANEL_LABEL_SKIN.visible = AshBlzSkinApi.UnitPanelLabelVisible()
-    else
-        GROUP_PANEL_LABEL_SKIN.visible = false
-    end
-
-    Style.UpdateSkin(SKIN_NAME, {
-        [PanelLabel]        = GROUP_PANEL_LABEL_SKIN
-    })
-end
-
-function UpdatePetPanelLabel()
-    if DB.Appearance.DisplayPetPanelLabel  then
-        GROUP_PET_PANEL_LABEL_SKIN.visible = AshBlzSkinApi.UnitPetPanelLabelVisible()
-    else
-        GROUP_PET_PANEL_LABEL_SKIN.visible = false
-    end
-
-    Style.UpdateSkin(SKIN_NAME, {
-        [PetPanelLabel]     = GROUP_PET_PANEL_LABEL_SKIN
-    })
-end
-
-__SystemEvent__()
-function AshToAsh_Blizzard_Skin_Config_Changed(type)
-    if type == "ALL" then
-        UpdateAll()
-    elseif type == "HealthTextStyle" then
-        UpdateHealthTextStyle()
-    elseif type == "PanelLabel" then
-        UpdatePanelLabel()
-    elseif type == "PetPanelLabel" then
-        UpdatePetPanelLabel()
-    end
-end

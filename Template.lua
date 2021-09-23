@@ -32,14 +32,6 @@ class "VehicleIcon" { Texture }
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinDeadIcon")
 class "DeadIcon" { Texture }
 
--- 血量文本
-__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinHealthLabel")
-class "HealthLabel" { FontString }
-
--- 面板标题
-__Sealed__() __ChildProperty__(AshGroupPanel, "AshBlzSkinPanelLabel")
-class "PanelLabel" { FontString }
-
 -- 宠物面板标题
 __Sealed__() __ChildProperty__(AshGroupPetPanel, "AshBlzSkinPanelLabel")
 class "PetPanelLabel" { FontString }
@@ -315,7 +307,6 @@ class "DispellDebuffPanel" (function(_ENV)
     }
 end)
 
-local shareColor    = ColorType(0, 0, 0, 1)
 TEMPLATE_SKIN_STYLE                                                                     = {
 
     -- 目标选中边框
@@ -329,38 +320,12 @@ TEMPLATE_SKIN_STYLE                                                             
         visible                                                                         = Wow.UnitIsTarget()
     },
 
-    -- 仇恨指示器
-    [AggroHighlight]                                                                    = {
-        drawLayer                                                                       = "ARTWORK",
-        subLevel                                                                        = 3,
-        file                                                                            = "Interface\\RaidFrame\\Raid-FrameHighlights",
-        texCoords                                                                       = RectType(0.00781250, 0.55468750, 0.00781250, 0.27343750),
-        setAllPoints                                                                    = true,
-        visible                                                                         = AshBlzSkinApi.UnitThreatLevel():Map("l=> l>0"),
-        vertexColor                                                                     = AshBlzSkinApi.UnitThreatLevel():Map(function(level)
-            shareColor.r, shareColor.g, shareColor.b, shareColor.a = GetThreatStatusColor(level)
-            return shareColor
-        end)
-    },
-
     -- 死亡图标
     [DeadIcon]                                                                          = {
         file                                                                            = "Interface\\EncounterJournal\\UI-EJ-Icons",
         texCoords                                                                       = RectType(0.375, 0.5, 0, 0.5),
         visible                                                                         = AshBlzSkinApi.UnitIsDead()
     },
-
-    -- 血量文本
-    -- [HealthLabel]                                                                       = {
-    --     location                                                                        = {
-    --         Anchor("CENTER"),
-    --         Anchor("TOP", 0, -2, "NameLabel", "BOTTOM")
-    --     },
-    --     text                                                                            = NIL,
-    --     fontObject                                                                      = SystemFont_Small,
-    --     textColor                                                                       = Color.RED,
-    --     visible                                                                         = AshBlzSkinApi.HealthLableVisible()
-    -- },
 
     -- 解锁按钮
     [UnlockButton]                                                                      = {

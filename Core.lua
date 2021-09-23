@@ -103,6 +103,15 @@ enum "NameStyle" {
 GuildColor = Color(0.25, 1, 0.25, 1)
 
 function OnLoad()
+    -- make mask frame strata lower
+    local function OnInit(self, mask)
+        mask:InstantApplyStyle()
+        mask:SetFrameStrata("DIALOG")
+        mask:SetFrameLevel(8)
+    end
+
+    RECYCLE_MASKS.OnInit = RECYCLE_MASKS.OnInit + OnInit
+
     DB = SVManager("AshToAsh_BlizzardSkin_DB", "AshToAsh_BlizzardSkin_CharDB").Char
     DB:SetDefault{
         Appearance                                                                                                          = {
@@ -141,11 +150,11 @@ function OnLoad()
     }
 
     -- 初始化推送值
-    SendConfigChanged("ALL")
+    Delay(3, SendConfigChanged)
 end
 
-function SendConfigChanged(type)
-    FireSystemEvent("AshToAsh_Blizzard_Skin_Config_Changed", type)
+function SendConfigChanged()
+    FireSystemEvent("AshToAsh_Blizzard_Skin_Config_Changed")
 end
 
 __Static__() __AutoCache__()
@@ -235,7 +244,7 @@ local function GetAppearanceMenu()
                             end,
                             set                                                                                             = function(value)
                                 DB.Appearance.Health.Style = value
-                                SendConfigChanged("HealthTextStyle")
+                                SendConfigChanged()
                             end
                         },
                         {
@@ -454,6 +463,7 @@ local function GetAppearanceMenu()
                 end,
                 set                                                                                                         = function(value)
                     DB.Appearance.DisplayAggroHighlight = value
+                    SendConfigChanged()
                 end
             }
         },
@@ -468,7 +478,7 @@ local function GetAppearanceMenu()
                 end,
                 set                                                                                                         = function(value)
                     DB.Appearance.DisplayPanelLabel = value
-                    SendConfigChanged("PanelLabel")
+                    SendConfigChanged()
                 end
             }
         },
@@ -481,7 +491,7 @@ local function GetAppearanceMenu()
                 end,
                 set                                                                                                         = function(value)
                     DB.Appearance.DisplayPetPanelLabel = value
-                    SendConfigChanged("PetPanelLabel")
+                    SendConfigChanged()
                 end
             }
         },
@@ -516,6 +526,8 @@ function ASHTOASH_OPEN_MENU(panel, menu)
     for _, v in ipairs(skinMenu) do
         tinsert(menu, v)
     end
+
+    SendConfigChanged()
 end
 
 function ShowError(text)

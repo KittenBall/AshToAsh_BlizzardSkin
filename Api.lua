@@ -103,37 +103,12 @@ function UnitIsInDistance(unit)
 end
 
 -------------------------------------------------
--- Aggro
--------------------------------------------------
-
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitThreatLevel()
-    return Wow.UnitThreatLevel():Where(function(threatLevel)
-        return DB.Appearance.DisplayAggroHighlight or threatLevel <= 0
-    end)
-end
-
--------------------------------------------------
 -- Option
 -------------------------------------------------
-
-__Static__() __AutoCache__()
-function AshBlzSkinApi.CastBarVisibilityChanged()
-    return AshBlzSkinApi.OnConfigChanged():Map(function()
-        return DB.Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS and DB.Appearance.CastBar.Visibility or Visibility.HIDE
-    end)
-end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.PowerBarVisible()
     return AshBlzSkinApi.OnConfigChanged():Map(function()
         return DB.Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS
-    end)
-end
-
-__Static__() __AutoCache__()
-function AshBlzSkinApi.HealthLableVisible()
-    return AshBlzSkinApi.OnConfigChanged():Map(function()
-        return DB.Appearance.Health.Style ~= HealthTextStyle.NONE
     end)
 end
