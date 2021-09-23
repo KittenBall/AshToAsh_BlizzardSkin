@@ -125,10 +125,13 @@ function OnLoad()
             },
             -- 仇恨高亮
             DisplayAggroHighlight                                                                                           = true,
-            -- 生命值
-            Health                                                                                                          = {
-                Style                                                                                                       = HealthTextStyle.NONE,
-                TextFormat                                                                                                  = HealthTextFormat.KILO
+            -- 生命条
+            HealthBar                                                                                                       = {
+                -- 生命值文本
+                HealthText                                                                                                  = {
+                    Style                                                                                                   = HealthTextStyle.NONE,
+                    TextFormat                                                                                              = HealthTextFormat.KILO
+                },
             },
             -- 名字
             Name                                                                                                            = {
@@ -240,10 +243,10 @@ local function GetAppearanceMenu()
                     submenu                                                                                                 = {
                         check                                                                                               = {
                             get                                                                                             = function()
-                                return DB.Appearance.Health.Style
+                                return DB.Appearance.HealthBar.HealthText.Style
                             end,
                             set                                                                                             = function(value)
-                                DB.Appearance.Health.Style = value
+                                DB.Appearance.HealthBar.HealthText.Style = value
                                 SendConfigChanged()
                             end
                         },
@@ -271,10 +274,10 @@ local function GetAppearanceMenu()
                     submenu                                                                                                 = {
                         check                                                                                               = {
                             get                                                                                             = function()
-                                return DB.Appearance.Health.TextFormat
+                                return DB.Appearance.HealthBar.HealthText.TextFormat
                             end,
                             set                                                                                             = function(value)
-                                DB.Appearance.Health.TextFormat = value
+                                DB.Appearance.HealthBar.HealthText.TextFormat = value
                                 FireSystemEvent("UNIT_HEALTH", 'any')
                             end
                         },

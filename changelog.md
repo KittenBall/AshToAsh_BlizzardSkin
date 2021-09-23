@@ -1,3 +1,5 @@
+## 1.4.22
+- Modified the level of health configuration, you may need to reset
 ## 1.4.21
 - Pet color will be cached now
 - Increase dispell debuff color lightness

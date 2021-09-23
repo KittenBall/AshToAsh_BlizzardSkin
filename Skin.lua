@@ -63,9 +63,9 @@ SHARE_HEALTHLABEL_SKIN                                                          
 
 local function formatHealth(health)
     if health and health > 0 then
-        if DB.Appearance.Health.TextFormat == HealthTextFormat.TEN_THOUSAND then
+        if DB.Appearance.HealthBar.HealthText.TextFormat == HealthTextFormat.TEN_THOUSAND then
             return health >= 10000 and ("%.1fW"):format(health/10000) or health
-        elseif DB.Appearance.Health.TextFormat == HealthTextFormat.KILO then
+        elseif DB.Appearance.HealthBar.HealthText.TextFormat == HealthTextFormat.KILO then
             return health >= 1000 and ("%.1fK"):format(health/1000) or health
         else
             return BreakUpLargeNumbers(health)
@@ -76,7 +76,7 @@ end
 __Static__() __AutoCache__()
 function AshBlzSkinApi.HealthLabelSkin()
     return AshBlzSkinApi.OnConfigChanged():Map(function()
-        local healthTextStyle = DB.Appearance.Health.Style
+        local healthTextStyle = DB.Appearance.HealthBar.HealthText.Style
         if healthTextStyle == HealthTextStyle.HEALTH then
             SHARE_HEALTHLABEL_SKIN.text  = Wow.UnitHealthFrequent():Map(formatHealth)
         elseif healthTextStyle == HealthTextStyle.LOSTHEALTH then
