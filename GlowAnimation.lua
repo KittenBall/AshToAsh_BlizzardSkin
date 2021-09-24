@@ -307,65 +307,159 @@ class "AutoCastGlow"(function(_ENV)
         texture:ClearAllPoints()
     end
 
+    function recycle:OnInit(texture)
+        texture:SetDrawLayer("ARTWORK", 6)
+    end
+
     __Static__()
     property "TexturePool" { set = false, default = recycle }
+
+    local function UpdatePoints(self)
+        self:SetPoint("TOPLEFT", parent, "TOPLEFT", -self.PaddingHorizontal + 0.05, self.PaddingVertical + 0.05)
+        self:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", self.PaddingHorizontal, -self.PaddingVertical + 0.05)
+    end
+
+    local function AddOrRemoveTextures(self)
+        local textureNumber = self.GroupNumber * 4
+        for i = 1, textureNumber do
+            local texture = self.textures[i]
+            if not texture then
+                texture = self.TexturePool()
+                texture:SetParent(self)
+                self.textures[i] = texture
+            end
+            texture:SetTexture(self.Texture)
+            local texCoords = self.TexCoords
+            texture:SetTexCoord(texCoords.left, texCoords.right, texCoords.top, texCoords.bottom)
+            texture:SetDesaturated(true)
+            texture:SetVertexColor(color.r, color.g, color.b, color.a)
+            texture:Show()
+        end
+    
+        while #frame.textures > textureNumber do
+            GlowTexturePool(frame.textures[#frame.textures])
+            table.remove(frame.textures)
+        end
+    end
 
     -- Corresponding to the N param of the LibCustomGlow.AutoCastGlow_Start
     -- Number of particle groups. Each group contains 4 particles
     property "GroupNumber"          {
         type        = NaturalNumber,
-        default     = 4
+        default     = 4,
+        get         = function(self) return self._GroupNumber or 4 end,
+        set         = function(self, groupNumber)
+            groupNumber = groupNumber >= 0 and groupNumber or 4
+            self._GroupNumber = groupNumber
+            AddOrRemoveTextures(self)
+        end
     }
 
     -- Corresponding to the xoffset param of the LibCustomGlow.AutoCastGlow_Start
     -- Horizontal margin between glow and target frame
     property "PaddingHorizontal"    {
         type        = Number,
-        default     = 0
+        default     = 0,
+        get         = function(self) return self._PaddingVertical or 0 end,
+        set         = function(self, paddingHorizontal)
+            self._PaddingHorizontal = paddingHorizontal
+            UpdatePoints(self)
+        end
     }
 
     -- Corresponding to the yoffset param of the LibCustomGlow.AutoCastGlow_Start
     -- Vertical margin between glow and target frame    
     property "PaddingVertical"      {
         type        = Number,
-        default     = 0
+        default     = 0,
+        get         = function(self) return self._PaddingVertical or 0 end,
+        set         = function(self, paddingVertical)
+            self._PaddingVertical = paddingVertical
+            UpdatePoints(self)
+        end
     }
 
     -- Scale of particles
     property "Scale"                {
         type        = Number,
-        default     = 1
+        default     = 1,
+        get         = function(self) return self._Scale or 1 end,
+        set         = function(self, scale)
+            scale = (scale >= 0) and scale or 1
+            self._Scale = scale
+        end
     }
 
     -- Corresponding to the frequency param of the LibCustomGlow.AutoCastGlow_Start
     -- Set to negative to inverse direction of rotation
     property "Period"               {
         type        = Number,
-        default     = 8
+        default     = 8,
+        get         = function(self) return self._Period or 8 end,
+        set         = function(self, period)
+            period = (period == 0) and 8 or period
+            self._Period = period
+        end
+    }
+    
+    -- Whether glow texture is desaturated
+    property "Desaturated"          {
+        type        = Boolean,
+        default     = false,
+        get         = function(self) return self._Desaturated or false end,
+        set         = function(self, desaturated)
+            self._Desaturated = desaturated
+        end
     }
 
     -- Glow color
     property "Color"                {
         type        = ColorType,
-        default     = Color(0.95, 0.95, 0.32)
+        default     = Color(0.95, 0.95, 0.32),
+        get         = function(self) return self._Color or Color(0.95, 0.95, 0.32) end,
+        set         = function(self, color)
+            self._Color = color
+            for _, texture in ipairs(self.textures) do
+                texture:SetVertexColor(color.r, color.g, color.b, color.a)
+            end
+        end
     }
 
     -- FrameLevel of glow
     property "FrameLevel"           {
         type        = NaturalNumber,
-        default     = 8
+        default     = 8,
+        get         = function(self) return self._FrameLevel or 8 end,
+        set         = function(self, frameLevel)
+            self._FrameLevel = frameLevel
+            self:SetFrameLevel(parent:GetFrameLevel() + frameLevel)
+        end
     }
 
-    -- Texture of particle
-    property "Texture"              {
+    -- Texture file or fileID of particle
+    property "File"                 {
         type        = String + Number,
-        default     = Scorpio.IsRetail and [[Interface\Artifacts\Artifacts]] or [[Interface\ItemSocketingFrame\UI-ItemSockets]]
+        default     = Scorpio.IsRetail and [[Interface\Artifacts\Artifacts]] or [[Interface\ItemSocketingFrame\UI-ItemSockets]],
+        get         = function(self) return self._Texture or (Scorpio.IsRetail and [[Interface\Artifacts\Artifacts]] or [[Interface\ItemSocketingFrame\UI-ItemSockets]]) end,
+        set         = function(self, file)
+            self._Texture = texture
+            for _, texture in ipairs(self.textures) do
+                texture:SetTexture(file)
+            end
+        end
     }
 
     -- TexCoords of particle
     property "TexCoords"            {
         type        = RectType,
-        default     = Scorpio.IsRetail and RectType(0.8115234375, 0.9169921875, 0.8798828125, 0.9853515625) or RectType(0.3984375, 0.4453125, 0.40234375, 0.44921875)
+        default     = Scorpio.IsRetail and RectType(0.8115234375, 0.9169921875, 0.8798828125, 0.9853515625) or RectType(0.3984375, 0.4453125, 0.40234375, 0.44921875),
+        get         = function(self) return self._TexCoords or (Scorpio.IsRetail and RectType(0.8115234375, 0.9169921875, 0.8798828125, 0.9853515625) or RectType(0.3984375, 0.4453125, 0.40234375, 0.44921875)) end,
+        set         = function(self, texCoords)
+            self._TexCoords = texCoords
+            for _, texture in ipairs(self.textures) do
+                texture:SetTexCoord(texCoords.left, texCoords.right, texCoords.top, texCoords.bottom)
+            end
+        end
     }
 
     local function OnShow(self)
@@ -384,6 +478,7 @@ class "AutoCastGlow"(function(_ENV)
     end
 
     function __ctor(self)
+        self.textures = {}
         self.OnShow = self.OnShow + OnShow
         self.OnHide = self.OnHide + OnHide
         self.OnUpdate = self.OnUpdate + OnUpdate
