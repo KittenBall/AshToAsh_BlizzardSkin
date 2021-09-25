@@ -135,6 +135,7 @@ function OnLoad()
             },
             -- 名字
             Name                                                                                                            = {
+                ScaleWithFrame                                                                                              = false,
                 Style                                                                                                       = NameStyle.PLAYERNAME_SERVER_SHORTHAND,
                 Nickname                                                                                                    = nil,
                 ShowNicknameOwns                                                                                            = true,
@@ -405,6 +406,21 @@ local function GetAppearanceMenu()
                             FireSystemEvent("UNIT_NAME_UPDATE", 'any')
                         end
                     }
+                },
+                -- 名字大小随框体缩放
+                {
+                    text                                                                                                    = L["name_scales_with_frame"],
+                    check                                                                                                   = {
+                        get                                                                                                 = function()
+                            return DB.Appearance.Name.ScaleWithFrame
+                        end,
+                        set                                                                                                 = function(value)
+                            DB.Appearance.Name.ScaleWithFrame = value
+                            SendConfigChanged()
+                        end
+                    }
+                }
+                
                     -- 不允许更改颜色
                     -- submenu                                                                                                 = {
                     --     {
@@ -456,7 +472,6 @@ local function GetAppearanceMenu()
                     --         }
                     --     }
                     -- }
-                }
             } 
         },
         -- 仇恨指示器

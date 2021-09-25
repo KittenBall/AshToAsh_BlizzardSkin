@@ -263,6 +263,50 @@ function AshBlzSkinApi.PetAggroSkin()
     end)
 end
 
+
+-- 名字
+SHARE_NAMELABEL_SKIN                                                                        = {
+    drawLayer                                                                               = "ARTWORK",
+    wordWrap                                                                                = false,
+    justifyH                                                                                = "LEFT",
+    textColor                                                                               = AshBlzSkinApi.UnitNameColor()
+}
+
+-- 名字指示器
+NAMELABEL_SKIN                                                                              = {
+    SHARE_NAMELABEL_SKIN,
+
+    text                                                                                    = AshBlzSkinApi.UnitName(),
+    location                                                                                = {
+        Anchor("TOPLEFT", 0, -1, "RoleIcon", "TOPRIGHT"), 
+        Anchor("TOPRIGHT", -3, -3) 
+    }
+}
+
+-- 名字字体
+NAME_FONT                                                                                   = {
+    font                                                                                    = GameFontHighlightSmall:GetFont(),
+    height                                                                                  = Wow.FromFrameSize(UnitFrame):Map(function(width, height)
+        local _, fontHeight = GameFontHighlightSmall:GetFont()
+        local scale = height / 72
+        return fontHeight * scale
+    end)
+}
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.NameSkin()
+    return  AshBlzSkinApi.OnConfigChanged():Map(function()
+        if DB.Appearance.Name.ScaleWithFrame then
+            NAMELABEL_SKIN.Font = NAME_FONT
+            NAMELABEL_SKIN.FontObject = CLEAR
+        else
+            NAMELABEL_SKIN.Font = CLEAR
+            NAMELABEL_SKIN.FontObject = GameFontHighlightSmall
+        end
+        return NAMELABEL_SKIN
+    end)
+end
+
 -------------------------------------------------
 -- Share Skin
 -------------------------------------------------
@@ -323,7 +367,7 @@ SHARE_BOSSDEBUFFPANEL_SKIN                                                      
     customFilter                                                                            = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID)
         return not _EnlargeDebuffList[spellID]
     end
-}                                                             
+}
 
 -- Debuff
 SHARE_DEBUFFPANEL_SKIN                                                                      = {
@@ -374,14 +418,6 @@ SHARE_RAIDTARGET_SKIN                                                           
         Anchor("TOPRIGHT", -3, -2)      
     },
     size                                                                                    = resizeUnitFrameIconOnSizeChanged(14)
-}
-
--- 名字
-SHARE_NAMELABEL_SKIN                                                                        = {
-    drawLayer                                                                               = "ARTWORK",
-    wordWrap                                                                                = false,
-    justifyH                                                                                = "LEFT",
-    textColor                                                                               = AshBlzSkinApi.UnitNameColor()
 }
 
 -- 血条
@@ -553,16 +589,7 @@ SKIN_STYLE =                                                                    
         AshBlzSkinAggroHighlight                                                            = AshBlzSkinApi.AggroSkin(),
 
         -- 名字
-        NameLabel                                                                           = {
-            SHARE_NAMELABEL_SKIN,
-
-            fontObject                                                                      = GameFontHighlightSmall,
-            text                                                                            = AshBlzSkinApi.UnitName(),
-            location                                                                        = {
-                Anchor("TOPLEFT", 0, -1, "RoleIcon", "TOPRIGHT"), 
-                Anchor("TOPRIGHT", -3, -3) 
-            }
-        },
+        NameLabel                                                                           = AshBlzSkinApi.NameSkin(),
 
         -- 血量文本
         HealthLabel                                                                         = AshBlzSkinApi.HealthLabelSkin(),
