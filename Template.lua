@@ -39,9 +39,6 @@ class "PetPanelLabel" { FontString }
 -- Buff icon
 __Sealed__() class "AshBlzSkinBuffIcon"{ AshAuraPanelIcon }
 
--- Debuff icon
-__Sealed__() class "AshBlzSkinDebuffIcon" { AshBlzSkinBuffIcon }
-
 -- ClassBuff icon
 __Sealed__() class "AshBlzSkinClassBuffIcon" { AshBlzSkinBuffIcon }
 
@@ -77,9 +74,10 @@ class "UnlockButton"(function()
     end
 end)
 
--- 专用于BossDebuffPanel
-class "AshBlzSkinBossDebuffIcon"(function()
-    inherit "AshBlzSkinDebuffIcon"
+-- 用于DebuffPanel
+__Sealed__()
+class "AshBlzSkinDebuffIcon"(function()
+    inherit "AshBlzSkinBuffIcon"
 
     local function OnEnter(self)
         if self.ShowTooltip and self.AuraFilter then
@@ -99,6 +97,9 @@ class "AshBlzSkinBossDebuffIcon"(function()
     property "AuraFilter" { type = String }
 
 end)
+
+-- Debuff icon
+__Sealed__() class "AshBlzSkinBossDebuffIcon" { AshBlzSkinDebuffIcon }
 
 -- Buff panel
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinBuffPanel")
@@ -303,7 +304,7 @@ class "DispellDebuffPanel" (function(_ENV)
     property "AuraFilter"       {
         type                    = String,
         set                     = false,
-        default                 = "HARMFUL"
+        default                 = Scorpio.IsRetail and "HARMFUL|RAID" or "RAID"
     }
 end)
 

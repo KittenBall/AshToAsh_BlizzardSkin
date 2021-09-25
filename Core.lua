@@ -149,6 +149,8 @@ function OnLoad()
             DisplayPanelLabel                                                                                               = true,
             -- 显示宠物面板标签
             DisplayPetPanelLabel                                                                                            = true,
+            -- 仅显示可供驱散的Debuff
+            DisplayOnlyDispellableDebuffs                                                                                   = false,
         }
     }
 
@@ -495,6 +497,20 @@ local function GetAppearanceMenu()
                 set                                                                                                         = function(value)
                     DB.Appearance.DisplayPetPanelLabel = value
                     SendConfigChanged()
+                end
+            }
+        },
+        -- 仅显示可供驱散的Debuff
+        {
+            text                                                                                                            = COMPACT_UNIT_FRAME_PROFILE_DISPLAYONLYDISPELLABLEDEBUFFS,
+            check                                                                                                           = {
+                get                                                                                                         = function()
+                    return DB.Appearance.DisplayOnlyDispellableDebuffs and true or false
+                end,
+                set                                                                                                         = function(value)
+                    DB.Appearance.DisplayOnlyDispellableDebuffs = value
+                    SendConfigChanged()
+                    FireSystemEvent("UNIT_AURA", "any")
                 end
             }
         },

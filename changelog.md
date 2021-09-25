@@ -1,3 +1,7 @@
+## 1.4.23
+- Now, you can show only dispellable debuff
+- Now, dispell debuff filter is same as blz
+
 ## 1.4.22
 - Modified the level of health configuration, you may need to reset
 ## 1.4.21

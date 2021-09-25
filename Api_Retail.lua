@@ -243,10 +243,6 @@ end
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitDebuffCanDispell()
     return Wow.UnitAura():Map(function(unit)
-            -- 在副本内才工作
-            local inInstance, instanceType = IsInInstance()
-            if not inInstance or instanceType == "none" then return false end
-            
             local specID = GetSpecializationInfo(GetSpecialization())
             local canDispell, canDispellType
             AuraUtil.ForEachAura(unit, "HARMFUL|RAID", 1, function(_, _, _, dType)
@@ -267,5 +263,13 @@ __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitDebuffCanDispellColor()
     return AshBlzSkinApi.UnitDebuffCanDispell():Map(function(_, dType)
         return GetDispellDebuffColor(dType or "")
+    end)
+end
+
+-- Debuff 过滤类型
+__Static__() __AutoCache__()
+function AshBlzSkinApi.DebuffAuraFilter()
+    return Wow.FromUnitEvent(Wow.FromEvent("AshToAsh_Blizzard_Skin_Config_Changed"):Map("=> 'any'")):Map(function(unit)
+        return UnitCanAttack("player", unit) and "PLAYER|HARMFUL" or (DB.Appearance.DisplayOnlyDispellableDebuffs and "HARMFUL|RAID" or "HARMFUL")
     end)
 end

@@ -747,12 +747,3 @@ class "PixelGlow"(function(_ENV)
     end
 
 end)
-
-button = UIPanelButton("Test")
-button:SetPoint("CENTER")
-
-Count = 0
-button.OnClick = function()
-    Count = Count + 1
-    FireSystemEvent("AUTO_CAST_GLOW_ANIMATION_TEST", Count)
-end

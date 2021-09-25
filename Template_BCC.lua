@@ -129,6 +129,32 @@ class "DebuffPanel"(function()
         return refreshAura(self, unit, filter, eleIdx, auraIdx, UnitAura(unit, auraIdx, filter))
     end
 
+    local function refreshPriorityAura(self, unit, filter, eleIdx, auraIdx, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, castByPlayer, ...)
+        if not name then return end
+
+        if not self.CustomFilter or self.CustomFilter(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, castByPlayer, ...) then
+            if not isBossDebuff and isPriorityDebuff(spellID) then
+                tinsert(priorityDebuffs, auraIdx)
+            end
+        end
+
+        auraIdx                 = auraIdx + 1
+        return refreshPriorityAura(self, unit, filter, eleIdx, auraIdx, UnitAura(unit, auraIdx, filter))
+    end
+
+    local function refreshRaidAura(self, unit, filter, eleIdx, auraIdx, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, castByPlayer, ...)
+        if not name then return end
+
+        if not self.CustomFilter or self.CustomFilter(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, castByPlayer, ...) then
+            if not isBossDebuff and not isPriorityDebuff(spellID) and shouldDisplayDebuff(caster, spellID) then
+                tinsert(nonBossDebuffs, auraIdx)
+            end
+        end
+
+        auraIdx                 = auraIdx + 1
+        return refreshRaidAura(self, unit, filter, eleIdx, auraIdx, UnitAura(unit, auraIdx, filter))
+    end
+
     local function showElements(self, unit, filter, auras, eleIdx)
         if eleIdx > self.MaxCount then return eleIdx end
 
@@ -151,6 +177,7 @@ class "DebuffPanel"(function()
                 self.AuraSpellID[eleIdx]        = spellID
                 self.AuraBossDebuff[eleIdx]     = isBossDebuff
                 self.AuraCastByPlayer[eleIdx]   = castByPlayer
+                self.AuraFilter[eleIdx]         = filter
 
                 eleIdx = eleIdx + 1
                 
@@ -168,14 +195,48 @@ class "DebuffPanel"(function()
 
             wipe(priorityDebuffs)
             wipe(nonBossDebuffs)
-            refreshAura(self, unit, filter, 1, 1, UnitAura(unit, 1, filter))
 
-            local eleIdx = 1
-            eleIdx = showElements(self, unit, filter, priorityDebuffs, eleIdx)
-            eleIdx = showElements(self, unit, filter, nonBossDebuffs, eleIdx)
-            self.Count = eleIdx -1
+            local displayOnlyDispellableDebuffs = self.DisplayOnlyDispellableDebuffs
+
+            if UnitCanAttack("player", unit) then
+                local filter = "PLAYER|HARMFUL"
+                refreshAura(self, unit, filter, 1, 1, UnitAura(unit, 1, filter))
+
+                local eleIdx = 1
+                eleIdx = showElements(self, unit, filter, priorityDebuffs, eleIdx)
+                eleIdx = showElements(self, unit, filter, nonBossDebuffs, eleIdx)
+                self.Count = eleIdx -1
+            elseif not displayOnlyDispellableDebuffs then
+                local filter = "HARMFUL"
+                refreshAura(self, unit, filter, 1, 1, UnitAura(unit, 1, filter))
+
+                local eleIdx = 1
+                eleIdx = showElements(self, unit, filter, priorityDebuffs, eleIdx)
+                eleIdx = showElements(self, unit, filter, nonBossDebuffs, eleIdx)
+                self.Count = eleIdx -1
+            else
+                local filterHarmful = "HARMFUL"
+                local filterRaid = "RAID"
+                refreshPriorityAura(self, unit, filterHarmful, 1, 1, UnitAura(unit, 1, filterHarmful))
+                refreshRaidAura(self, unit, filterRaid, 1, 1, UnitAura(unit, 1, filterRaid))
+
+                local eleIdx = 1
+                eleIdx = showElements(self, unit, filterHarmful, priorityDebuffs, eleIdx)
+                eleIdx = showElements(self, unit, filterRaid, nonBossDebuffs, eleIdx)
+                self.Count = eleIdx -1
+            end
         end
     }
+
+
+    property "DisplayOnlyDispellableDebuffs" {
+        type                    = Boolean,
+        default                 = false
+    }
+
+    __Indexer__() __Observable__()
+    property "AuraFilter" { set = Toolset.fakefunc }
+
 end)
 
 -- CastBar 修改自Scorpio.UI.CooldownStatusBar

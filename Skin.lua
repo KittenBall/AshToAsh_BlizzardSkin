@@ -340,10 +340,8 @@ SHARE_DEBUFFPANEL_SKIN                                                          
     elementHeight                                                                           = resizeOnUnitFrameChanged(11),
     location                                                                                = {
         Anchor("BOTTOMLEFT", 0, 0, "AshBlzSkinBossDebuffPanel", "BOTTOMRIGHT")      
-    },      
-    auraFilter                                                                              = Wow.Unit():Map(function(unit)
-        return UnitCanAttack("player", unit) and "PLAYER|HARMFUL" or "HARMFUL"
-    end),
+    },
+    displayOnlyDispellableDebuffs                                                           = AshBlzSkinApi.DisplayOnlyDispellableDebuffs(),
 
     customFilter                                                                            = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID)
         return not (_AuraBlackList[spellID] or _EnlargeDebuffList[spellID]) 
@@ -513,16 +511,6 @@ SKIN_STYLE =                                                                    
             },
             texCoords                                                                       = RectType(0.296875, 0.5703125, 0, 0.515625),
             vertexColor                                                                     = Wow.FromPanelProperty("AuraDebuff"):Map(function(dtype) return DebuffTypeColor[dtype] or DebuffTypeColor["none"] end)
-        }
-    },
-
-    -- Boss debuff icon
-    [AshBlzSkinBossDebuffIcon]                                                              = {
-        Cooldown                                                                            = {
-            setAllPoints                                                                    = true,
-            enableMouse                                                                     = false,
-            cooldown                                                                        = Wow.FromPanelProperty("AuraCooldown"),
-            reverse                                                                         = true
         },
 
         auraFilter                                                                          = Wow.FromPanelProperty("AuraFilter")
