@@ -9,6 +9,10 @@ namespace "SpaUI.Widget"
 __Sealed__()
 interface "GlowAnimation"(function(_ENV)
 
+    -------------------------------------------------
+    -- Texture pool
+    -------------------------------------------------
+
     local texturePool                   = Recycle(Texture, "GlowAnimationTexture%d")
 
     function texturePool:OnPush(texture)
@@ -26,10 +30,8 @@ interface "GlowAnimation"(function(_ENV)
     end
 
     -------------------------------------------------
-    -- Texture pool
+    -- Masktexture pool
     -------------------------------------------------
-    __Static__()
-    property "TexturePool"  { set = false, default = texturePool }
 
     local maskPool                      = Recycle(MaskTexture, "GlowAnimationMaskTexture%d")
 
@@ -39,25 +41,22 @@ interface "GlowAnimation"(function(_ENV)
     end
 
     -------------------------------------------------
-    -- Masktexture pool
-    -------------------------------------------------
-    __Static__()
-    property "MaskPool"     { set = false, default = maskPool    }
-
+    -- Functions
+    -------------------------------------------------    
     function AcquireTexture(self)
-        return GlowAnimation.TexturePool()
+        return texturePool()
     end
 
     function ReleaseTexture(self, texture)
-        return GlowAnimation.TexturePool(texture)
+        return texturePool(texture)
     end
 
     function AcquireMaskTexture(self)
-        return GlowAnimation.MaskPool()
+        return maskPool()
     end
 
     function ReleaseMaskTexture(self, mask)
-        return GlowAnimation.MaskPool(mask)
+        return maskPool(mask)
     end
 
 end)
@@ -158,7 +157,7 @@ class "AutoCastGlow"(function(_ENV)
     }
 
     -- Corresponding to the yoffset param of the LibCustomGlow.AutoCastGlow_Start
-    -- Vertical margin between glow and target frame    
+    -- Vertical margin between glow and target frame
     property "PaddingVertical"      {
         type        = Number,
         default     = 0,

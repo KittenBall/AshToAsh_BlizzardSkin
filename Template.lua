@@ -36,15 +36,6 @@ class "DeadIcon" { Texture }
 __Sealed__() __ChildProperty__(AshGroupPetPanel, "AshBlzSkinPanelLabel")
 class "PetPanelLabel" { FontString }
 
--- Buff icon
-__Sealed__() class "AshBlzSkinBuffIcon"{ AshAuraPanelIcon }
-
--- ClassBuff icon
-__Sealed__() class "AshBlzSkinClassBuffIcon" { AshBlzSkinBuffIcon }
-
--- 可驱散类型
-__Sealed__() class "AshBlzSkinDispellIcon" { Scorpio.Secure.UnitFrame.AuraPanelIcon  }
-
 -- 解锁按钮
 __Sealed__() __ChildProperty__(AshGroupPanel, "AshBlzSkinUnlockButton")
 class "UnlockButton"(function()
@@ -74,7 +65,34 @@ class "UnlockButton"(function()
     end
 end)
 
--- 用于DebuffPanel
+-- Buff icon
+__Sealed__()
+class "AshBlzSkinBuffIcon"(function()
+    inherit "AshAuraPanelIcon"
+    
+    local function OnUpdate(self, elapsed)
+        self.timer = (self.timer or 0) + elapsed
+        if self.timer < 0.1 then
+            return
+        end
+        self.timer = 0
+
+        local parent        = self:GetParent()
+        if not parent then return end
+
+        if self.ShowTooltip and GameTooltip:IsOwned(self) then
+            GameTooltip:SetUnitAura(parent.Unit, self.AuraIndex, parent.AuraFilter)
+        end
+    end
+
+    function __ctor(self)
+        super(self)
+        self.OnUpdate = self.OnUpdate + OnUpdate
+    end
+
+end)
+
+-- Debuff icon
 __Sealed__()
 class "AshBlzSkinDebuffIcon"(function()
     inherit "AshBlzSkinBuffIcon"
@@ -89,9 +107,25 @@ class "AshBlzSkinDebuffIcon"(function()
         end
     end
 
+    local function OnUpdate(self, elapsed)
+        self.timer = (self.timer or 0) + elapsed
+        if self.timer < 0.1 then
+            return
+        end
+        self.timer = 0
+
+        local parent        = self:GetParent()
+        if not parent then return end
+
+        if self.ShowTooltip and GameTooltip:IsOwned(self) then
+            GameTooltip:SetUnitAura(parent.Unit, self.AuraIndex, self.AuraFilter)
+        end
+    end
+
     function __ctor(self)
         super(self)
         self.OnEnter = OnEnter
+        self.OnUpdate = self.OnUpdate + OnUpdate
     end
 
     property "AuraFilter" { type = String }
@@ -100,6 +134,35 @@ end)
 
 -- Debuff icon
 __Sealed__() class "AshBlzSkinBossDebuffIcon" { AshBlzSkinDebuffIcon }
+
+-- ClassBuff icon
+__Sealed__() class "AshBlzSkinClassBuffIcon" { AshBlzSkinBuffIcon }
+
+-- Dispell icon
+__Sealed__()
+class "AshBlzSkinDispellIcon"(function()
+    inherit "Scorpio.Secure.UnitFrame.AuraPanelIcon"
+
+    local function OnUpdate(self, elapsed)
+        self.timer = (self.timer or 0) + elapsed
+        if self.timer < 0.1 then
+            return
+        end
+        self.timer = 0
+
+        local parent        = self:GetParent()
+        if not parent then return end
+
+        if self.ShowTooltip and GameTooltip:IsOwned(self) then
+            GameTooltip:SetUnitAura(parent.Unit, self.AuraIndex, parent.AuraFilter)
+        end
+    end
+
+    function __ctor(self)
+        super(self)
+        self.OnUpdate = self.OnUpdate + OnUpdate
+    end
+end)
 
 -- Buff panel
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinBuffPanel")
@@ -304,7 +367,7 @@ class "DispellDebuffPanel" (function(_ENV)
     property "AuraFilter"       {
         type                    = String,
         set                     = false,
-        default                 = Scorpio.IsRetail and "HARMFUL|RAID" or "RAID"
+        default                 = "HARMFUL|RAID"
     }
 end)
 

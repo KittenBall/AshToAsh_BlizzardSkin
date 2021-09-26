@@ -22,6 +22,8 @@ Localization\Localization.xml
 GlowAnimation.lua
 
 Core.lua
+OptionMenu.lua
+BlockBlizzard.lua
 Api.lua
 PetApi.lua
 PanelApi.lua

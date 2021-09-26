@@ -7,6 +7,8 @@ if not L then return end
 L["menu_title"] = "暴雪皮肤"
 L["tips"] = "提示"
 L["appearance"] = "外观"
+L["block_blizzard_unitframe"] = "屏蔽暴雪框架"
+L["block_blizzard_unitframe_tips"] = "不管怎样，同时运行ATA和暴雪团队框架总是没什么好处的。\n打开/关闭此选项需要重载界面才能生效"
 
 L["visibility"] = "可见性"
 L["visibility_hide"] = "隐藏"

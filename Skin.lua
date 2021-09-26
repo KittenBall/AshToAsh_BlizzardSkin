@@ -52,7 +52,10 @@ end)
 -------------------------------------------------
 -- Dynamic Style
 -------------------------------------------------
--- 生命值
+
+-------------------------------------------------
+-- Health
+-------------------------------------------------
 SHARE_HEALTHLABEL_SKIN                                                                       = {
     location                                                                                 = {
         Anchor("CENTER"),
@@ -95,7 +98,9 @@ function AshBlzSkinApi.HealthLabelSkin()
     end)
 end
 
--- 面板标题
+-------------------------------------------------
+-- Panel Label
+-------------------------------------------------
 GROUP_PANEL_LABEL_SKIN                                                                       = {
     fontObject                                                                               = AshBlzSkinApi.UnitPanelOrientation():Map(function(orientation)
         if orientation == Orientation.HORIZONTAL then
@@ -152,7 +157,10 @@ function AshBlzSkinApi.PetPanelLableSkin()
 end
 
 
---能量条
+-------------------------------------------------
+-- Power Bar
+-------------------------------------------------
+
 SHARE_POWERBAR_SKIN                                                                         = {
     useParentLevel                                                                          = true,
     statusBarTexture                                                                        = {
@@ -203,7 +211,9 @@ function AshBlzSkinApi.CastBarVisibilityChanged()
     end)
 end
 
--- 施法条
+-------------------------------------------------
+-- CastBar
+-------------------------------------------------
 SHARE_CASTBAR_SKIN                                                                          = {
     height                                                                                  = 8,
     location                                                                                = {
@@ -224,7 +234,9 @@ function AshBlzSkinApi.CastBarSkin()
     end)
 end
 
--- 仇恨皮肤
+-------------------------------------------------
+-- Aggro
+-------------------------------------------------
 AGGRO_SKIN                                                                                  = {
     drawLayer                                                                               = "ARTWORK",
     subLevel                                                                                = 3,
@@ -263,8 +275,10 @@ function AshBlzSkinApi.PetAggroSkin()
     end)
 end
 
+-------------------------------------------------
+-- Name
+-------------------------------------------------
 
--- 名字
 SHARE_NAMELABEL_SKIN                                                                        = {
     drawLayer                                                                               = "ARTWORK",
     wordWrap                                                                                = false,
@@ -295,7 +309,7 @@ NAME_FONT                                                                       
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.NameSkin()
-    return  AshBlzSkinApi.OnConfigChanged():Map(function()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
         if DB.Appearance.Name.ScaleWithFrame then
             NAMELABEL_SKIN.Font = NAME_FONT
             NAMELABEL_SKIN.FontObject = CLEAR
@@ -569,6 +583,11 @@ SKIN_STYLE =                                                                    
 
         frameStrata                                                                         = "LOW",
         alpha                                                                               = AshBlzSkinApi.UnitInRange():Map('v=>v and 1 or 0.55'),
+
+        -- 可驱散debuff高亮
+        PixelGlow                                                                           = {
+            visible                                                                         = AshBlzSKinApi.UnitDebuffCanDispell()
+        },
         
         -- 去除默认皮肤的目标指示器
         Label2                                                                              = NIL,

@@ -5,6 +5,8 @@ local L = _Locale("enUS", true)
 L["menu_title"] = "Blizzard Skin"
 L["tips"] = "Tips"
 L["appearance"] = "Appearance"
+L["block_blizzard_unitframe"] = "Block Blizzard CompactUnitFrame"
+L["block_blizzard_unitframe_tips"] = "Anyway, it’s always no good to run ATA and the Blizzard CompactUnitFrame at the same time, right?\nTurning on/off this option requires reload ui to take effect"
 
 L["visibility"] = "Visibility"
 L["visibility_hide"] = "Hide"
