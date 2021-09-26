@@ -5,6 +5,7 @@ local L = _Locale("zhCN")
 if not L then return end
 
 L["menu_title"] = "暴雪皮肤"
+L["panel_mask_tips"] = "只有面板序号大于另一面板才会自动依附！"
 L["tips"] = "提示"
 L["appearance"] = "外观"
 L["block_blizzard_unitframe"] = "屏蔽暴雪团队框架"

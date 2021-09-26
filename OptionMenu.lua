@@ -1,5 +1,9 @@
 Scorpio "AshToAsh.BlizzardSkin.OptionMenu" ""
 
+-------------------------------------------------
+-- Menu
+-------------------------------------------------
+
 -- 外观菜单
 local function GetAppearanceMenu()
     local menu = {
@@ -423,3 +427,26 @@ function ASHTOASH_OPEN_MENU(panel, menu)
 
     SendConfigChanged()
 end
+
+-------------------------------------------------
+-- Config Panel
+-------------------------------------------------
+
+ConfigPanel                 = Dialog("AshToAsh_BlzSkinConfigDialog")
+ConfigPanel:Hide()
+
+
+
+Style[ConfigPanel]                                      = {
+    
+    size                                                = Size(640, 560),
+
+    Resizer                                             = {
+        visible                                         = false
+    },
+
+    Header                                              = {
+        text                                            = L["menu_title"]
+    },
+
+}

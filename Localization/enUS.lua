@@ -3,6 +3,7 @@ Scorpio "AshToAsh.BlizzardSkin.Localization.enUS" ""
 local L = _Locale("enUS", true)
 
 L["menu_title"] = "Blizzard Skin"
+L["panel_mask_tips"] = "Only if the index of the panel is greater than that of the other panel, it will be automatically attached!"
 L["tips"] = "Tips"
 L["appearance"] = "Appearance"
 L["block_blizzard_unitframe"] = "Block Blizzard CompactUnitFrame"

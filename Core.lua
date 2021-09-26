@@ -105,9 +105,21 @@ GuildColor = Color(0.25, 1, 0.25, 1)
 function OnLoad()
     -- make mask frame strata lower
     local function OnInit(self, mask)
-        mask:InstantApplyStyle()
-        mask:SetFrameStrata("DIALOG")
-        mask:SetFrameLevel(8)
+        Style[mask]             = {
+            frameLevel          = 8,
+            frameStrata         = "DIALOG",
+
+            Label               = {
+                text            = L["panel_mask_tips"],
+                fontObject      = GameFontHighlightSmall,
+                justifyH        = "CENTER",
+                justifyV        = "TOP",
+                location        = {
+                    Anchor("TOPLEFT", 8, -8),
+                    Anchor("BOTTOMRIGHT", -8, 8)
+                }
+            }
+        }
     end
 
     RECYCLE_MASKS.OnInit = RECYCLE_MASKS.OnInit + OnInit
