@@ -71,12 +71,6 @@ class "AshBlzSkinBuffIcon"(function()
     inherit "AshAuraPanelIcon"
     
     local function OnUpdate(self, elapsed)
-        self.timer = (self.timer or 0) + elapsed
-        if self.timer < 0.1 then
-            return
-        end
-        self.timer = 0
-
         local parent        = self:GetParent()
         if not parent then return end
 
@@ -108,16 +102,10 @@ class "AshBlzSkinDebuffIcon"(function()
     end
 
     local function OnUpdate(self, elapsed)
-        self.timer = (self.timer or 0) + elapsed
-        if self.timer < 0.1 then
-            return
-        end
-        self.timer = 0
-
         local parent        = self:GetParent()
         if not parent then return end
 
-        if self.ShowTooltip and GameTooltip:IsOwned(self) then
+        if  GameTooltip:IsOwned(self) and self.ShowTooltip then
             GameTooltip:SetUnitAura(parent.Unit, self.AuraIndex, self.AuraFilter)
         end
     end
@@ -144,16 +132,10 @@ class "AshBlzSkinDispellIcon"(function()
     inherit "Scorpio.Secure.UnitFrame.AuraPanelIcon"
 
     local function OnUpdate(self, elapsed)
-        self.timer = (self.timer or 0) + elapsed
-        if self.timer < 0.1 then
-            return
-        end
-        self.timer = 0
-
         local parent        = self:GetParent()
         if not parent then return end
 
-        if self.ShowTooltip and GameTooltip:IsOwned(self) then
+        if GameTooltip:IsOwned(self) and self.ShowTooltip then
             GameTooltip:SetUnitAura(parent.Unit, self.AuraIndex, parent.AuraFilter)
         end
     end
@@ -163,6 +145,9 @@ class "AshBlzSkinDispellIcon"(function()
         self.OnUpdate = self.OnUpdate + OnUpdate
     end
 end)
+
+-- EnlargeDebuff icon
+__Sealed__() class "AshBlzSkinEnlargetDebuffIcon" { AshBlzSkinDebuffIcon }
 
 -- Buff panel
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinBuffPanel")

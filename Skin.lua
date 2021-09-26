@@ -49,12 +49,34 @@ local relocationUnitFrameIconOnSizeChanged = Wow.FromFrameSize(UnitFrame):Map(fu
     return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, h/3-4))
 end)
 
+local shareFont = {}
+
+local function getDynamicHeightFont(frameHeight, fontObject, minScale, maxScale)
+    local font, height = fontObject:GetFont()
+    shareFont.font = font
+    local scale = frameHeight / 48
+    local minHeight = height * (minScale or 1)
+    local maxHeight = height * (maxScale or 1)
+    if minHeight > maxHeight then
+        minHeight = maxHeight
+    end
+    height = height * scale
+    if height > maxHeight then
+        height = maxHeight
+    elseif height < minHeight then
+        height = minHeight
+    end
+
+    shareFont.height = height
+    return shareFont
+end
+
 -------------------------------------------------
 -- Dynamic Style
 -------------------------------------------------
 
 -------------------------------------------------
--- Health
+-- Health Label
 -------------------------------------------------
 SHARE_HEALTHLABEL_SKIN                                                                       = {
     location                                                                                 = {
@@ -78,6 +100,10 @@ end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.HealthLabelSkin()
+    local font, height = SystemFont_Small:GetFont()
+    local fontType = { font = font, height = height }
+    local fontObserver   = Wow.FromFrameSize(UnitFrame):Map(function(w, h) return getDynamicHeightFont(h, SystemFont_Small, 0.6) end)
+
     return AshBlzSkinApi.OnConfigChanged():Map(function()
         local healthTextStyle = DB.Appearance.HealthBar.HealthText.Style
         if healthTextStyle == HealthTextStyle.HEALTH then
@@ -93,6 +119,7 @@ function AshBlzSkinApi.HealthLabelSkin()
         end
     
         SHARE_HEALTHLABEL_SKIN.textColor = (healthTextStyle == HealthTextStyle.LOSTHEALTH and Color.RED or Color.WHITE)
+        SHARE_HEALTHLABEL_SKIN.Font = DB.Appearance.HealthBar.HealthText.ScaleWithFrame and fontObserver or fontType
 
         return SHARE_HEALTHLABEL_SKIN
     end)
@@ -297,26 +324,13 @@ NAMELABEL_SKIN                                                                  
     }
 }
 
--- 名字字体
-NAME_FONT                                                                                   = {
-    font                                                                                    = GameFontHighlightSmall:GetFont(),
-    height                                                                                  = Wow.FromFrameSize(UnitFrame):Map(function(width, height)
-        local _, fontHeight = GameFontHighlightSmall:GetFont()
-        local scale = height / 72
-        return fontHeight * scale
-    end)
-}
-
 __Static__() __AutoCache__()
 function AshBlzSkinApi.NameSkin()
+    local font, height = GameFontHighlightSmall:GetFont()
+    local fontType = { font = font, height = height }
+    local fontObserver   = Wow.FromFrameSize(UnitFrame):Map(function(w, h) return getDynamicHeightFont(h, GameFontHighlightSmall, 0.6) end)
     return AshBlzSkinApi.OnConfigChanged():Map(function()
-        if DB.Appearance.Name.ScaleWithFrame then
-            NAMELABEL_SKIN.Font = NAME_FONT
-            NAMELABEL_SKIN.FontObject = CLEAR
-        else
-            NAMELABEL_SKIN.Font = CLEAR
-            NAMELABEL_SKIN.FontObject = GameFontHighlightSmall
-        end
+            NAMELABEL_SKIN.Font = DB.Appearance.Name.ScaleWithFrame and fontObserver or fontType
         return NAMELABEL_SKIN
     end)
 end
@@ -328,7 +342,7 @@ end
 -- Enlarge debuff
 SHARE_ENLARGEDEBUFFPANEL_SKIN                                                               = {
     topLevel                                                                                = true,
-    elementType                                                                             = AshBlzSkinDebuffIcon,
+    elementType                                                                             = AshBlzSkinEnlargetDebuffIcon,
     rowCount                                                                                = 1,
     columnCount                                                                             = 2,
     elementWidth                                                                            = resizeOnUnitFrameChanged(15),
@@ -422,7 +436,9 @@ SHARE_BUFFPANEL_SKIN                                                            
         Anchor("BOTTOMRIGHT", 0, 1.5, HEALTHBAR, "BOTTOMRIGHT") 
     },
         
-    customFilter                                                                            = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID) return not _AuraBlackList[spellID] end,
+    customFilter                                                                            = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID) 
+        return not _AuraBlackList[spellID] and not (_ClassBuffList[name] or _ClassBuffList[spellID])
+    end,
 }
 
 -- 标记
@@ -578,6 +594,13 @@ SKIN_STYLE =                                                                    
         }
     },
 
+    [AshBlzSkinEnlargetDebuffIcon]                                                          = {
+        PixelGlow                                                                           = {
+            period                                                                          = 2,
+            visible                                                                         = true
+        }
+    },
+
     [AshUnitFrame]                                                                          = {
         inherit                                                                             = "default",
 
@@ -586,7 +609,7 @@ SKIN_STYLE =                                                                    
 
         -- 可驱散debuff高亮
         PixelGlow                                                                           = {
-            visible                                                                         = AshBlzSKinApi.UnitDebuffCanDispell()
+            visible                                                                         = AshBlzSkinApi.UnitDebuffCanDispell()
         },
         
         -- 去除默认皮肤的目标指示器
@@ -758,7 +781,7 @@ SKIN_STYLE =                                                                    
         -- 宠物名字
         NameLabel                                                                           = {
             SHARE_NAMELABEL_SKIN,
-
+        
             fontObject                                                                      = GameFontWhiteSmall,
             text                                                                            = Wow.UnitName(),
             location                                                                        = {
@@ -775,8 +798,8 @@ SKIN_STYLE =                                                                    
             justifyH                                                                        = "LEFT",
             text                                                                            = AshBlzSkinApi.UnitPetOwnerName(),
             location                                                                        = {
-                Anchor("TOPLEFT", 0, -select(2, GameFontHighlightSmall:GetFont()), "NameLabel", "TOPLEFT"),
-                Anchor("TOPRIGHT", 0, -select(2, GameFontHighlightSmall:GetFont()), "NameLabel", "TOPRIGHT"),
+                Anchor("TOPLEFT", 0, -select(2, GameFontWhiteSmall:GetFont()), "NameLabel", "TOPLEFT"),
+                Anchor("TOPRIGHT", 0, -select(2, GameFontWhiteSmall:GetFont()), "NameLabel", "TOPRIGHT"),
             }
         },
 

@@ -129,6 +129,19 @@ local function GetAppearanceMenu()
                             checkvalue                                                                                      = HealthTextFormat.TEN_THOUSAND
                         }
                     }
+                },
+                -- 生命值大小随框体缩放
+                {
+                    text                                                                                                    = L["name_scales_with_frame"],
+                    check                                                                                                   = {
+                        get                                                                                                 = function()
+                            return DB.Appearance.HealthBar.HealthText.ScaleWithFrame
+                        end,
+                        set                                                                                                 = function(value)
+                            DB.Appearance.HealthBar.HealthText.ScaleWithFrame = value
+                            SendConfigChanged()
+                        end
+                    }
                 }
             }
         },
@@ -377,23 +390,24 @@ local function generateMenu()
                 {
                     text                                                                                                    = L["appearance"],
                     submenu                                                                                                 = GetAppearanceMenu()
+                },
+                {
+                    text                                                                                                    = L["block_blizzard_unitframe"],
+                    tiptitle                                                                                                = L["tips"],
+                    tiptext                                                                                                 = L["block_blizzard_unitframe_tips"],
+                    check                                                                                                   = {
+                        get                                                                                                 = function()
+                            return DB.BlockBlizzardUnitFrames
+                        end,
+                        set                                                                                                 = function(value)
+                            DB.BlockBlizzardUnitFrames = value
+                            ReloadUI()
+                        end
+                    }
                 }
             }
         },
-        {
-            text                                                                                                            = L["block_blizzard_unitframe"],
-            tiptitle                                                                                                        = L["tips"],
-            tiptext                                                                                                         = L["block_blizzard_unitframe_tips"],
-            check                                                                                                           = {
-                get                                                                                                         = function()
-                    return DB.BlockBlizzardUnitFrames
-                end,
-                set                                                                                                         = function(value)
-                    DB.BlockBlizzardUnitFrames = value
-                    ReloadUI()
-                end
-            }
-        }
+        
     }
 
     return menu

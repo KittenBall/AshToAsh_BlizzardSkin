@@ -130,7 +130,8 @@ function OnLoad()
                 -- 生命值文本
                 HealthText                                                                                                  = {
                     Style                                                                                                   = HealthTextStyle.NONE,
-                    TextFormat                                                                                              = HealthTextFormat.KILO
+                    TextFormat                                                                                              = HealthTextFormat.KILO,
+                    ScaleWithFrame                                                                                          = false
                 },
             },
             -- 名字

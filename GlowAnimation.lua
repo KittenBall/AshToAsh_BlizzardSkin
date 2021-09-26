@@ -327,6 +327,7 @@ class "AutoCastGlow"(function(_ENV)
         self.OnShow = self.OnShow + OnShow
         self.OnHide = self.OnHide + OnHide
         self.OnUpdate = self.OnUpdate + OnUpdate
+        self:Hide()
     end
 
 end)
@@ -743,6 +744,7 @@ class "PixelGlow"(function(_ENV)
         self.OnHide = self.OnHide + OnHide
         self.OnSizeChanged = self.OnSizeChanged + OnSizeChanged
         self.OnUpdate = self.OnUpdate + OnUpdate
+        self:Hide()
     end
 
 end)

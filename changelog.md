@@ -1,3 +1,11 @@
+## 1.4.24
+- Aura GameTooltip will update every frame, so you can see aura remain time dynamicly
+- Name font size can scale with unitframe now, default false
+- Dispellable debuff will show a pixel glow now
+- Enlarget debuff will show a pixel glow now
+- You can block BlizzardCompactUnitFrames now, default true
+- Fixed an issue where buff was considered to be a dispellable debuff
+
 ## 1.4.23
 - Now, you can show only dispellable debuff
 - Now, dispell debuff filter is same as blz
