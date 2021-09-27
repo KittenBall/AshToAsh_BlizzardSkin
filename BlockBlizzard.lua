@@ -42,7 +42,7 @@ local function BlockBlizzardFrames(frame)
 end
 
 function OnLoad()
-    _Enabled = DB.BlockBlizzardUnitFrames
+    _Enabled = CharDB.BlockBlizzardUnitFrames
 end
 
 __Async__()

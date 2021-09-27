@@ -88,9 +88,9 @@ SHARE_HEALTHLABEL_SKIN                                                          
 
 local function formatHealth(health)
     if health and health > 0 then
-        if DB.Appearance.HealthBar.HealthText.TextFormat == HealthTextFormat.TEN_THOUSAND then
+        if DB().Appearance.HealthBar.HealthText.TextFormat == HealthTextFormat.TEN_THOUSAND then
             return health >= 10000 and ("%.1fW"):format(health/10000) or health
-        elseif DB.Appearance.HealthBar.HealthText.TextFormat == HealthTextFormat.KILO then
+        elseif DB().Appearance.HealthBar.HealthText.TextFormat == HealthTextFormat.KILO then
             return health >= 1000 and ("%.1fK"):format(health/1000) or health
         else
             return BreakUpLargeNumbers(health)
@@ -105,7 +105,7 @@ function AshBlzSkinApi.HealthLabelSkin()
     local fontObserver   = Wow.FromFrameSize(UnitFrame):Map(function(w, h) return getDynamicHeightFont(h, SystemFont_Small, 0.6) end)
 
     return AshBlzSkinApi.OnConfigChanged():Map(function()
-        local healthTextStyle = DB.Appearance.HealthBar.HealthText.Style
+        local healthTextStyle = DB().Appearance.HealthBar.HealthText.Style
         if healthTextStyle == HealthTextStyle.HEALTH then
             SHARE_HEALTHLABEL_SKIN.text  = Wow.UnitHealthFrequent():Map(formatHealth)
         elseif healthTextStyle == HealthTextStyle.LOSTHEALTH then
@@ -119,7 +119,7 @@ function AshBlzSkinApi.HealthLabelSkin()
         end
     
         SHARE_HEALTHLABEL_SKIN.textColor = (healthTextStyle == HealthTextStyle.LOSTHEALTH and Color.RED or Color.WHITE)
-        SHARE_HEALTHLABEL_SKIN.Font = DB.Appearance.HealthBar.HealthText.ScaleWithFrame and fontObserver or fontType
+        SHARE_HEALTHLABEL_SKIN.Font = DB().Appearance.HealthBar.HealthText.ScaleWithFrame and fontObserver or fontType
 
         return SHARE_HEALTHLABEL_SKIN
     end)
@@ -151,7 +151,7 @@ GROUP_PANEL_LABEL_SKIN                                                          
 __Static__() __AutoCache__()
 function AshBlzSkinApi.PanelLableSkin()
     return Wow.FromEvent("AshToAsh_Blizzard_Skin_Config_Changed", "ASHTOASH_CONFIG_CHANGED"):Map(function()
-        return DB.Appearance.DisplayPanelLabel and GROUP_PANEL_LABEL_SKIN or nil
+        return DB().Appearance.DisplayPanelLabel and GROUP_PANEL_LABEL_SKIN or nil
     end)
 end
 
@@ -179,7 +179,7 @@ GROUP_PET_PANEL_LABEL_SKIN                                                      
 __Static__() __AutoCache__()
 function AshBlzSkinApi.PetPanelLableSkin()
     return Wow.FromEvent("AshToAsh_Blizzard_Skin_Config_Changed", "ASHTOASH_CONFIG_CHANGED"):Map(function()
-        return DB.Appearance.DisplayPetPanelLabel and GROUP_PET_PANEL_LABEL_SKIN or nil
+        return DB().Appearance.DisplayPetPanelLabel and GROUP_PET_PANEL_LABEL_SKIN or nil
     end)
 end
 
@@ -220,21 +220,21 @@ POWER_BAR_SKIN                                                                  
 __Static__() __AutoCache__()
 function AshBlzSkinApi.PowerBarSkin()
     return AshBlzSkinApi.PowerBarVisible():Map(function()
-        return DB.Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS and POWER_BAR_SKIN or nil
+        return DB().Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS and POWER_BAR_SKIN or nil
     end)
 end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.PetPowerBarSkin()
     return AshBlzSkinApi.PowerBarVisible():Map(function()
-        return DB.Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS and SHARE_POWERBAR_SKIN or nil
+        return DB().Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS and SHARE_POWERBAR_SKIN or nil
     end)
 end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.CastBarVisibilityChanged()
     return AshBlzSkinApi.OnConfigChanged():Map(function()
-        return DB.Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS and DB.Appearance.CastBar.Visibility or Visibility.HIDE
+        return DB().Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS and DB().Appearance.CastBar.Visibility or Visibility.HIDE
     end)
 end
 
@@ -257,7 +257,7 @@ SHARE_CASTBAR_SKIN                                                              
 __Static__() __AutoCache__()
 function AshBlzSkinApi.CastBarSkin()
     return AshBlzSkinApi.OnConfigChanged():Map(function()
-        return (DB.Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS and DB.Appearance.CastBar.Visibility) and SHARE_CASTBAR_SKIN or nil
+        return (DB().Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS and DB().Appearance.CastBar.Visibility) and SHARE_CASTBAR_SKIN or nil
     end)
 end
 
@@ -291,14 +291,14 @@ PET_AGGRO_SKIN                                                                  
 __Static__() __AutoCache__()
 function AshBlzSkinApi.AggroSkin()
     return  AshBlzSkinApi.OnConfigChanged():Map(function()
-        return DB.Appearance.DisplayAggroHighlight and AGGRO_SKIN or nil
+        return DB().Appearance.DisplayAggroHighlight and AGGRO_SKIN or nil
     end)
 end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.PetAggroSkin()
     return  AshBlzSkinApi.OnConfigChanged():Map(function()
-        return DB.Appearance.DisplayAggroHighlight and PET_AGGRO_SKIN or nil
+        return DB().Appearance.DisplayAggroHighlight and PET_AGGRO_SKIN or nil
     end)
 end
 
@@ -330,7 +330,7 @@ function AshBlzSkinApi.NameSkin()
     local fontType = { font = font, height = height }
     local fontObserver   = Wow.FromFrameSize(UnitFrame):Map(function(w, h) return getDynamicHeightFont(h, GameFontHighlightSmall, 0.6) end)
     return AshBlzSkinApi.OnConfigChanged():Map(function()
-            NAMELABEL_SKIN.Font = DB.Appearance.Name.ScaleWithFrame and fontObserver or fontType
+            NAMELABEL_SKIN.Font = DB().Appearance.Name.ScaleWithFrame and fontObserver or fontType
         return NAMELABEL_SKIN
     end)
 end

@@ -216,7 +216,7 @@ class "DebuffPanel"(function()
                 self.Count = eleIdx -1
             else
                 local filterHarmful = "HARMFUL"
-                local filterRaid = "RAID"
+                local filterRaid = "HARMFUL|RAID"
                 refreshPriorityAura(self, unit, filterHarmful, 1, 1, UnitAura(unit, 1, filterHarmful))
                 refreshRaidAura(self, unit, filterRaid, 1, 1, UnitAura(unit, 1, filterRaid))
 

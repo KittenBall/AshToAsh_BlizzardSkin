@@ -111,7 +111,7 @@ function OnLoad()
 
             Label               = {
                 text            = L["panel_mask_tips"],
-                fontObject      = GameFontHighlightSmall,
+                fontObject      = GameFontWhiteTiny,
                 justifyH        = "CENTER",
                 justifyV        = "TOP",
                 location        = {
@@ -124,8 +124,17 @@ function OnLoad()
 
     RECYCLE_MASKS.OnInit = RECYCLE_MASKS.OnInit + OnInit
 
-    DB = SVManager("AshToAsh_BlizzardSkin_DB", "AshToAsh_BlizzardSkin_CharDB").Char
-    DB:SetDefault{
+    _SVDB = SVManager("AshToAsh_BlizzardSkin_DB", "AshToAsh_BlizzardSkin_CharDB")
+    _SVDB:SetDefault{
+        Templates                                                                                                           = {}
+    }
+
+    CharDB = _SVDB.Char
+    CharDB:SetDefault{
+        BlockBlizzardUnitFrames                                                                                             = true
+    }
+
+    DB():SetDefault{
         Appearance                                                                                                          = {
             -- 施法条
             CastBar                                                                                                         = {
@@ -165,13 +174,21 @@ function OnLoad()
             DisplayPetPanelLabel                                                                                            = true,
             -- 仅显示可供驱散的Debuff
             DisplayOnlyDispellableDebuffs                                                                                   = false,
-        },
-
-        BlockBlizzardUnitFrames                                                                                             = true
+        }
     }
-
+    
     -- 初始化推送值
     Delay(3, SendConfigChanged)
+end
+
+function OnSpecChanged()
+    SendConfigChanged()
+
+    -- 触发一些配置更改
+    FireSystemEvent("UNIT_HEALTH", 'any')
+    FireSystemEvent("ASHTOASH_BLZ_SKIN_NICK_NAME_UPDATE", 'any')
+    FireSystemEvent("ASHTOASH_BLZ_SKIN_NICK_NAME_REFRESH", 'any')
+    FireSystemEvent("UNIT_NAME_UPDATE", 'any')
 end
 
 function SendConfigChanged()
@@ -185,6 +202,10 @@ end
 
 function ShowError(text)
     UIErrorsFrame:AddMessage(text, 1.0, 0.0, 0.0, 1, 4)
+end
+
+function DB()
+    return Scorpio.IsRetail and _SVDB.Char.Spec or _SVDB.Char
 end
 
 -------------------------------------------------

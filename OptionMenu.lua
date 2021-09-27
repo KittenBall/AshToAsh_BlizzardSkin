@@ -14,16 +14,16 @@ local function GetAppearanceMenu()
                 {
                     -- 可见性
                     text                                                                                                    = L["visibility"],
-                    disabled                                                                                                = DB.Appearance.PowerBar.Visibility ~= Visibility.SHOW_ALWAYS,
+                    disabled                                                                                                = DB().Appearance.PowerBar.Visibility ~= Visibility.SHOW_ALWAYS,
                     tiptitle                                                                                                = L["tips"],
                     tiptext                                                                                                 = L["power_bar_visibility_tips"],
                     submenu                                                                                                 = {
                         check                                                                                               = {
                             get                                                                                             = function()
-                                return DB.Appearance.CastBar.Visibility
+                                return DB().Appearance.CastBar.Visibility
                             end,
                             set                                                                                             = function(value)
-                                DB.Appearance.CastBar.Visibility = value
+                                DB().Appearance.CastBar.Visibility = value
                                 SendConfigChanged()
                             end
                         },
@@ -53,10 +53,10 @@ local function GetAppearanceMenu()
                     submenu                                                                                                 = {
                         check                                                                                               = {
                             get                                                                                             = function()
-                                return DB.Appearance.PowerBar.Visibility
+                                return DB().Appearance.PowerBar.Visibility
                             end,
                             set                                                                                             = function(value)
-                                DB.Appearance.PowerBar.Visibility = value
+                                DB().Appearance.PowerBar.Visibility = value
                                 SendConfigChanged()
                             end
                         },
@@ -82,10 +82,10 @@ local function GetAppearanceMenu()
                     submenu                                                                                                 = {
                         check                                                                                               = {
                             get                                                                                             = function()
-                                return DB.Appearance.HealthBar.HealthText.Style
+                                return DB().Appearance.HealthBar.HealthText.Style
                             end,
                             set                                                                                             = function(value)
-                                DB.Appearance.HealthBar.HealthText.Style = value
+                                DB().Appearance.HealthBar.HealthText.Style = value
                                 SendConfigChanged()
                             end
                         },
@@ -113,10 +113,10 @@ local function GetAppearanceMenu()
                     submenu                                                                                                 = {
                         check                                                                                               = {
                             get                                                                                             = function()
-                                return DB.Appearance.HealthBar.HealthText.TextFormat
+                                return DB().Appearance.HealthBar.HealthText.TextFormat
                             end,
                             set                                                                                             = function(value)
-                                DB.Appearance.HealthBar.HealthText.TextFormat = value
+                                DB().Appearance.HealthBar.HealthText.TextFormat = value
                                 FireSystemEvent("UNIT_HEALTH", 'any')
                             end
                         },
@@ -139,10 +139,10 @@ local function GetAppearanceMenu()
                     text                                                                                                    = L["name_scales_with_frame"],
                     check                                                                                                   = {
                         get                                                                                                 = function()
-                            return DB.Appearance.HealthBar.HealthText.ScaleWithFrame
+                            return DB().Appearance.HealthBar.HealthText.ScaleWithFrame
                         end,
                         set                                                                                                 = function(value)
-                            DB.Appearance.HealthBar.HealthText.ScaleWithFrame = value
+                            DB().Appearance.HealthBar.HealthText.ScaleWithFrame = value
                             SendConfigChanged()
                         end
                     }
@@ -159,10 +159,10 @@ local function GetAppearanceMenu()
                     submenu                                                                                                 = {
                         check                                                                                               = {
                             get                                                                                             = function()
-                                return DB.Appearance.Name.Style
+                                return DB().Appearance.Name.Style
                             end,
                             set                                                                                             = function(value)
-                                DB.Appearance.Name.Style = value
+                                DB().Appearance.Name.Style = value
                                 FireSystemEvent("UNIT_NAME_UPDATE", 'any')
                             end
                         },
@@ -186,7 +186,7 @@ local function GetAppearanceMenu()
                     submenu                                                                                                 = {
                         -- 设置昵称
                         {
-                            text                                                                                            = DB.Appearance.Name.Nickname and L["nick_name_format"]:format(DB.Appearance.Name.Nickname) or L["nick_name_setting"],
+                            text                                                                                            = DB().Appearance.Name.Nickname and L["nick_name_format"]:format(DB().Appearance.Name.Nickname) or L["nick_name_setting"],
                             tiptitle                                                                                        = L["tips"],
                             tiptext                                                                                         = L["nick_name_setting"],
                             click                                                                                           = function()
@@ -195,7 +195,7 @@ local function GetAppearanceMenu()
                                     ShowError(L["err_nickname_too_long"])
                                     return
                                 end
-                                DB.Appearance.Name.Nickname = nickname
+                                DB().Appearance.Name.Nickname = nickname
                                 FireSystemEvent("ASHTOASH_BLZ_SKIN_NICK_NAME_UPDATE", 'any')
                                 FireSystemEvent("ASHTOASH_BLZ_SKIN_NICK_NAME_REFRESH", 'any')
                             end
@@ -205,10 +205,10 @@ local function GetAppearanceMenu()
                             text                                                                                            = L["show_nick_name_owns"],
                             check                                                                                           = {
                                 get                                                                                         = function()
-                                    return DB.Appearance.Name.ShowNicknameOwns
+                                    return DB().Appearance.Name.ShowNicknameOwns
                                 end,
                                 set                                                                                         = function(value)
-                                    DB.Appearance.Name.ShowNicknameOwns = value
+                                    DB().Appearance.Name.ShowNicknameOwns = value
                                     FireSystemEvent("ASHTOASH_BLZ_SKIN_NICK_NAME_UPDATE", 'any')
                                 end
                             }
@@ -218,10 +218,10 @@ local function GetAppearanceMenu()
                             text                                                                                            = L["show_nick_name_others"],
                             check                                                                                           = {
                                 get                                                                                         = function()
-                                    return DB.Appearance.Name.ShowNicknameOthers
+                                    return DB().Appearance.Name.ShowNicknameOthers
                                 end,
                                 set                                                                                         = function(value)
-                                    DB.Appearance.Name.ShowNicknameOthers = value
+                                    DB().Appearance.Name.ShowNicknameOthers = value
                                     FireSystemEvent("ASHTOASH_BLZ_SKIN_NICK_NAME_UPDATE", 'any')
                                 end
                             }
@@ -233,10 +233,10 @@ local function GetAppearanceMenu()
                             tiptext                                                                                         = L["show_nick_name_to_others_tips"],
                             check                                                                                           = {
                                 get                                                                                         = function()
-                                    return DB.Appearance.Name.ShowNicknameToOthers
+                                    return DB().Appearance.Name.ShowNicknameToOthers
                                 end,
                                 set                                                                                         = function(value)
-                                    DB.Appearance.Name.ShowNicknameToOthers = value
+                                    DB().Appearance.Name.ShowNicknameToOthers = value
                                     FireSystemEvent("ASHTOASH_BLZ_SKIN_NICK_NAME_REFRESH", 'any')
                                 end
                             }
@@ -248,10 +248,11 @@ local function GetAppearanceMenu()
                     text                                                                                                    = L["friends_name_coloring"],
                     check                                                                                                   = {
                         get                                                                                                 = function()
-                            return DB.Appearance.Name.FriendsNameColoring
+                            return DB().Appearance.Name.FriendsNameColoring
                         end,
                         set                                                                                                 = function(value)
-                            DB.Appearance.Name.FriendsNameColoring = value
+                            DB().Appearance.Name.FriendsNameColoring = value
+                            SendConfigChanged()
                             FireSystemEvent("UNIT_NAME_UPDATE", 'any')
                         end
                     }
@@ -261,10 +262,10 @@ local function GetAppearanceMenu()
                     text                                                                                                    = L["name_scales_with_frame"],
                     check                                                                                                   = {
                         get                                                                                                 = function()
-                            return DB.Appearance.Name.ScaleWithFrame
+                            return DB().Appearance.Name.ScaleWithFrame
                         end,
                         set                                                                                                 = function(value)
-                            DB.Appearance.Name.ScaleWithFrame = value
+                            DB().Appearance.Name.ScaleWithFrame = value
                             SendConfigChanged()
                         end
                     }
@@ -276,10 +277,10 @@ local function GetAppearanceMenu()
                     --         text                                                                                            = ENABLE,
                     --         check                                                                                           = {
                     --             get                                                                                         = function()
-                    --                 return DB.Appearance.Name.FriendsNameColoring
+                    --                 return DB().Appearance.Name.FriendsNameColoring
                     --             end,
                     --             set                                                                                         = function(value)
-                    --                 DB.Appearance.Name.FriendsNameColoring = value
+                    --                 DB().Appearance.Name.FriendsNameColoring = value
                     --                 FireSystemEvent("UNIT_NAME_UPDATE", 'any')
                     --             end
                     --         }
@@ -288,10 +289,10 @@ local function GetAppearanceMenu()
                     --         text                                                                                            = L["battle_net_friend_color"],
                     --         color                                                                                           = {
                     --             get                                                                                         = function()
-                    --                 return DB.Appearance.Name.BNFriendColor
+                    --                 return DB().Appearance.Name.BNFriendColor
                     --             end,
                     --             set                                                                                         = function(value)
-                    --                 DB.Appearance.Name.BNFriendColor = value
+                    --                 DB().Appearance.Name.BNFriendColor = value
                     --                 FireSystemEvent("UNIT_NAME_UPDATE", 'any')
                     --             end
                     --         }
@@ -300,10 +301,10 @@ local function GetAppearanceMenu()
                     --         text                                                                                            = L["guild_friend_color"],
                     --         color                                                                                           = {
                     --             get                                                                                         = function()
-                    --                 return DB.Appearance.Name.GuildColor
+                    --                 return DB().Appearance.Name.GuildColor
                     --             end,
                     --             set                                                                                         = function(value)
-                    --                 DB.Appearance.Name.GuildColor = value
+                    --                 DB().Appearance.Name.GuildColor = value
                     --                 FireSystemEvent("UNIT_NAME_UPDATE", 'any')
                     --             end
                     --         }
@@ -312,10 +313,10 @@ local function GetAppearanceMenu()
                     --         text                                                                                            = L["friend_color"],
                     --         color                                                                                           = {
                     --             get                                                                                         = function()
-                    --                 return DB.Appearance.Name.FriendColor
+                    --                 return DB().Appearance.Name.FriendColor
                     --             end,
                     --             set                                                                                         = function(value)
-                    --                 DB.Appearance.Name.FriendColor = value
+                    --                 DB().Appearance.Name.FriendColor = value
                     --                 FireSystemEvent("UNIT_NAME_UPDATE", 'any')
                     --             end
                     --         }
@@ -328,10 +329,10 @@ local function GetAppearanceMenu()
             text                                                                                                            = COMPACT_UNIT_FRAME_PROFILE_DISPLAYAGGROHIGHLIGHT,
             check                                                                                                           = {
                 get                                                                                                         = function()
-                    return DB.Appearance.DisplayAggroHighlight and true or false
+                    return DB().Appearance.DisplayAggroHighlight and true or false
                 end,
                 set                                                                                                         = function(value)
-                    DB.Appearance.DisplayAggroHighlight = value
+                    DB().Appearance.DisplayAggroHighlight = value
                     SendConfigChanged()
                 end
             }
@@ -343,10 +344,10 @@ local function GetAppearanceMenu()
             tiptext                                                                                                         = L["show_panel_label_tips"],
             check                                                                                                           = {
                 get                                                                                                         = function()
-                    return DB.Appearance.DisplayPanelLabel and true or false
+                    return DB().Appearance.DisplayPanelLabel and true or false
                 end,
                 set                                                                                                         = function(value)
-                    DB.Appearance.DisplayPanelLabel = value
+                    DB().Appearance.DisplayPanelLabel = value
                     SendConfigChanged()
                 end
             }
@@ -356,10 +357,10 @@ local function GetAppearanceMenu()
             text                                                                                                            = L["show_pet_panel_label"],
             check                                                                                                           = {
                 get                                                                                                         = function()
-                    return DB.Appearance.DisplayPetPanelLabel and true or false
+                    return DB().Appearance.DisplayPetPanelLabel and true or false
                 end,
                 set                                                                                                         = function(value)
-                    DB.Appearance.DisplayPetPanelLabel = value
+                    DB().Appearance.DisplayPetPanelLabel = value
                     SendConfigChanged()
                 end
             }
@@ -369,16 +370,67 @@ local function GetAppearanceMenu()
             text                                                                                                            = COMPACT_UNIT_FRAME_PROFILE_DISPLAYONLYDISPELLABLEDEBUFFS,
             check                                                                                                           = {
                 get                                                                                                         = function()
-                    return DB.Appearance.DisplayOnlyDispellableDebuffs and true or false
+                    return DB().Appearance.DisplayOnlyDispellableDebuffs and true or false
                 end,
                 set                                                                                                         = function(value)
-                    DB.Appearance.DisplayOnlyDispellableDebuffs = value
+                    DB().Appearance.DisplayOnlyDispellableDebuffs = value
                     SendConfigChanged()
                     FireSystemEvent("UNIT_AURA", "any")
                 end
             }
         },
     }
+
+    return menu
+end
+
+local function GetTemplateMenu()
+    local menu = {
+        {
+            text                                                                                                            = L["add_template"],
+            click                                                                                                           = function()
+                AddCurrentConfigurationAsTemplate(Input(L["add_template"]))
+            end
+        }
+    }
+
+    for name, _ in pairs(_SVDB.Templates) do
+        local templateMenu                                                                                                  = {
+            text                                                                                                            = name,
+            submenu                                                                                                         = {
+                {
+                    text                                                                                                    = L["template_apply"],
+                    tiptitle                                                                                                = L["tips"],
+                    tiptext                                                                                                 = L["template_apply_tips"],
+                    click                                                                                                   = function()
+                        if Confirm(L["template_apply_confirm"]:format(name)) then
+                            ApplyTemplate(name)
+                        end
+                    end
+                },
+                {
+                    text                                                                                                    = L["template_update"],
+                    tiptitle                                                                                                = L["tips"],
+                    tiptext                                                                                                 = L["template_update_tips"],
+                    click                                                                                                   = function()
+                        if Confirm(L["template_update_confirm"]:format(name)) then
+                            UpdateTemplate(name)
+                        end
+                    end
+                },
+                {
+                    text                                                                                                    = L["template_delete"],
+                    click                                                                                                   = function()
+                        if Confirm(L["template_delete_confirm"]:format(name)) then
+                            DeleteTemplate(name)
+                        end
+                    end
+                }
+            }
+        }
+
+        tinsert(menu, templateMenu)
+    end
 
     return menu
 end
@@ -401,13 +453,19 @@ local function generateMenu()
                     tiptext                                                                                                 = L["block_blizzard_unitframe_tips"],
                     check                                                                                                   = {
                         get                                                                                                 = function()
-                            return DB.BlockBlizzardUnitFrames
+                            return CharDB.BlockBlizzardUnitFrames
                         end,
                         set                                                                                                 = function(value)
-                            DB.BlockBlizzardUnitFrames = value
+                            CharDB.BlockBlizzardUnitFrames = value
                             ReloadUI()
                         end
                     }
+                },
+                {
+                    text                                                                                                    = L["template"],
+                    tiptitle                                                                                                = L["tips"],
+                    tiptext                                                                                                 = L["template_tips"],
+                    submenu                                                                                                 = GetTemplateMenu()
                 }
             }
         },
@@ -426,6 +484,46 @@ function ASHTOASH_OPEN_MENU(panel, menu)
     end
 
     SendConfigChanged()
+end
+
+function AddCurrentConfigurationAsTemplate(name)
+    if not name or _SVDB.Templates[name] then
+        ShowError(L["err_add_template"])
+        return
+    end
+
+    local template                                                                                                          = {
+        AshToAshData                                                                                                        = CharSV():GetData(),
+        AshToAsh_BlizzardSkinData                                                                                           = DB():GetData()
+    }
+    
+    _SVDB.Templates[name] = template
+end
+
+function UpdateTemplate(name)
+    if not name or not _SVDB.Templates[name] then return end
+
+    local template                                                                                                          = {
+        AshToAshData                                                                                                        = CharSV():GetData(),
+        AshToAsh_BlizzardSkinData                                                                                           = DB():GetData()
+    }
+    
+    _SVDB.Templates[name] = template
+end
+
+function ApplyTemplate(name)
+    if not name then return end
+
+    local template = _SVDB.Templates[name]
+    if not template then return end
+
+    CharSV():SetData(template.AshToAshData)
+    DB():SetData(template.AshToAsh_BlizzardSkinData)
+    ReloadUI()
+end
+
+function DeleteTemplate(name)
+    _SVDB.Templates[name] = nil
 end
 
 -------------------------------------------------

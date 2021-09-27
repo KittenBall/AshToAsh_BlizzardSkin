@@ -123,13 +123,13 @@ end
 __Static__() __AutoCache__()
 function AshBlzSkinApi.PowerBarVisible()
     return AshBlzSkinApi.OnConfigChanged():Map(function()
-        return DB.Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS
+        return DB().Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS
     end)
 end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.DisplayOnlyDispellableDebuffs()
     return AshBlzSkinApi.OnConfigChanged():Map(function()
-        return DB.Appearance.DisplayOnlyDispellableDebuffs
+        return DB().Appearance.DisplayOnlyDispellableDebuffs
     end)
 end

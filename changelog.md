@@ -1,3 +1,6 @@
+## 1.5
+- Add Template feature, you can use it to easy apply serval config to ata
+- Fix debuff panel show raid aura when you select only show dispellabel debuff
 ## 1.4.25
 - Fix error that debuff can not be added to aura black list or enlarget debuff list
 - Health and power will not be queued to reduce the task count, followed by ATA
