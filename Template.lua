@@ -175,6 +175,7 @@ end)
 
 -- EnlargeDebuff icon
 __Sealed__() class "AshBlzSkinEnlargetDebuffIcon"(function()
+    inherit "AshBlzSkinDebuffIcon"
 
     function __ctor(self)
         super(self)
