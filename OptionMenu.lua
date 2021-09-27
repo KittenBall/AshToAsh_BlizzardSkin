@@ -432,21 +432,21 @@ end
 -- Config Panel
 -------------------------------------------------
 
-ConfigPanel                 = Dialog("AshToAsh_BlzSkinConfigDialog")
-ConfigPanel:Hide()
+-- ConfigPanel                 = Dialog("AshToAsh_BlzSkinConfigDialog")
+-- ConfigPanel:Hide()
 
 
 
-Style[ConfigPanel]                                      = {
+-- Style[ConfigPanel]                                      = {
     
-    size                                                = Size(640, 560),
+--     size                                                = Size(640, 560),
 
-    Resizer                                             = {
-        visible                                         = false
-    },
+--     Resizer                                             = {
+--         visible                                         = false
+--     },
 
-    Header                                              = {
-        text                                            = L["menu_title"]
-    },
+--     Header                                              = {
+--         text                                            = L["menu_title"]
+--     },
 
-}
+-- }

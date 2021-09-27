@@ -1,3 +1,7 @@
+## 1.4.25
+- Fix error that debuff can not be added to aura black list or enlarget debuff list
+- Health and power will not be queued to reduce the task count, followed by ATA
+- Add tips to panel mask 
 ## 1.4.24
 - Aura GameTooltip will update every frame, so you can see aura remain time dynamicly
 - Name font size can scale with unitframe now, default false

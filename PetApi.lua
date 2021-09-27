@@ -116,7 +116,7 @@ end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPetInRange()
-    return Wow.FromUnitEvent(Observable.Interval(0.5):Map("=>'any'")):Map(function(unit)
+    return Wow.FromUnitEvent(Observable.Interval(0.5):Map("=>'any'"):ToSubject()):Map(function(unit)
         return UnitInRange(unit) or not IsInGroup()
     end)
 end

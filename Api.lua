@@ -38,7 +38,7 @@ end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitInRange()
-    return Wow.FromUnitEvent(Observable.Interval(0.5):Map("=>'any'")):Map(function(unit)
+    return Wow.FromUnitEvent(Observable.Interval(0.5):Map("=>'any'"):ToSubject()):Map(function(unit)
         return UnitIsUnit(unit, "player") or UnitInRange(unit)
     end)
 end
@@ -65,7 +65,7 @@ end
 -------------------------------------------------
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitIsDead()
-    return Wow.FromUnitEvent(Wow.FromEvent("UNIT_CONNECTION", "PLAYER_FLAGS_CHANGED", "UNIT_HEALTH")):Next():Map(function(unit)
+    return Wow.FromUnitEvent(Wow.FromEvent("UNIT_CONNECTION", "PLAYER_FLAGS_CHANGED", "UNIT_HEALTH")):Map(function(unit)
         return UnitIsDeadOrGhost(unit) and UnitIsConnected(unit)
     end)
 end

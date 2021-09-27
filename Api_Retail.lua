@@ -18,7 +18,7 @@ end
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPower(frequent)
     return Wow.FromUnitEvent(frequent and "UNIT_POWER_FREQUENT" or "UNIT_POWER_UPDATE", "UNIT_MAXPOWER", "UNIT_DISPLAYPOWER", "UNIT_POWER_BAR_SHOW", "UNIT_POWER_BAR_HIDE")
-        :Next():Map(function(unit)
+        :Map(function(unit)
             return UnitPower(unit, getDisplayedPowerID(unit))
         end)
 end
