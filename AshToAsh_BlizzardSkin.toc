@@ -34,3 +34,5 @@ Api_Retail.lua
 Template.lua
 Template_Retail.lua
 Skin.lua
+
+ConfigWidget.lua

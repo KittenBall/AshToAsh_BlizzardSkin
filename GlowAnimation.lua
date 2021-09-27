@@ -100,8 +100,8 @@ class "AutoCastGlow"(function(_ENV)
     local function UpdatePoints(self)
         local parent = self:GetParent()
         if parent then
-            self:SetPoint("TOPLEFT", parent, "TOPLEFT", -self.PaddingHorizontal + 0.05, self.PaddingVertical + 0.05)
-            self:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", self.PaddingHorizontal, -self.PaddingVertical + 0.05)
+            self:SetPoint("TOPLEFT", parent, "TOPLEFT", -self.PaddingHorizontal - 0.05, self.PaddingVertical + 0.05)
+            self:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", self.PaddingHorizontal + 0.05, -self.PaddingVertical - 0.05)
         end
     end
 
@@ -356,8 +356,8 @@ class "PixelGlow"(function(_ENV)
     local function UpdatePoints(self)
         local parent = self:GetParent()
         if parent then
-            self:SetPoint("TOPLEFT", parent, "TOPLEFT", -self.PaddingHorizontal + 0.05, self.PaddingVertical + 0.05)
-            self:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", self.PaddingHorizontal, -self.PaddingVertical + 0.05)
+            self:SetPoint("TOPLEFT", parent, "TOPLEFT", -self.PaddingHorizontal - 0.05, self.PaddingVertical + 0.05)
+            self:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", self.PaddingHorizontal + 0.05, -self.PaddingVertical - 0.05)
         end
     end
 

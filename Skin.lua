@@ -674,13 +674,13 @@ SKIN_STYLE =                                                                    
             location                                                                        = {
                 Anchor("TOPRIGHT", -3, -2)
             },
-            file                                                                            = Wow.UnitIsLead():Map(function(isLeader)
+            file                                                                            = Wow.UnitIsLeader():Map(function(isLeader)
                 return isLeader and [[Interface\GroupFrame\UI-Group-LeaderIcon]] or nil
             end),
             visible                                                                         = true,
             drawLayer                                                                       = "ARTWORK",
             subLevel                                                                        = 2,
-            size                                                                            = Wow.UnitIsLead():Map(function(isLeader)
+            size                                                                            = Wow.UnitIsLeader():Map(function(isLeader)
                 if isLeader then
                     shareSize.width, shareSize.height = 12, 12
                 else

@@ -33,3 +33,5 @@ Api_BCC.lua
 Template.lua
 Template_BCC.lua
 Skin.lua
+
+ConfigWidget.lua

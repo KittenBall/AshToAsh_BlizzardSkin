@@ -265,11 +265,3 @@ function AshBlzSkinApi.UnitDebuffCanDispellColor()
         return GetDispellDebuffColor(dType or "")
     end)
 end
-
--- Debuff 过滤类型
-__Static__() __AutoCache__()
-function AshBlzSkinApi.DebuffAuraFilter()
-    return Wow.FromUnitEvent(Wow.FromEvent("AshToAsh_Blizzard_Skin_Config_Changed"):Map("=> 'any'")):Map(function(unit)
-        return UnitCanAttack("player", unit) and "PLAYER|HARMFUL" or (DB.Appearance.DisplayOnlyDispellableDebuffs and "HARMFUL|RAID" or "HARMFUL")
-    end)
-end
