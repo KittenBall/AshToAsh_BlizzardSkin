@@ -129,7 +129,7 @@ class "AshBlzSkinBuffIcon"(function()
                 -- Force the refreshing
                 Next(Scorpio.FireSystemEvent, "UNIT_AURA", "any")
             end
-        elseif IsControlKeyDown() and button == "LeftButton" then
+        elseif IsControlKeyDown() and button == "LeftButton" and self.AuraFilter:match("HARMFUL") then
             local name, _, _, _, _, _, _, _, _, spellID = UnitAura(parent.Unit, self.AuraIndex, self.AuraFilter)
 
             if name then
