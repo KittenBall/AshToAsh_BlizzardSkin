@@ -342,7 +342,7 @@ end
 -- Enlarge debuff
 SHARE_ENLARGEDEBUFFPANEL_SKIN                                                               = {
     topLevel                                                                                = true,
-    elementType                                                                             = AshBlzSkinEnlargetDebuffIcon,
+    elementType                                                                             = AshBlzSkinEnlargeDebuffIcon,
     rowCount                                                                                = 1,
     columnCount                                                                             = 2,
     elementWidth                                                                            = resizeOnUnitFrameChanged(15),
@@ -594,7 +594,7 @@ SKIN_STYLE =                                                                    
         }
     },
 
-    [AshBlzSkinEnlargetDebuffIcon]                                                          = {
+    [AshBlzSkinEnlargeDebuffIcon]                                                           = {
         PixelGlow                                                                           = {
             period                                                                          = 2,
             visible                                                                         = true

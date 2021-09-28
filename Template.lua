@@ -50,7 +50,9 @@ class "UnlockButton"(function()
     end
 
     local function OnEnter(self)
-        self:SetAlpha(100)
+        if not UnitAffectingCombat("player") then
+            self:SetAlpha(100)
+        end
     end
 
     local function OnLeave(self)
@@ -174,7 +176,7 @@ class "AshBlzSkinDispellIcon"(function()
 end)
 
 -- EnlargeDebuff icon
-__Sealed__() class "AshBlzSkinEnlargetDebuffIcon"(function()
+__Sealed__() class "AshBlzSkinEnlargeDebuffIcon"(function()
     inherit "AshBlzSkinDebuffIcon"
 
     function __ctor(self)
