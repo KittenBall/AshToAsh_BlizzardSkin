@@ -391,6 +391,16 @@ local function GetTemplateMenu()
             click                                                                                                           = function()
                 AddCurrentConfigurationAsTemplate(Input(L["add_template"]))
             end
+        },
+        {
+            text                                                                                                            = L["template_default_apply"],
+            tiptitle                                                                                                        = L["tips"],
+            tiptext                                                                                                         = L["template_default_apply_tips"],
+            click                                                                                                           = function()
+                if Confirm(L["template_default_apply_confirm"]) then
+                    ApplyDefaultTemplate()
+                end
+            end
         }
     }
 
@@ -486,6 +496,10 @@ function ASHTOASH_OPEN_MENU(panel, menu)
     SendConfigChanged()
 end
 
+-------------------------------------------------
+-- Template
+-------------------------------------------------
+
 function AddCurrentConfigurationAsTemplate(name)
     if not name or _SVDB.Templates[name] then
         ShowError(L["err_add_template"])
@@ -524,6 +538,12 @@ end
 
 function DeleteTemplate(name)
     _SVDB.Templates[name] = nil
+end
+
+function ApplyDefaultTemplate()
+    CharSV():SetData(_Parent.DefaultTemplate)
+    DB():Reset()
+    ReloadUI()
 end
 
 -------------------------------------------------

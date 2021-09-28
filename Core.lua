@@ -176,9 +176,6 @@ function OnLoad()
             DisplayOnlyDispellableDebuffs                                                                                   = false,
         }
     }
-    
-    -- 初始化推送值
-    Delay(3, SendConfigChanged)
 end
 
 function OnSpecChanged()

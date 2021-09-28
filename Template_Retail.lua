@@ -306,7 +306,7 @@ class "CastBar" (function(_ENV)
         elseif visibility == Visibility.SHOW_ONLY_PARTY and IsInRaid() then
             return
         end
-
+        
         if duration <= 0 then
             self:Hide()
             return
@@ -347,7 +347,7 @@ Style.UpdateSkin(SKIN_NAME,{
 
     -- 施法条
     [CastBar]                                                                           = {
-        useParentLevel                                                                  = true,
+        frameLevel                                                                      = 1,
         statusBarTexture                                                                = {
             file                                                                        = "Interface\\TargetingFrame\\UI-StatusBar"
         },
