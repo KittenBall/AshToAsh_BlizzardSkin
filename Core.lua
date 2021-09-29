@@ -204,8 +204,14 @@ function ShowError(text)
     UIErrorsFrame:AddMessage(text, 1.0, 0.0, 0.0, 1, 4)
 end
 
-function DB()
-    return Scorpio.IsRetail and _SVDB.Char.Spec or _SVDB.Char
+if Scorpio.IsRetail then
+    function DB()
+        return _SVDB.Char.Spec
+    end
+else
+    function DB()
+        return _SVDB.Char
+    end
 end
 
 -------------------------------------------------
