@@ -311,7 +311,7 @@ Style.UpdateSkin(SKIN_NAME,{
 
     -- 施法条
     [CastBar]                                                                           = {
-        useParentLevel                                                                  = true,
+        frameLevel                                                                      = 1,
         statusBarTexture                                                                = {
             file                                                                        = "Interface\\TargetingFrame\\UI-StatusBar"
         },

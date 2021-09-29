@@ -1,3 +1,7 @@
+## 1.5.1
+- Fix debuff panel can'not add enlarge debuff bug
+- Blizzard skin no longer inherits the default skin
+- Add default template which show 8 party panel
 ## 1.5
 - Add Template feature, you can use it to easy apply serval config to ata
 - Fix debuff panel show raid aura when you select only show dispellabel debuff

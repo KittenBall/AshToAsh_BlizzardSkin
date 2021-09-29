@@ -143,7 +143,7 @@ GROUP_PANEL_LABEL_SKIN                                                          
         if orientation == Orientation.HORIZONTAL then
             return getLocation(getAnchor(shareAnchor1, "RIGHT", 0, 0, nil, "LEFT"))
         else
-            return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, 3, nil, "TOP"))
+            return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, 1, nil, "TOP"))
         end
     end),
 }
@@ -171,7 +171,7 @@ GROUP_PET_PANEL_LABEL_SKIN                                                      
         if orientation == Orientation.HORIZONTAL then
             return getLocation(getAnchor(shareAnchor1, "RIGHT", 0, 0, nil, "LEFT"))
         else
-            return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, 3, nil, "TOP"))
+            return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, 1, nil, "TOP"))
         end
     end),
 }
@@ -189,6 +189,7 @@ end
 -------------------------------------------------
 
 SHARE_POWERBAR_SKIN                                                                         = {
+    frameStrata                                                                             = "LOW",
     useParentLevel                                                                          = true,
     statusBarTexture                                                                        = {
         file                                                                                = "Interface\\RaidFrame\\Raid-Bar-Resource-Fill",
@@ -219,22 +220,22 @@ POWER_BAR_SKIN                                                                  
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.PowerBarSkin()
-    return AshBlzSkinApi.PowerBarVisible():Map(function()
-        return DB().Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS and POWER_BAR_SKIN or nil
+    return AshBlzSkinApi.PowerBarVisible():Map(function(visible)
+        return visible and POWER_BAR_SKIN or nil
     end)
 end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.PetPowerBarSkin()
-    return AshBlzSkinApi.PowerBarVisible():Map(function()
-        return DB().Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS and SHARE_POWERBAR_SKIN or nil
+    return AshBlzSkinApi.PowerBarVisible():Map(function(visible)
+        return visible and SHARE_POWERBAR_SKIN or nil
     end)
 end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.CastBarVisibilityChanged()
-    return AshBlzSkinApi.OnConfigChanged():Map(function()
-        return DB().Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS and DB().Appearance.CastBar.Visibility or Visibility.HIDE
+    return AshBlzSkinApi.PowerBarVisible():Map(function(visible)
+        return visible and DB().Appearance.CastBar.Visibility or Visibility.HIDE
     end)
 end
 
@@ -352,9 +353,13 @@ SHARE_ENLARGEDEBUFFPANEL_SKIN                                                   
     frameStrata                                                                             = "MEDIUM",
     leftToRight                                                                             = true,
     topToBottom                                                                             = false,
+    visible                                                                                 = AshToAsh.FromConfig():Map(function() return next(_EnlargeDebuffList) and true or false end),
     location                                                                                = {
         Anchor("TOPLEFT", 3, -3, HEALTHBAR, "TOPLEFT")
-    }
+    },
+    customFilter                                                                            = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID) 
+        return _EnlargeDebuffList[spellID] 
+    end
 }
 
 -- Dispell debuff
@@ -452,6 +457,7 @@ SHARE_RAIDTARGET_SKIN                                                           
 
 -- 血条
 SHARE_HEALTHBAR_SKIN                                                                        = {
+    frameStrata                                                                             = "LOW",
     useParentLevel                                                                          = true,
     statusBarTexture                                                                        = {
         file                                                                                = "Interface\\RaidFrame\\Raid-Bar-Hp-Fill",
@@ -465,8 +471,6 @@ SHARE_HEALTHBAR_SKIN                                                            
         end
     end),
 
-    BackgroundFrame                                                                         = NIL,
-
     -- 拥有驱散debuff的能力
     IconTexture                                                                             = {
         drawLayer                                                                           = "BORDER",
@@ -474,7 +478,7 @@ SHARE_HEALTHBAR_SKIN                                                            
         location                                                                            = {
             Anchor("TOPLEFT", 0, 0, "$parent.statusBarTexture", "TOPLEFT"), 
             Anchor("BOTTOMRIGHT", 0, 0, "$parent.statusBarTexture", "BOTTOMRIGHT")
-        },      
+        },
         ignoreParentAlpha                                                                   = true,
         file                                                                                = "Interface\\RaidFrame\\Raid-Bar-Hp-Fill",
         vertexColor                                                                         = AshBlzSkinApi.UnitDebuffCanDispellColor(),
@@ -527,83 +531,7 @@ SKIN_STYLE =                                                                    
         Label                                                                               = AshBlzSkinApi.PetPanelLableSkin()
     },
 
-    [AshBlzSkinBuffIcon]                                                                    = {
-        backdrop                                                                            = NIL,
-        backdropBorderColor                                                                 = NIL,
-
-        IconTexture                                                                         = {
-            drawLayer                                                                       = "ARTWORK",
-            setAllPoints                                                                    = true,
-            file                                                                            = Wow.FromPanelProperty("AuraIcon"),
-            texCoords                                                                       = NIL
-        },
-
-        Label                                                                               = {
-            drawLayer                                                                       = "OVERLAY",
-            fontObject                                                                      = NumberFontNormalSmall,
-            location                                                                        = {
-                Anchor("BOTTOMRIGHT", 0, 0)
-            },
-            text                                                                            = Wow.FromPanelProperty("AuraCount"):Map(function(val)
-                if val >= 100 then
-                    return BUFF_STACKS_OVERFLOW
-                elseif val > 1 then
-                    return val
-                else
-                    return ""
-                end
-            end),
-        },
-
-        Cooldown                                                                            = {
-            setAllPoints                                                                    = true,
-            enableMouse                                                                     = false,
-            cooldown                                                                        = Wow.FromPanelProperty("AuraCooldown"),
-            reverse                                                                         = true,
-        },
-    },
-
-    [AshBlzSkinClassBuffIcon]                                                               = {
-        enableMouse                                                                         = false
-    },
-
-    [AshBlzSkinDebuffIcon]                                                                  = {
-        BackgroundTexture                                                                   = {
-            drawLayer                                                                       = "OVERLAY",
-            file                                                                            = "Interface\\Buttons\\UI-Debuff-Overlays",
-            location                                                                        = {
-                Anchor("TOPLEFT", -1, 1),
-                Anchor("BOTTOMRIGHT", 1, -1)
-            },
-            texCoords                                                                       = RectType(0.296875, 0.5703125, 0, 0.515625),
-            vertexColor                                                                     = Wow.FromPanelProperty("AuraDebuff"):Map(function(dtype) return DebuffTypeColor[dtype] or DebuffTypeColor["none"] end)
-        },
-
-        auraFilter                                                                          = Wow.FromPanelProperty("AuraFilter")
-    },
-
-    -- Dispell debuff Icon
-    [AshBlzSkinDispellIcon]                                                                 = {
-        IconTexture                                                                         = {
-            drawLayer                                                                       = "ARTWORK",
-            setAllPoints                                                                    = true,
-            file                                                                            = Wow.FromPanelProperty("AuraDebuff"):Map(function(dtype)
-                return "Interface\\RaidFrame\\Raid-Icon-Debuff"..dtype
-            end),
-            texCoords                                                                       = RectType(0.125, 0.875, 0.125, 0.875)
-        }
-    },
-
-    [AshBlzSkinEnlargeDebuffIcon]                                                           = {
-        PixelGlow                                                                           = {
-            period                                                                          = 2,
-            visible                                                                         = true
-        }
-    },
-
     [AshUnitFrame]                                                                          = {
-        inherit                                                                             = "default",
-
         frameStrata                                                                         = "LOW",
         alpha                                                                               = AshBlzSkinApi.UnitInRange():Map('v=>v and 1 or 0.55'),
 
@@ -611,10 +539,6 @@ SKIN_STYLE =                                                                    
         PixelGlow                                                                           = {
             visible                                                                         = AshBlzSkinApi.UnitDebuffCanDispell()
         },
-        
-        -- 去除默认皮肤的目标指示器
-        Label2                                                                              = NIL,
-        Label3                                                                              = NIL,
 
         BackgroundTexture                                                                   = {
             file                                                                            = "Interface\\RaidFrame\\Raid-Bar-Hp-Bg",
@@ -693,15 +617,12 @@ SKIN_STYLE =                                                                    
         -- 主坦克、主助理
         RaidRosterIcon                                                                      = {
             location                                                                        = {
-                Anchor("TOPRIGHT", -1, 0, "LeaderIcon", "TOPLEFT")
+                Anchor("RIGHT", -1, 0, "LeaderIcon", "LEFT")
             },
             drawLayer                                                                       = "ARTWORK",
             subLevel                                                                        = 2,
-            size                                                                            = Size(12, 12),
+            size                                                                            = Size(10, 10),
         },
-
-        -- 复活图标，不需要了，用CenterStatusIcon
-        ResurrectIcon                                                                       = NIL,
 
         -- 标记图标
         RaidTargetIcon                                                                      = SHARE_RAIDTARGET_SKIN,
@@ -732,6 +653,7 @@ SKIN_STYLE =                                                                    
         -- 血条
         [HEALTHBAR]                                                                         = {
             SHARE_HEALTHBAR_SKIN,
+
             statusBarColor                                                                  = AshBlzSkinApi.UnitColor(),
         },
 
@@ -741,12 +663,8 @@ SKIN_STYLE =                                                                    
         -- 施法条
         AshBlzSkinCastBar                                                                   = AshBlzSkinApi.CastBarSkin(),
 
-        BuffPanel                                                                           = NIL,
-
         -- Buff
         AshBlzSkinBuffPanel                                                                 = SHARE_BUFFPANEL_SKIN,
-
-        DebuffPanel                                                                         = NIL,
 
         -- Debuff
         AshBlzSkinDebuffPanel                                                               = SHARE_DEBUFFPANEL_SKIN,
@@ -755,15 +673,18 @@ SKIN_STYLE =                                                                    
         AshBlzSkinBossDebuffPanel                                                           = SHARE_BOSSDEBUFFPANEL_SKIN,
 
         -- 职业buff
-        ClassBuffPanel                                                                      = {
+        AshBlzSkinClassBuffPanel                                                            = {
             topLevel                                                                        = true,
             elementType                                                                     = AshBlzSkinClassBuffIcon,
             location                                                                        = relocationUnitFrameIconOnSizeChanged,
             rowCount                                                                        = 1,
             columnCount                                                                     = 1,
+            topToBottom                                                                     = false,
+            leftToRight                                                                     = true,
             visible                                                                         = AshBlzSkinApi.UnitIsPlayer(),
             elementWidth                                                                    = resizeOnUnitFrameChanged(),
-            elementHeight                                                                   = resizeOnUnitFrameChanged()
+            elementHeight                                                                   = resizeOnUnitFrameChanged(),
+            customFilter                                                                    = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID) return _ClassBuffList[name] or _ClassBuffList[spellID] end
         },
 
         -- 可驱散debuff (是可驱散类型即可驱散debuff)
@@ -774,7 +695,7 @@ SKIN_STYLE =                                                                    
         },
 
         -- 重要Debuff
-        EnlargeDebuffPanel                                                                  = SHARE_ENLARGEDEBUFFPANEL_SKIN
+        AshBlzSkinEnlargeDebuffPanel                                                        = SHARE_ENLARGEDEBUFFPANEL_SKIN
     },
 
     [AshPetUnitFrame]                                                                       = {
