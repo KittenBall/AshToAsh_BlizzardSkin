@@ -44,6 +44,7 @@ L["err_nickname_too_long"] = "Nickname is too long"
 L["show_panel_label"] = "Display unit panel label"
 L["show_pet_panel_label"] = "Display pet panel label"
 L["show_panel_label_tips"] = "When only one item is checked in any group filter, the panel label will be displayed, such as: Group N"
+L["show_focus_indicator"] = "Display focus highlight"
 
 L["template"] = "Template"
 L["template_tips"] = "You can save the current AshToAsh and Blizzard skin configuration as a template, and the template is account-common. When needed, you can apply a template with one click. \n|cffffffff In the retail, the configuration of the ATA and Blizzard skins is switched with specialization, and in the classic, it is switched with the role.\nThe template does not contain the aura watch list, because they are account-common already.|r\n\nNote: The template just copies its configuration to the current character or specialization (determined by your World of Warcraft version), updating the template will not update the configuration based on the template."

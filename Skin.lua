@@ -189,7 +189,7 @@ end
 -------------------------------------------------
 
 SHARE_POWERBAR_SKIN                                                                         = {
-    frameStrata                                                                             = "LOW",
+    frameStrata                                                                             = "MEDIUM",
     useParentLevel                                                                          = true,
     statusBarTexture                                                                        = {
         file                                                                                = "Interface\\RaidFrame\\Raid-Bar-Resource-Fill",
@@ -243,7 +243,9 @@ end
 -- CastBar
 -------------------------------------------------
 SHARE_CASTBAR_SKIN                                                                          = {
-    height                                                                                  = 8,
+    frameStrata                                                                             = "MEDIUM",
+    useParentLevel                                                                          = true,
+    height                                                                                  = POWERBAR_HEIGHT - 1,
     location                                                                                = {
         Anchor("TOPLEFT", 0, 0, "PowerBar", "TOPLEFT"),
         Anchor("BOTTOMRIGHT", 0, 0, "PowerBar", "BOTTOMRIGHT") 
@@ -337,6 +339,25 @@ function AshBlzSkinApi.NameSkin()
 end
 
 -------------------------------------------------
+-- Focus
+-------------------------------------------------
+
+FOCUS_SKIN                                                                                  = {
+    file                                                                                    = "Interface\\AddOns\\AshToAsh_BlizzardSkin\\Media\\indicator_focus",
+    setAllPoints                                                                            = true,
+    vertexColor                                                                             = Color(0.9, 0.9, 0.9),
+    texCoords                                                                               = RectType(0.1, 0.9, 0.1, 0.9),
+    visible                                                                                 = AshBlzSkinApi.UnitIsFocus()
+}
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.FocusSkin()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
+        return DB().Appearance.DisplayFocusHighlight and FOCUS_SKIN or nil
+    end)
+end
+
+-------------------------------------------------
 -- Share Skin
 -------------------------------------------------
 
@@ -350,7 +371,6 @@ SHARE_ENLARGEDEBUFFPANEL_SKIN                                                   
     elementHeight                                                                           = resizeOnUnitFrameChanged(15),
     marginLeft                                                                              = 0,
     marginTop                                                                               = 0,
-    frameStrata                                                                             = "MEDIUM",
     leftToRight                                                                             = true,
     topToBottom                                                                             = false,
     visible                                                                                 = AshToAsh.FromConfig():Map(function() return next(_EnlargeDebuffList) and true or false end),
@@ -457,7 +477,7 @@ SHARE_RAIDTARGET_SKIN                                                           
 
 -- 血条
 SHARE_HEALTHBAR_SKIN                                                                        = {
-    frameStrata                                                                             = "LOW",
+    frameStrata                                                                             = "MEDIUM",
     useParentLevel                                                                          = true,
     statusBarTexture                                                                        = {
         file                                                                                = "Interface\\RaidFrame\\Raid-Bar-Hp-Fill",
@@ -532,7 +552,7 @@ SKIN_STYLE =                                                                    
     },
 
     [AshUnitFrame]                                                                          = {
-        frameStrata                                                                         = "LOW",
+        frameStrata                                                                         = "MEDIUM",
         alpha                                                                               = AshBlzSkinApi.UnitInRange():Map('v=>v and 1 or 0.55'),
 
         -- 可驱散debuff高亮
@@ -547,6 +567,9 @@ SKIN_STYLE =                                                                    
             ignoreParentAlpha                                                               = true,
             drawLayer                                                                       = "BACKGROUND"
         },
+
+        -- 焦点
+        AshBlzSkinFocusTexture                                                              = AshBlzSkinApi.FocusSkin(),
 
         -- 选中
         AshBlzSkinSelectionHighlightTexture                                                 = {},
@@ -699,7 +722,7 @@ SKIN_STYLE =                                                                    
     },
 
     [AshPetUnitFrame]                                                                       = {
-        frameStrata                                                                         = "LOW",
+        frameStrata                                                                         = "MEDIUM",
         alpha                                                                               = AshBlzSkinApi.UnitPetInRange():Map('v=> v and 1 or 0.55'), 
 
         BackgroundTexture                                                                   = {

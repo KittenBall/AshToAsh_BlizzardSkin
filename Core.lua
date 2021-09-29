@@ -146,6 +146,8 @@ function OnLoad()
             },
             -- 仇恨高亮
             DisplayAggroHighlight                                                                                           = true,
+            -- 焦点高亮
+            DisplayFocusHighlight                                                                                           = true,
             -- 生命条
             HealthBar                                                                                                       = {
                 -- 生命值文本
@@ -163,7 +165,7 @@ function OnLoad()
                 ShowNicknameOwns                                                                                            = true,
                 ShowNicknameOthers                                                                                          = true,
                 ShowNicknameToOthers                                                                                        = true,
-                FriendsNameColoring                                                                                         = true,
+                FriendsNameColoring                                                                                         = false,
                 GuildColor                                                                                                  = GuildColor,
                 FriendColor                                                                                                 = Color.NORMAL,
                 BNFriendColor                                                                                               = Color.BATTLENET

@@ -46,6 +46,7 @@ L["err_nickname_too_long"] = "昵称过长"
 L["show_panel_label"] = "显示单位面板标签"
 L["show_pet_panel_label"] = "显示宠物面板标签"
 L["show_panel_label_tips"] = "当任意分组过滤仅勾选一项时，显示面板标签，如：小队N"
+L["show_focus_indicator"] = "高亮显示焦点"
 
 L["template"] = "模板"
 L["template_tips"] = "你可以将当前AshToAsh和暴雪皮肤的配置保存为模板，模板账号通用。需要时，你可以一键应用模板。\n|cffffffff在正式服，ATA和暴雪皮肤的配置随专精切换，在怀旧服则是随角色切换。\n模板不包含增益/减益列表，因为它们本就是账号通用的.\n\n注意：模板只是将其配置复制给当前角色或专精（由你的魔兽世界版本决定），更新模板不会使基于该模板的配置更新。|r"

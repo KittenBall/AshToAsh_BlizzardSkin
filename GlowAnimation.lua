@@ -330,6 +330,18 @@ class "AutoCastGlow"(function(_ENV)
         self:Hide()
     end
 
+    __Static__()
+    __Arguments__{ Frame, RawTable }
+    function Attach(frame, option)
+        Style[frame].AutoCastGlow = option
+    end
+
+    __Static__()
+    __Arguments__{ Frame }
+    function Detach(frame)
+        Style[frame].AutoCastGlow = NIL
+    end
+
 end)
 
 
@@ -345,7 +357,7 @@ __ChildProperty__(Frame, "PixelGlow3")
 class "PixelGlow"(function(_ENV)
     inherit "Frame"
     extend "GlowAnimation"
-    
+
     local function UpdateFrameLevel(self)
         local parent = self:GetParent()
         if parent then
@@ -745,6 +757,18 @@ class "PixelGlow"(function(_ENV)
         self.OnSizeChanged = self.OnSizeChanged + OnSizeChanged
         self.OnUpdate = self.OnUpdate + OnUpdate
         self:Hide()
+    end
+
+    __Static__()
+    __Arguments__{ Frame, RawTable }
+    function Attach(frame, option)
+        Style[frame].PixelGlow = option
+    end
+
+    __Static__()
+    __Arguments__{ Frame }
+    function Detach(frame)
+        Style[frame].PixelGlow = NIL
     end
 
 end)

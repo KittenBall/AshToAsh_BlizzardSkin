@@ -1,3 +1,7 @@
+## 1.5.2
+- Reload ui in combat can correctly loaded skin now
+- Add focus indicator
+
 ## 1.5.1
 - Fix debuff panel can'not add enlarge debuff bug
 - Blizzard skin no longer inherits the default skin

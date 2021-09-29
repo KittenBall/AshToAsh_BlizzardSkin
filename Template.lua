@@ -20,6 +20,10 @@ UI.Property             {
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinSelectionHighlightTexture")
 class "SelectionHighlightTexture" { Texture }
 
+-- 焦点
+__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinFocusTexture")
+class "FocusTexture" { Texture }
+
 -- 仇恨指示器
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinAggroHighlight")
 class "AggroHighlight" { Texture }

@@ -37,6 +37,13 @@ function AshBlzSkinApi.UnitIsPlayer()
 end
 
 __Static__() __AutoCache__()
+function AshBlzSkinApi.UnitIsFocus()
+    return Wow.FromUnitEvent(Wow.FromEvent("PLAYER_FOCUS_CHANGED"):Map("=> 'any'")):Map(function(unit)
+        return UnitIsUnit(unit, "focus")
+    end)
+end
+
+__Static__() __AutoCache__()
 function AshBlzSkinApi.UnitInRange()
     return Wow.FromUnitEvent(Observable.Interval(0.5):Map("=>'any'"):ToSubject()):Map(function(unit)
         return UnitIsUnit(unit, "player") or UnitInRange(unit)

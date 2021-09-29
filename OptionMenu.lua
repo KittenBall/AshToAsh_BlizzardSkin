@@ -337,6 +337,19 @@ local function GetAppearanceMenu()
                 end
             }
         },
+        -- 焦点指示器
+        {
+            text                                                                                                            = L["show_focus_indicator"],
+            check                                                                                                           = {
+                get                                                                                                         = function()
+                    return DB().Appearance.DisplayFocusHighlight and true or false
+                end,
+                set                                                                                                         = function(value)
+                    DB().Appearance.DisplayFocusHighlight = value
+                    SendConfigChanged()
+                end
+            }
+        },
         -- 显示面板标签
         {
             text                                                                                                            = L["show_panel_label"],
