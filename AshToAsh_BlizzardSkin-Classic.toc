@@ -1,6 +1,4 @@
-## Interface: 90100
-## Interface-BCC: 20502
-## Interface-Classic: 11400
+## Interface: 11400
 ## Author: 绿毛龟12138
 ## Version: @project-version@
 ## Title: AshToAsh_BlizzardSkin
@@ -26,8 +24,8 @@ GlowAnimation.lua
 Core.lua
 OptionMenu.lua
 BlockBlizzard.lua
-Api\Api_Retail.xml
-Template\Template_Retail.xml
+Api\Api_Classic.xml
+Template\Template_Classic.xml
 Skin.lua
 DefaultTemplate.lua
 ImprovedPanel.lua

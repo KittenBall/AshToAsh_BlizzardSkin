@@ -1,3 +1,11 @@
+## 1.5.4
+- Add panel attach indicator
+- Move panel need hold alt key now
+- You can set margin with panel and keep it's attachment relationship
+- Nickname display with a indicator now
+- Healthbar changed to PredictionHealthBar followed by ata
+- Support wow classic flavor
+
 ## 1.5.2
 - Reload ui in combat can correctly loaded skin now
 - Add focus indicator

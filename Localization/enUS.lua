@@ -4,10 +4,14 @@ local L = _Locale("enUS", true)
 
 L["menu_title"] = "Blizzard Skin"
 L["panel_mask_tips"] = "Only if the index of the panel is greater than that of the other panel, it will be automatically attached!"
+L["panel_moving_tips"] = "Hold down the Alt key to move the panel"
 L["tips"] = "Tips"
 L["appearance"] = "Appearance"
 L["block_blizzard_unitframe"] = "Block Blizzard CompactUnitFrame"
 L["block_blizzard_unitframe_tips"] = "Anyway, it’s always no good to run ATA and the Blizzard CompactUnitFrame at the same time, right?\nTurning on/off this option will reload ui"
+L["adjust_auto_attach_margin"] = "Adjust panel(%d) margin"
+L["adjust_auto_attach_margin_tips"] = "When panel is auto attched, you cat set it's margin use this option.\n\nNote: This option will not be saved!"
+L["adjust_auto_attach_margin_input_title"] = "Input margin(-100~100)"
 
 L["visibility"] = "Visibility"
 L["visibility_hide"] = "Hide"

@@ -1,7 +1,5 @@
 Scorpio "AshToAsh.BlizzardSkin.Active" ""
 
-HEALTHBAR           = (Scorpio.IsRetail or Scorpio.IsBCC or IsAddOnLoaded("LibHealComm-4.0") or pcall(_G.LibStub, "LibHealComm-4.0")) and "PredictionHealthBar" or "HealthBar"
-
 -- 能量条高度
 POWERBAR_HEIGHT     = 9
 
@@ -196,7 +194,7 @@ SHARE_POWERBAR_SKIN                                                             
         drawLayer                                                                           = "BORDER"
     },
     location                                                                                = {
-        Anchor("TOPLEFT", 0, 0, HEALTHBAR, "BOTTOMLEFT"),
+        Anchor("TOPLEFT", 0, 0, "PredictionHealthBar", "BOTTOMLEFT"),
         Anchor("BOTTOMRIGHT", -1, 1)
     },
 
@@ -375,7 +373,7 @@ SHARE_ENLARGEDEBUFFPANEL_SKIN                                                   
     topToBottom                                                                             = false,
     visible                                                                                 = AshToAsh.FromConfig():Map(function() return next(_EnlargeDebuffList) and true or false end),
     location                                                                                = {
-        Anchor("TOPLEFT", 3, -3, HEALTHBAR, "TOPLEFT")
+        Anchor("TOPLEFT", 3, -3, "PredictionHealthBar", "TOPLEFT")
     },
     customFilter                                                                            = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID) 
         return _EnlargeDebuffList[spellID] 
@@ -396,7 +394,7 @@ SHARE_DISPELLDEBUFFPANEL_SKIN                                                   
     elementWidth                                                                            = resizeOnUnitFrameChanged(9),
     elementHeight                                                                           = resizeOnUnitFrameChanged(9),
     location                                                                                = {
-        Anchor("TOPRIGHT", 0, 0, HEALTHBAR, "TOPRIGHT")
+        Anchor("TOPRIGHT", 0, 0, "PredictionHealthBar", "TOPRIGHT")
     }
 }
 
@@ -414,7 +412,7 @@ SHARE_BOSSDEBUFFPANEL_SKIN                                                      
     elementWidth                                                                            = resizeOnUnitFrameChanged(15),
     elementHeight                                                                           = resizeOnUnitFrameChanged(15),
     location                                                                                = {
-        Anchor("BOTTOMLEFT", 3, 1.5, HEALTHBAR, "BOTTOMLEFT")
+        Anchor("BOTTOMLEFT", 3, 1.5, "PredictionHealthBar", "BOTTOMLEFT")
     },
 
     customFilter                                                                            = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID)
@@ -458,7 +456,7 @@ SHARE_BUFFPANEL_SKIN                                                            
     leftToRight                                                                             = false,
     topToBottom                                                                             = false,
     location                                                                                = {
-        Anchor("BOTTOMRIGHT", 0, 1.5, HEALTHBAR, "BOTTOMRIGHT") 
+        Anchor("BOTTOMRIGHT", 0, 1.5, "PredictionHealthBar", "BOTTOMRIGHT") 
     },
         
     customFilter                                                                            = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID) 
@@ -674,7 +672,7 @@ SKIN_STYLE =                                                                    
         },
 
         -- 血条
-        [HEALTHBAR]                                                                         = {
+        PredictionHealthBar                                                                 = {
             SHARE_HEALTHBAR_SKIN,
 
             statusBarColor                                                                  = AshBlzSkinApi.UnitColor(),
@@ -774,7 +772,7 @@ SKIN_STYLE =                                                                    
         RaidTargetIcon                                                                      = SHARE_RAIDTARGET_SKIN,
 
         -- 血条
-        [HEALTHBAR]                                                                         = {
+        PredictionHealthBar                                                                 = {
             SHARE_HEALTHBAR_SKIN,
             statusBarColor                                                                  = AshBlzSkinApi.UnitPetColor(),
         },
