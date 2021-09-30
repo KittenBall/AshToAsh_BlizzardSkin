@@ -25,13 +25,7 @@ GlowAnimation.lua
 Core.lua
 OptionMenu.lua
 BlockBlizzard.lua
-Api.lua
-PetApi.lua
-PanelApi.lua
-NameApi.lua
-FriendApi.lua
-Api_Retail.lua
-Template.lua
-Template_Retail.lua
+Api\Api_Retail.xml
+Template\Template_Retail.xml
 Skin.lua
 DefaultTemplate.lua
