@@ -1,3 +1,9 @@
+## 1.6.0
+- *Now can adjust texture*  I don't like this feature, but many people want 
+- Now can adjust aura size
+- Add ata aura priority list support, display on topright
+- Buff/Debuff can click through to unitframe
+
 ## 1.5.4
 - Add panel attach indicator
 - Move panel need hold alt key now

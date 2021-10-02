@@ -91,10 +91,75 @@ class "CenterStatusIcon"(function()
     end
 end)
 
+-- Buff panel
+__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinBuffPanel")
+class "BuffPanel"(function()
+    inherit "BlzSkinAuraPanel"
+
+    local shareCooldown         = { start = 0, duration = 0 }
+
+    local function shouldDisplayBuff(self, unitCaster, spellId, canApplyAura)
+        local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
+        
+        if ( hasCustom ) then
+            return showForMySpec or (alwaysShowMine and (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle"))
+        else
+            return (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle") and canApplyAura and not SpellIsSelfBuff(spellId)
+        end
+    end
+
+    local function refreshAura(self, unit, filter, eleIdx, auraIdx, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
+        if not name or eleIdx > self.MaxCount then return eleIdx end
+
+        if not self.CustomFilter or self.CustomFilter(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...) then
+            if shouldDisplayBuff(self, caster, spellID, canApplyAura) and not isBossAura then
+                self.Elements[eleIdx]:Show()
+
+                shareCooldown.start             = expires - duration
+                shareCooldown.duration          = duration
+
+                self.AuraIndex[eleIdx]          = auraIdx
+                self.AuraName[eleIdx]           = name
+                self.AuraIcon[eleIdx]           = icon
+                self.AuraCount[eleIdx]          = count
+                self.AuraDebuff[eleIdx]         = dtype
+                self.AuraCooldown[eleIdx]       = shareCooldown
+                self.AuraStealable[eleIdx]      = isStealable and not UnitIsUnit(unit, "player")
+                self.AuraCaster[eleIdx]         = caster
+                self.AuraSpellID[eleIdx]        = spellID
+                self.AuraBossDebuff[eleIdx]     = isBossAura
+                self.AuraCastByPlayer[eleIdx]   = castByPlayer
+                self.AuraFilter[eleIdx]         = filter
+
+                eleIdx = eleIdx + 1
+            end
+        end
+        
+        auraIdx = auraIdx + 1
+        return refreshAura(self, unit, filter, eleIdx, auraIdx, UnitAura(unit, auraIdx, filter))
+    end
+
+    property "Refresh"          {
+        set                     = function(self, unit)
+            self.Unit           = unit
+            if not (unit  and self:IsVisible()) then return end
+
+            local filter        = "HELPFUL"
+            self.Count          = refreshAura(self, unit, filter, 1, 1, UnitAura(unit, 1, filter)) - 1
+        end
+    }
+
+    function __ctor(self)
+        super(self)
+        self.class = UnitClassBase("player")
+    end
+
+end)
+
 -- Debuff panel
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinDebuffPanel")
 class "DebuffPanel"(function()
-    inherit "AuraPanel"
+    inherit "BlzSkinAuraPanel"
 
     local shareCooldown         = { start = 0, duration = 0 }
     local priorityDebuffs       = {}
@@ -184,6 +249,7 @@ class "DebuffPanel"(function()
                 self.AuraDebuff[eleIdx]         = dtype
                 self.AuraCooldown[eleIdx]       = shareCooldown
                 self.AuraStealable[eleIdx]      = isStealable and not UnitIsUnit(unit, "player")
+                self.AuraCaster[eleIdx]         = caster
                 self.AuraSpellID[eleIdx]        = spellID
                 self.AuraBossDebuff[eleIdx]     = isBossDebuff
                 self.AuraCastByPlayer[eleIdx]   = castByPlayer
@@ -241,9 +307,6 @@ class "DebuffPanel"(function()
         type                    = Boolean,
         default                 = false
     }
-
-    __Indexer__() __Observable__()
-    property "AuraFilter" { set = Toolset.fakefunc }
 
 end)
 
@@ -349,7 +412,7 @@ Style.UpdateSkin(SKIN_NAME,{
     [CastBar]                                                                           = {
         frameLevel                                                                      = 1,
         statusBarTexture                                                                = {
-            file                                                                        = "Interface\\TargetingFrame\\UI-StatusBar"
+            file                                                                        = AshBlzSkinApi.CastBarTexture()
         },
         normalColor                                                                     = AshBlzSkinApi.UnitCastBarColor(),
         interruptible                                                                   = Wow.UnitCastInterruptible(),

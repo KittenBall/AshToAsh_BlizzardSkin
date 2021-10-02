@@ -5,6 +5,7 @@ local L = _Locale("zhCN")
 if not L then return end
 
 L["menu_title"] = "暴雪皮肤"
+L["default"] = "默认"
 L["panel_mask_tips"] = "只有面板序号大于另一面板才会自动依附！"
 L["panel_moving_tips"] = "按住Alt键移动面板"
 L["tips"] = "提示"
@@ -12,7 +13,7 @@ L["appearance"] = "外观"
 L["block_blizzard_unitframe"] = "屏蔽暴雪团队框架"
 L["block_blizzard_unitframe_tips"] = "不管怎样，同时运行ATA和暴雪团队框架总是没什么好处的。\n打开/关闭此选项将会重载界面"
 L["adjust_auto_attach_margin"] = "调整面板(%d)间距"
-L["adjust_auto_attach_margin_tips"] = "当面板自动依附后，你可以使用此选项调整间距。\n\n注意：这个选项并不会被保存！"
+L["adjust_auto_attach_margin_tips"] = "当面板自动依附后，你可以使用此选项调整间距。"
 L["adjust_auto_attach_margin_input_title"] = "输入间距值(-100~100)"
 
 L["visibility"] = "可见性"
@@ -20,6 +21,13 @@ L["visibility_hide"] = "隐藏"
 L["visibility_show_only_party"] = "仅小队显示"
 L["visibility_show_always"] = "一直显示"
 L["visibility_show"] = "显示"
+
+L["texture"] = "材质"
+L["background_texture"] = "背景材质"
+L["unitframe_background"] = "框体背景材质"
+
+L["aura_size"]  = "光环大小"
+L["aura_size_tips"] = "调整光环的基础大小，只影响Buff和Debuff，职业增益、重要减益等不受影响\n|cffffffff光环仍然会随框体缩放|r"
 
 L["cast_bar"] = "施法条"
 L["power_bar"] = "能量条"

@@ -3,6 +3,37 @@ Scorpio "AshToAsh.BlizzardSkin.OptionMenu" ""
 -------------------------------------------------
 -- Menu
 -------------------------------------------------
+DEFAULT_TEXTURE = "ASH_TO_ASH_BLZ_SKIN_TEXTURE_DEFAULT"
+
+local function GetTextureMenus(type, check)
+    local menu = {}
+    menu.check                                                                                                              = check
+    tinsert(menu, {
+        text                                                                                                                = L["default"],
+        checkvalue                                                                                                          = DEFAULT_TEXTURE
+    })
+
+    local libSharedMedia = GetLibSharedMedia()
+    if libSharedMedia then
+        if type == "StatusBar" then
+            type = libSharedMedia.MediaType.STATUSBAR
+        elseif type == "Background" then
+            type = libSharedMedia.MediaType.BACKGROUND
+        end
+
+        local textures = libSharedMedia:List(type)
+        for _, name in ipairs_reverse(textures) do
+            if name ~= "NONE" then
+                tinsert(menu, {
+                    text                                                                                                        = name,
+                    checkvalue                                                                                                  = name
+                })
+            end
+        end
+    end
+
+    return menu
+end
 
 -- 外观菜单
 local function GetAppearanceMenu()
@@ -40,7 +71,20 @@ local function GetAppearanceMenu()
                             checkvalue                                                                                      = Visibility.SHOW_ALWAYS
                         },
                     }
-                }
+                },
+                -- 材质
+                {
+                    text                                                                                                    = L["texture"],
+                    submenu                                                                                                 = GetTextureMenus("StatusBar", {
+                        get                                                                                                 = function()
+                            return DB().Appearance.CastBar.Texture or DEFAULT_TEXTURE
+                        end,
+                        set                                                                                                 = function(value)
+                            DB().Appearance.CastBar.Texture = (value ~= DEFAULT_TEXTURE and value or nil)
+                            SendConfigChanged()
+                        end
+                    })
+                },
             }
         },
         -- 能量条
@@ -69,7 +113,33 @@ local function GetAppearanceMenu()
                             checkvalue                                                                                      = Visibility.SHOW_ALWAYS
                         },
                     }
-                }
+                },
+                -- 材质
+                {
+                    text                                                                                                    = L["texture"],
+                    submenu                                                                                                 = GetTextureMenus("StatusBar", {
+                        get                                                                                                 = function()
+                            return DB().Appearance.PowerBar.Texture or DEFAULT_TEXTURE
+                        end,
+                        set                                                                                                 = function(value)
+                            DB().Appearance.PowerBar.Texture = (value ~= DEFAULT_TEXTURE and value or nil)
+                            SendConfigChanged()
+                        end
+                    })
+                },
+                -- 背景材质
+                {
+                    text                                                                                                    = L["background_texture"],
+                    submenu                                                                                                 = GetTextureMenus("Background", {
+                        get                                                                                                 = function()
+                            return DB().Appearance.PowerBar.Background or DEFAULT_TEXTURE
+                        end,
+                        set                                                                                                 = function(value)
+                            DB().Appearance.PowerBar.Background = (value ~= DEFAULT_TEXTURE and value or nil)
+                            SendConfigChanged()
+                        end
+                    })
+                },
             }
         },
         -- 生命值
@@ -134,6 +204,19 @@ local function GetAppearanceMenu()
                         }
                     }
                 },
+                -- 材质
+                {
+                    text                                                                                                    = L["texture"],
+                    submenu                                                                                                 = GetTextureMenus("StatusBar", {
+                        get                                                                                                 = function()
+                            return DB().Appearance.HealthBar.Texture or DEFAULT_TEXTURE
+                        end,
+                        set                                                                                                 = function(value)
+                            DB().Appearance.HealthBar.Texture = (value ~= DEFAULT_TEXTURE and value or nil)
+                            SendConfigChanged()
+                        end
+                    })
+                },
                 -- 生命值大小随框体缩放
                 {
                     text                                                                                                    = L["name_scales_with_frame"],
@@ -146,7 +229,7 @@ local function GetAppearanceMenu()
                             SendConfigChanged()
                         end
                     }
-                }
+                },
             }
         },
         -- 名字
@@ -324,6 +407,19 @@ local function GetAppearanceMenu()
                     -- }
             } 
         },
+        -- 单位框体背景
+        {
+            text                                                                                                            = L["unitframe_background"],
+            submenu                                                                                                         = GetTextureMenus("Background", {
+                get                                                                                                         = function()
+                    return DB().Appearance.Background or DEFAULT_TEXTURE
+                end,
+                set                                                                                                         = function(value)
+                    DB().Appearance.Background = (value ~= DEFAULT_TEXTURE and value or nil)
+                    SendConfigChanged()
+                end
+            })
+        },
         -- 仇恨指示器
         {
             text                                                                                                            = COMPACT_UNIT_FRAME_PROFILE_DISPLAYAGGROHIGHLIGHT,
@@ -391,6 +487,19 @@ local function GetAppearanceMenu()
                     FireSystemEvent("UNIT_AURA", "any")
                 end
             }
+        },
+        -- 光环大小
+        {
+            text                                                                                                            = L["aura_size"],
+            tiptitle                                                                                                        = L["tips"],
+            tiptext                                                                                                         = L["aura_size_tips"],
+            click                                                                                                           = function()
+                local value = PickRange(L["aura_size"], 5, 15, 1, DB().Appearance.AuraSize)
+                if value then
+                    DB().Appearance.AuraSize = value
+                    SendConfigChanged()
+                end
+            end
         },
     }
 
@@ -505,8 +614,6 @@ function ASHTOASH_OPEN_MENU(panel, menu)
     for _, v in ipairs(skinMenu) do
         tinsert(menu, v)
     end
-
-    SendConfigChanged()
 end
 
 -------------------------------------------------

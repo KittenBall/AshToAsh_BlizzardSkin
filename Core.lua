@@ -100,7 +100,7 @@ enum "NameStyle" {
     "PLAYERNAME_SERVER"
 }
 
-GuildColor = Color(0.25, 1, 0.25, 1)
+GuildColor          = Color(0.25, 1, 0.25, 1)
 
 function OnLoad()
     _SVDB = SVManager("AshToAsh_BlizzardSkin_DB", "AshToAsh_BlizzardSkin_CharDB")
@@ -117,11 +117,14 @@ function OnLoad()
         Appearance                                                                                                          = {
             -- 施法条
             CastBar                                                                                                         = {
-                Visibility                                                                                                  = Visibility.SHOW_ONLY_PARTY
+                Visibility                                                                                                  = Visibility.SHOW_ONLY_PARTY,
+                Texture                                                                                                     = nil
             },
             -- 能量条
             PowerBar                                                                                                        = {
-                Visibility                                                                                                  = Visibility.SHOW_ALWAYS
+                Visibility                                                                                                  = Visibility.SHOW_ALWAYS,
+                Texture                                                                                                     = nil,
+                Background                                                                                                  = nil
             },
             -- 仇恨高亮
             DisplayAggroHighlight                                                                                           = true,
@@ -135,7 +138,10 @@ function OnLoad()
                     TextFormat                                                                                              = HealthTextFormat.KILO,
                     ScaleWithFrame                                                                                          = false
                 },
+                Texture                                                                                                     = nil
             },
+            AuraSize                                                                                                        = 11,
+            Background                                                                                                      = nil,
             -- 名字
             Name                                                                                                            = {
                 ScaleWithFrame                                                                                              = false,
@@ -154,7 +160,7 @@ function OnLoad()
             -- 显示宠物面板标签
             DisplayPetPanelLabel                                                                                            = true,
             -- 仅显示可供驱散的Debuff
-            DisplayOnlyDispellableDebuffs                                                                                   = false,
+            DisplayOnlyDispellableDebuffs                                                                                   = false
         }
     }
 end
@@ -180,6 +186,29 @@ end
 
 function ShowError(text)
     UIErrorsFrame:AddMessage(text, 1.0, 0.0, 0.0, 1, 4)
+end
+
+function GetLibSharedMedia()
+    if not LibSharedMedia then
+        if _G.LibStub then
+            LibSharedMedia = _G.LibStub("LibSharedMedia-3.0")
+        end
+    end
+    return LibSharedMedia
+end
+
+function GetLibSharedMediaTexture(type, name)
+    if not name then return end
+    
+    if GetLibSharedMedia() then
+        if type == "StatusBar" then
+            type = LibSharedMedia.MediaType.STATUSBAR
+        elseif type == "Background" then
+            type = LibSharedMedia.MediaType.BACKGROUND
+        end
+
+        return LibSharedMedia:Fetch(type, name, true)
+    end
 end
 
 if Scorpio.IsRetail then

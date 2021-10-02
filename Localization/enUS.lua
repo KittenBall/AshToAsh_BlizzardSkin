@@ -3,6 +3,7 @@ Scorpio "AshToAsh.BlizzardSkin.Localization.enUS" ""
 local L = _Locale("enUS", true)
 
 L["menu_title"] = "Blizzard Skin"
+L["default"] = "Default"
 L["panel_mask_tips"] = "Only if the index of the panel is greater than that of the other panel, it will be automatically attached!"
 L["panel_moving_tips"] = "Hold down the Alt key to move the panel"
 L["tips"] = "Tips"
@@ -10,7 +11,7 @@ L["appearance"] = "Appearance"
 L["block_blizzard_unitframe"] = "Block Blizzard CompactUnitFrame"
 L["block_blizzard_unitframe_tips"] = "Anyway, it’s always no good to run ATA and the Blizzard CompactUnitFrame at the same time, right?\nTurning on/off this option will reload ui"
 L["adjust_auto_attach_margin"] = "Adjust panel(%d) margin"
-L["adjust_auto_attach_margin_tips"] = "When panel is auto attched, you cat set it's margin use this option.\n\nNote: This option will not be saved!"
+L["adjust_auto_attach_margin_tips"] = "When panel is auto attched, you cat set it's margin use this option."
 L["adjust_auto_attach_margin_input_title"] = "Input margin(-100~100)"
 
 L["visibility"] = "Visibility"
@@ -18,6 +19,13 @@ L["visibility_hide"] = "Hide"
 L["visibility_show_only_party"] = "Show only in party"
 L["visibility_show_always"] = "Show always"
 L["visibility_show"] = "Show"
+
+L["texture"] = "Texture"
+L["background_texture"] = "Background texture"
+L["unitframe_background"] = "Unitframe background"
+
+L["aura_size"] = "Aura Size"
+L["aura_size_tips"] = "Adjust the basic size of the aura, which only affects the Buff and Debuff, and the class buff, enlarge debuff, etc. are not affected.\n|cffffffff The aura will still scale with the frame|r"
 
 L["cast_bar"] = "Cast bar"
 L["power_bar"] = "Power bar"

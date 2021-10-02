@@ -112,7 +112,7 @@ local function OnInit(self, mask)
         },
 
         IconTexture         = {
-            size            = Size(24, 24),
+            size            = Size(22, 22),
             subLevel        = 7,
             vertexColor     = Color.RED
         }

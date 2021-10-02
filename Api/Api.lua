@@ -50,6 +50,11 @@ function AshBlzSkinApi.UnitInRange()
     end)
 end
 
+__Static__() __AutoCache__()
+function AshBlzSkinApi.UnitAura()
+    return Wow.FromUnitEvent(Wow.FromEvent("UNIT_AURA", "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED"):Map("unit => unit or 'any'")):Next()
+end
+
 -------------------------------------------------
 -- CastBar
 -------------------------------------------------
@@ -138,5 +143,45 @@ __Static__() __AutoCache__()
 function AshBlzSkinApi.DisplayOnlyDispellableDebuffs()
     return AshBlzSkinApi.OnConfigChanged():Map(function()
         return DB().Appearance.DisplayOnlyDispellableDebuffs
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.HealthBarTexture()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
+        local texture = GetLibSharedMediaTexture("StatusBar", DB().Appearance.HealthBar.Texture)
+        return texture or "Interface\\RaidFrame\\Raid-Bar-Hp-Fill"
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.PowerBarTexture()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
+        local texture = GetLibSharedMediaTexture("StatusBar", DB().Appearance.PowerBar.Texture)
+        return texture or "Interface\\RaidFrame\\Raid-Bar-Resource-Fill"
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.PowerBarBackground()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
+        local texture = GetLibSharedMediaTexture("Background", DB().Appearance.PowerBar.Background)
+        return texture or "Interface\\RaidFrame\\Raid-Bar-Resource-Background"
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.UnitFrameBackground()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
+        local texture = GetLibSharedMediaTexture("Background", DB().Appearance.Background)
+        return texture or "Interface\\RaidFrame\\Raid-Bar-Hp-Bg"
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.CastBarTexture()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
+        local texture = GetLibSharedMediaTexture("StatusBar", DB().Appearance.CastBar.Texture)
+        return texture or "Interface\\TargetingFrame\\UI-StatusBar"
     end)
 end
