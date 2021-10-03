@@ -1,3 +1,7 @@
+## 1.6.1
+- Fix some error
+- Add master looter indicator
+
 ## 1.6.0
 - *Now can adjust texture*  I don't like this feature, but many people want 
 - Now can adjust aura size

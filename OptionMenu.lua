@@ -23,7 +23,7 @@ local function GetTextureMenus(type, check)
 
         local textures = libSharedMedia:List(type)
         for _, name in ipairs_reverse(textures) do
-            if name ~= "NONE" then
+            if strlower(name) ~= "none" then
                 tinsert(menu, {
                     text                                                                                                        = name,
                     checkvalue                                                                                                  = name

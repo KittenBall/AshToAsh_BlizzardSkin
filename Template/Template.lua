@@ -36,6 +36,10 @@ class "VehicleIcon" { Texture }
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinDeadIcon")
 class "DeadIcon" { Texture }
 
+-- 团队拾取者
+__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinMasterLooterIcon")
+class "MasterLooterIcon" { Texture }
+
 -- 宠物面板标题
 __Sealed__() __ChildProperty__(AshGroupPetPanel, "AshBlzSkinPanelLabel")
 class "PetPanelLabel" { FontString }
@@ -547,7 +551,7 @@ TEMPLATE_SKIN_STYLE                                                             
     -- Buff icon
     [AshBlzSkinBuffIcon]                                                                = {
         alpha                                                                           = Wow.FromPanelProperty("AuraCaster"):Map(function(caster)
-            return UnitIsUnit("player", caster) and 1 or 0.5
+            return UnitExists(caster) and (UnitIsUnit("player", caster) and 1 or 0.5) or 1
         end)
     },
 

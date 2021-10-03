@@ -133,6 +133,22 @@ end
 -------------------------------------------------
 
 __Static__() __AutoCache__()
+function AshBlzSkinApi.IsMasterLooter()
+    return Wow.FromUnitEvent(Wow.FromEvent("GROUP_ROSTER_UPDATER"):Map("=>'any'")):Next():Map(function(unit)
+        local raidIndex = UnitInRaid(unit)
+        if raidIndex then
+            local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, loot = GetRaidRosterInfo(i)
+            return loot
+        end
+        return false
+    end)
+end
+
+-------------------------------------------------
+-- Option
+-------------------------------------------------
+
+__Static__() __AutoCache__()
 function AshBlzSkinApi.PowerBarVisible()
     return AshBlzSkinApi.OnConfigChanged():Map(function()
         return DB().Appearance.PowerBar.Visibility == Visibility.SHOW_ALWAYS

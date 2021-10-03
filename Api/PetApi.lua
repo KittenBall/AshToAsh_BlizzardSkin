@@ -39,7 +39,7 @@ function UpdateGroupPetMap(unit)
 
         if IsInGroup() then
             if IsInRaid() then
-                for i = 1, 39 do
+                for i = 1, 40 do
                     unit = "raid"..i
                     if UnitExists(unit) then
                         mapPetGuidToUnit(unit, getUnitPetGUID(unit), UnitInRaid(unit))

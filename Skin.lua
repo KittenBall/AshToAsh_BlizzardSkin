@@ -383,7 +383,7 @@ __Static__() __AutoCache__()
 function AshBlzSkinApi.DebuffPanelSkin()
     return AshBlzSkinApi.OnConfigChanged():Map(function()
         SHARE_DEBUFFPANEL_SKIN.elementWidth = resizeOnUnitFrameChanged(DB().Appearance.AuraSize)
-        SHARE_BUFFPANEL_SKIN.elementHeight = resizeOnUnitFrameChanged(DB().Appearance.AuraSize)
+        SHARE_DEBUFFPANEL_SKIN.elementHeight = resizeOnUnitFrameChanged(DB().Appearance.AuraSize)
         return SHARE_DEBUFFPANEL_SKIN
     end)
 end
@@ -415,6 +415,26 @@ function AshBlzSkinApi.BuffPanelSkin()
         SHARE_BUFFPANEL_SKIN.elementWidth = resizeOnUnitFrameChanged(DB().Appearance.AuraSize)
         SHARE_BUFFPANEL_SKIN.elementHeight = resizeOnUnitFrameChanged(DB().Appearance.AuraSize)
         return SHARE_BUFFPANEL_SKIN
+    end)
+end
+
+-------------------------------------------------
+-- Master loot
+-------------------------------------------------
+
+MASTER_LOOTER_SKIN                                                                          = {
+    location                                                                                = {
+        Anchor("LEFT", 0, 0, nil, "TOPLEFT")
+    },
+    size                                                                                    = Size(12, 12),
+    file                                                                                    = "Interface\\GroupFrame\\UI-Group-MasterLooter",
+    visible                                                                                 = AshBlzSkinApi.IsMasterLooter()
+}
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.MasterLooterSkin()
+    return Observable.Just(not Scorpio.IsRetail):Map(function(display)
+        if display then return MASTER_LOOTER_SKIN end
     end)
 end
 
@@ -714,6 +734,9 @@ SKIN_STYLE =                                                                    
             visible                                                                         = AshBlzSkinApi.UnitCenterStatusIconVisible(),
             unit                                                                            = Wow.Unit()
         },
+
+        -- 团队拾取者
+        AshBlzSkinMasterLooterIcon                                                          = AshBlzSkinApi.MasterLooterSkin(),
 
         -- 血条
         PredictionHealthBar                                                                 = {
