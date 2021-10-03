@@ -135,10 +135,12 @@ end
 __Static__() __AutoCache__()
 function AshBlzSkinApi.IsMasterLooter()
     return Wow.FromUnitEvent(Wow.FromEvent("GROUP_ROSTER_UPDATER"):Map("=>'any'")):Next():Map(function(unit)
-        local raidIndex = UnitInRaid(unit)
-        if raidIndex then
-            local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, loot = GetRaidRosterInfo(i)
-            return loot
+        if UnitExists(unit) then
+            local raidIndex = UnitInRaid(unit)
+            if raidIndex then
+                local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, loot = GetRaidRosterInfo(raidIndex)
+                return loot
+            end
         end
         return false
     end)

@@ -1,3 +1,6 @@
+## 1.6.2
+- Fix serveral bugs
+
 ## 1.6.1
 - Fix some error
 - Add master looter indicator

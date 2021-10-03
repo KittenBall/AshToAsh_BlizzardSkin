@@ -253,7 +253,7 @@ class "BossDebuffPanel"(function()
     property "Refresh"          {
         set                     = function(self, unit)
             self.Unit           = unit
-            if not (unit  and self:IsVisible()) then return end
+            if not (unit and self:IsVisible()) then self.Count = 0 return end
             wipe(bossDebuffs)
             wipe(bossBuffs)
             
@@ -315,7 +315,7 @@ class "DispellDebuffPanel" (function(_ENV)
     property "Refresh"          {
         set                     = function(self, unit)
             self.Unit           = unit
-            if not (unit and self:IsVisible()) then return end
+            if not (unit and self:IsVisible()) then self.Count = 0 return end
 
             wipe(dispellDebuffs)
             
@@ -369,7 +369,7 @@ class "EnlargeDebuffPanel" (function(_ENV)
     property "Refresh"          {
         set                     = function(self, unit)
             self.Unit           = unit
-            if not (unit and self:IsVisible()) then return end
+            if not (unit and self:IsVisible()) then self.Count = 0 return end
             
             local filter        = "HARMFUL"
             self.Count          = refreshAura(self, unit, filter, 1, 1, UnitAura(unit, 1, filter)) - 1
@@ -416,7 +416,7 @@ class "EnlargeBuffPanel" (function(_ENV)
     property "Refresh"          {
         set                     = function(self, unit)
             self.Unit           = unit
-            if not (unit and self:IsVisible()) then return end
+            if not (unit and self:IsVisible()) then self.Count = 0 return end
             
             local filter        = "HELPFUL"
             self.Count          = refreshAura(self, unit, filter, 1, 1, UnitAura(unit, 1, filter)) - 1
@@ -463,7 +463,7 @@ class "ClassBuffPanel" (function(_ENV)
     property "Refresh"          {
         set                     = function(self, unit)
             self.Unit           = unit
-            if not (unit and self:IsVisible()) then return end
+            if not (unit and self:IsVisible()) then self.Count = 0 return end
             
             local filter        = "HELPFUL"
             self.Count          = refreshAura(self, unit, filter, 1, 1, UnitAura(unit, 1, filter)) - 1
@@ -473,6 +473,9 @@ class "ClassBuffPanel" (function(_ENV)
 end)
 
 TEMPLATE_SKIN_STYLE                                                                     = {
+    [BlzSkinAuraPanel]                                                                  = {
+        refresh                                                                         = AshBlzSkinApi.UnitAura()
+    },
 
     -- 目标选中边框
     [SelectionHighlightTexture]                                                         = {
@@ -557,6 +560,8 @@ TEMPLATE_SKIN_STYLE                                                             
 
     -- DebuffIcon
     [AshBlzSkinDebuffIcon]                                                              = {
+        alpha                                                                           = NIL,
+
         BackgroundTexture                                                               = {
             drawLayer                                                                   = "OVERLAY",
             file                                                                        = "Interface\\Buttons\\UI-Debuff-Overlays",
@@ -591,6 +596,7 @@ TEMPLATE_SKIN_STYLE                                                             
 
     -- Class buff icon
     [AshBlzSkinClassBuffIcon]                                                           = {
+        alpha                                                                           = NIL,
         enableMouse                                                                     = false
     }
 }

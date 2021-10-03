@@ -2,11 +2,10 @@ Scorpio "AshToAsh.BlizzardSkin.Api.Pet" ""
 
 PetOwnerClassMap = LruCache(100)
 
-local function getUnitPetGUID(unit)
-    if unit and UnitIsPlayer(unit) then
-        unit = unit.."pet"
-        if UnitExists(unit) then
-            return UnitGUID(unit)
+local function getUnitPetGUID(playerUnit, petUnit)
+    if playerUnit and UnitIsPlayer(playerUnit) then
+        if UnitExists(petUnit) then
+            return UnitGUID(petUnit)
         end
     end
 end
@@ -18,7 +17,7 @@ local function mapPetGuidToUnit(unit, petGuid, raidIndex)
             petOwnerInfo = {}
         end
         petOwnerInfo.class = UnitClassBase(unit)
-        petOwnerInfo.name = GetUnitName(unit)
+        petOwnerInfo.name = UnitName(unit)
         if raidIndex then
             local _, _, subGroup = GetRaidRosterInfo(raidIndex)
             petOwnerInfo.subGroup = subGroup
@@ -32,26 +31,26 @@ end
 __SystemEvent__ "GROUP_ROSTER_UPDATE" "UNIT_NAME_UPDATE" "UNIT_PET" "UNIT_CONNECTION"
 function UpdateGroupPetMap(unit)
     if unit and UnitExists(unit) then
-        mapPetGuidToUnit(unit, getUnitPetGUID(unit))
+        mapPetGuidToUnit(unit, getUnitPetGUID(unit, unit .. "pet"))
     elseif unit == nil then
         unit = "player"
-        mapPetGuidToUnit(unit, getUnitPetGUID(unit))
+        mapPetGuidToUnit(unit, getUnitPetGUID(unit, "pet"))
 
         if IsInGroup() then
             if IsInRaid() then
                 for i = 1, 40 do
-                    unit = "raid"..i
-                    if UnitExists(unit) then
-                        mapPetGuidToUnit(unit, getUnitPetGUID(unit), UnitInRaid(unit))
+                    local playerUnit = "raid" .. i
+                    if UnitExists(playerUnit) then
+                        mapPetGuidToUnit(playerUnit, getUnitPetGUID(playerUnit, "raidpet"..i), UnitInRaid(playerUnit))
                     else
                         break
                     end
                 end
             else
                 for i = 1, 4 do
-                    unit = "party"..i
-                    if UnitExists(unit) then
-                        mapPetGuidToUnit(unit, getUnitPetGUID(unit))
+                    local playerUnit = "party"..i
+                    if UnitExists(playerUnit) then
+                        mapPetGuidToUnit(playerUnit, getUnitPetGUID(unplayerUnit, "partypet"..i))
                     else
                         break
                     end

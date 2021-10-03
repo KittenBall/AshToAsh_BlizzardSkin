@@ -142,7 +142,7 @@ class "BuffPanel"(function()
     property "Refresh"          {
         set                     = function(self, unit)
             self.Unit           = unit
-            if not (unit  and self:IsVisible()) then return end
+            if not (unit and self:IsVisible()) then self.Count = 0 return end
 
             local filter        = "HELPFUL"
             self.Count          = refreshAura(self, unit, filter, 1, 1, UnitAura(unit, 1, filter)) - 1
@@ -266,7 +266,7 @@ class "DebuffPanel"(function()
     property "Refresh"          {
         set                     = function(self, unit)
             self.Unit           = unit
-            if not (unit  and self:IsVisible()) then return end
+            if not (unit and self:IsVisible()) then self.Count = 0 return end
 
             wipe(priorityDebuffs)
             wipe(nonBossDebuffs)

@@ -370,7 +370,7 @@ SHARE_DEBUFFPANEL_SKIN                                                          
     hSpacing                                                                                = 0.5,
     vSpacing                                                                                = 1,
     location                                                                                = {
-        Anchor("BOTTOMLEFT", 0, 0, "AshBlzSkinBossDebuffPanel", "BOTTOMRIGHT")      
+        Anchor("BOTTOMLEFT", 0, 0, "AshBlzSkinBossDebuffPanel", "BOTTOMRIGHT")
     },
     displayOnlyDispellableDebuffs                                                           = AshBlzSkinApi.DisplayOnlyDispellableDebuffs(),
 
@@ -589,10 +589,6 @@ SHARE_HEALTHBAR_SKIN                                                            
 -------------------------------------------------
 
 SKIN_STYLE =                                                                                {
-    [BlzSkinAuraPanel]                                                                      = {
-        refresh                                                                             = AshBlzSkinApi.UnitAura()
-    },
-
     -- 单位面板
     [AshGroupPanel]                                                                         = {
 
@@ -805,7 +801,7 @@ SKIN_STYLE =                                                                    
         NameLabel                                                                           = {
             SHARE_NAMELABEL_SKIN,
         
-            fontObject                                                                      = GameFontWhiteSmall,
+            fontObject                                                                      = GameFontWhiteTiny,
             text                                                                            = Wow.UnitName(),
             location                                                                        = {
                 Anchor("TOPLEFT", 3, -3), 
@@ -821,8 +817,8 @@ SKIN_STYLE =                                                                    
             justifyH                                                                        = "LEFT",
             text                                                                            = AshBlzSkinApi.UnitPetOwnerName(),
             location                                                                        = {
-                Anchor("TOPLEFT", 0, -select(2, GameFontWhiteSmall:GetFont()), "NameLabel", "TOPLEFT"),
-                Anchor("TOPRIGHT", 0, -select(2, GameFontWhiteSmall:GetFont()), "NameLabel", "TOPRIGHT"),
+                Anchor("TOPLEFT", 0, 0, "NameLabel", "BOTTOMLEFT"),
+                Anchor("RIGHT", 0, 0, nil, "RIGHT"),
             }
         },
 

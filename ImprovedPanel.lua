@@ -40,7 +40,7 @@ local function OnMaskStopMoving(self)
             indicator:Hide()
         end
 
-        parent:SetFrameLevel(8 + (parent.Index or 0 ))
+        self:SetFrameLevel(8 + (parent.Index or 0 ))
     end
 end
 
