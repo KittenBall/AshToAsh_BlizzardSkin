@@ -366,7 +366,7 @@ class "DebuffPanel"(function()
     property "Refresh"          {
         set                     = function(self, unit)
             self.Unit           = unit
-            if not (unit and self:IsVisible()) then return end
+            if not (unit and self:IsVisible()) then self.Count = 0 return end
 
             wipe(priorityDebuffs)
             wipe(nonBossDebuffs)
