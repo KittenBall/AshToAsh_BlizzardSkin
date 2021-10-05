@@ -8,6 +8,7 @@ DEFAULT_TEXTURE = "ASH_TO_ASH_BLZ_SKIN_TEXTURE_DEFAULT"
 local function GetTextureMenus(type, check)
     local menu = {}
     menu.check                                                                                                              = check
+
     tinsert(menu, {
         text                                                                                                                = L["default"],
         checkvalue                                                                                                          = DEFAULT_TEXTURE
@@ -22,15 +23,57 @@ local function GetTextureMenus(type, check)
         end
 
         local textures = libSharedMedia:List(type)
-        for _, name in ipairs_reverse(textures) do
-            if strlower(name) ~= "none" then
+        if textures then
+            for _, name in ipairs_reverse(textures) do
+                if strlower(name) ~= "none" then
+                    tinsert(menu, {
+                        text                                                                                                    = name,
+                        checkvalue                                                                                              = name
+                    })
+                end
+            end
+        end
+    end
+
+    return menu
+end
+
+local function GetFontMenu(check)
+    local menu = {}
+    menu.check                                                                                                              = check
+
+    local libSharedMedia = GetLibSharedMedia()
+    if libSharedMedia then
+        local fonts = libSharedMedia:List(libSharedMedia.MediaType.FONT)
+        if fonts then
+            for _, name in ipairs_reverse(fonts) do
                 tinsert(menu, {
-                    text                                                                                                        = name,
-                    checkvalue                                                                                                  = name
+                    text                                                                                                    = name,
+                    checkvalue                                                                                              = name
                 })
             end
         end
     end
+
+    return menu
+end
+
+local function GetFontOutlineMenu(check)
+    local menu = {
+        check                                                                                                               = check,
+        {
+            text                                                                                                            = L["font_outline_none"],
+            checkvalue                                                                                                      = "NONE"
+        },
+        {
+            text                                                                                                            = L["font_outline_normal"],
+            checkvalue                                                                                                      = "NORMAL"
+        },
+        {
+            text                                                                                                            = L["font_outline_thick"],
+            checkvalue                                                                                                      = "THICK"
+        }
+    }
 
     return menu
 end
@@ -217,6 +260,62 @@ local function GetAppearanceMenu()
                         end
                     })
                 },
+                -- 字体
+                {
+                    text                                                                                                    = L["font"],
+                    submenu                                                                                                 = {
+                        -- 字体路径
+                        {
+                            text                                                                                            = L["font"],
+                            submenu                                                                                         = GetFontMenu({
+                                get                                                                                         = function()
+                                    return DB().Appearance.HealthBar.HealthText.Font
+                                end,
+                                set                                                                                         = function(value)
+                                    DB().Appearance.HealthBar.HealthText.Font = value
+                                    SendConfigChanged()
+                                end
+                            })
+                        },
+                        -- 字体描边
+                        {
+                            text                                                                                            = L["font_outline"],
+                            submenu                                                                                         = GetFontOutlineMenu({
+                                get                                                                                         = function()
+                                    return DB().Appearance.HealthBar.HealthText.FontOutline
+                                end,
+                                set                                                                                         = function(value)
+                                    DB().Appearance.HealthBar.HealthText.FontOutline = value
+                                    SendConfigChanged()
+                                end
+                            })
+                        },
+                        -- 字体大小
+                        {
+                            text                                                                                            = L["font_size"],
+                            click                                                                                           = function()
+                                local size = PickRange(L["font_size"], 8, 20, 1, DB().Appearance.HealthBar.HealthText.FontSize)
+                                if size then
+                                    DB().Appearance.HealthBar.HealthText.FontSize = size
+                                    SendConfigChanged()
+                                end
+                            end
+                        },
+                        -- 单色
+                        {
+                            text                                                                                            = L["font_monochrome"],
+                            check                                                                                           = {
+                                get                                                                                         = function()
+                                    return DB().Appearance.HealthBar.HealthText.FontMonochrome
+                                end,
+                                set                                                                                         = function(value)
+                                    DB().Appearance.HealthBar.HealthText.FontMonochrome = value
+                                    SendConfigChanged()
+                                end
+                            }
+                        }
+                    }
+                },
                 -- 生命值大小随框体缩放
                 {
                     text                                                                                                    = L["name_scales_with_frame"],
@@ -321,6 +420,62 @@ local function GetAppearanceMenu()
                                 set                                                                                         = function(value)
                                     DB().Appearance.Name.ShowNicknameToOthers = value
                                     FireSystemEvent("ASHTOASH_BLZ_SKIN_NICK_NAME_REFRESH", 'any')
+                                end
+                            }
+                        }
+                    }
+                },
+                -- 字体
+                {
+                    text                                                                                                    = L["font"],
+                    submenu                                                                                                 = {
+                        -- 字体路径
+                        {
+                            text                                                                                            = L["font"],
+                            submenu                                                                                         = GetFontMenu({
+                                get                                                                                         = function()
+                                    return DB().Appearance.Name.Font or DEFAULT_FONT
+                                end,
+                                set                                                                                         = function(value)
+                                    DB().Appearance.Name.Font = (value ~= DEFAULT_FONT and value or nil)
+                                    SendConfigChanged()
+                                end
+                            })
+                        },
+                        -- 字体描边
+                        {
+                            text                                                                                            = L["font_outline"],
+                            submenu                                                                                         = GetFontOutlineMenu({
+                                get                                                                                         = function()
+                                    return DB().Appearance.Name.FontOutline
+                                end,
+                                set                                                                                         = function(value)
+                                    DB().Appearance.Name.FontOutline = value
+                                    SendConfigChanged()
+                                end
+                            })
+                        },
+                        -- 字体大小
+                        {
+                            text                                                                                            = L["font_size"],
+                            click                                                                                           = function()
+                                local size = PickRange(L["font_size"], 8, 20, 1, DB().Appearance.Name.FontSize)
+                                if size then
+                                    DB().Appearance.Name.FontSize = size
+                                    SendConfigChanged()
+                                end
+                            end
+                        },
+                        -- 单色
+                        {
+                            text                                                                                            = L["font_monochrome"],
+                            check                                                                                           = {
+                                get                                                                                         = function()
+                                    return DB().Appearance.Name.FontMonochrome
+                                end,
+                                set                                                                                         = function(value)
+                                    DB().Appearance.Name.FontMonochrome = value
+                                    SendConfigChanged()
                                 end
                             }
                         }

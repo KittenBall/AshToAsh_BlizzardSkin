@@ -26,6 +26,14 @@ L["texture"] = "材质"
 L["background_texture"] = "背景材质"
 L["unitframe_background"] = "框体背景材质"
 
+L["font"] = "字体"
+L["font_outline"] = "轮廓"
+L["font_outline_none"] = "无"
+L["font_outline_normal"] = "轮廓"
+L["font_outline_thick"] = "细轮廓"
+L["font_size"] = "字体大小"
+L["font_monochrome"] = "单色"
+
 L["aura_size"]  = "光环大小"
 L["aura_size_tips"] = "调整光环的基础大小，只影响Buff和Debuff，职业增益、重要减益等不受影响\n|cffffffff光环仍然会随框体缩放|r"
 

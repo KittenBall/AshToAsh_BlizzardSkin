@@ -47,26 +47,21 @@ local relocationUnitFrameIconOnSizeChanged = Wow.FromFrameSize(UnitFrame):Map(fu
     return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, h/3-4))
 end)
 
-local shareFont = {}
-
-local function getDynamicHeightFont(frameHeight, fontObject, minScale, maxScale)
-    local font, height = fontObject:GetFont()
-    shareFont.font = font
+local function getDynamicFontHeight(frameHeight, fontSize, minScale, maxScale)
     local scale = frameHeight / 48
-    local minHeight = height * (minScale or 1)
-    local maxHeight = height * (maxScale or 1)
+    local minHeight = fontSize * (minScale or 1)
+    local maxHeight = fontSize * (maxScale or 1)
     if minHeight > maxHeight then
         minHeight = maxHeight
     end
-    height = height * scale
-    if height > maxHeight then
-        height = maxHeight
-    elseif height < minHeight then
-        height = minHeight
+    fontSize = fontSize * scale
+    if fontSize > maxHeight then
+        fontSize = maxHeight
+    elseif fontSize < minHeight then
+        fontSize = minHeight
     end
 
-    shareFont.height = height
-    return shareFont
+    return fontSize
 end
 
 -------------------------------------------------
@@ -80,8 +75,7 @@ SHARE_HEALTHLABEL_SKIN                                                          
     location                                                                                 = {
         Anchor("CENTER"),
         Anchor("TOP", 0, -2, "NameLabel", "BOTTOM")
-    },
-    fontObject                                                                               = SystemFont_Small
+    }
 }
 
 local function formatHealth(health)
@@ -98,9 +92,14 @@ end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.HealthLabelSkin()
-    local font, height = SystemFont_Small:GetFont()
-    local fontType = { font = font, height = height }
-    local fontObserver   = Wow.FromFrameSize(UnitFrame):Map(function(w, h) return getDynamicHeightFont(h, SystemFont_Small, 0.6) end)
+    local fontObserver  = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
+            local fontType = {}
+            fontType.font = GetLibSharedMediaFont(DB().Appearance.HealthBar.HealthText.Font) or HealthLabelFont
+            fontType.outline = DB().Appearance.HealthBar.HealthText.FontOutline
+            fontType.monochrome = DB().Appearance.HealthBar.HealthText.FontMonochrome
+            fontType.height = getDynamicFontHeight(h, DB().Appearance.HealthBar.HealthText.FontSize, 0.6)
+            return fontType
+        end)
 
     return AshBlzSkinApi.OnConfigChanged():Map(function()
         local healthTextStyle = DB().Appearance.HealthBar.HealthText.Style
@@ -115,9 +114,19 @@ function AshBlzSkinApi.HealthLabelSkin()
         else
             return nil
         end
-    
+        
         SHARE_HEALTHLABEL_SKIN.textColor = (healthTextStyle == HealthTextStyle.LOSTHEALTH and Color.RED or Color.WHITE)
-        SHARE_HEALTHLABEL_SKIN.Font = DB().Appearance.HealthBar.HealthText.ScaleWithFrame and fontObserver or fontType
+        
+        if DB().Appearance.HealthBar.HealthText.ScaleWithFrame then
+            SHARE_HEALTHLABEL_SKIN.Font = fontObserver
+        else
+            local fontType = {}
+            fontType.font = GetLibSharedMediaFont(DB().Appearance.HealthBar.HealthText.Font) or HealthLabelFont
+            fontType.outline = DB().Appearance.HealthBar.HealthText.FontOutline
+            fontType.monochrome = DB().Appearance.HealthBar.HealthText.FontMonochrome
+            fontType.height = DB().Appearance.HealthBar.HealthText.FontSize
+            SHARE_HEALTHLABEL_SKIN.Font = fontType
+        end
 
         return SHARE_HEALTHLABEL_SKIN
     end)
@@ -327,11 +336,25 @@ NAMELABEL_SKIN                                                                  
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.NameSkin()
-    local font, height = GameFontHighlightSmall:GetFont()
-    local fontType = { font = font, height = height }
-    local fontObserver   = Wow.FromFrameSize(UnitFrame):Map(function(w, h) return getDynamicHeightFont(h, GameFontHighlightSmall, 0.6) end)
+    local fontObserver  = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
+        local fontType = {}
+        fontType.font = GetLibSharedMediaFont(DB().Appearance.Name.Font) or NameFont
+        fontType.outline = DB().Appearance.Name.FontOutline
+        fontType.monochrome = DB().Appearance.Name.FontMonochrome
+        fontType.height = getDynamicFontHeight(h, DB().Appearance.Name.FontSize, 0.6)
+        return fontType
+        end)
     return AshBlzSkinApi.OnConfigChanged():Map(function()
-            NAMELABEL_SKIN.Font = DB().Appearance.Name.ScaleWithFrame and fontObserver or fontType
+            if DB().Appearance.Name.ScaleWithFrame then
+                NAMELABEL_SKIN.Font = fontObserver
+            else
+                local fontType = {}
+                fontType.font = GetLibSharedMediaFont(DB().Appearance.Name.Font) or HealthLabelFont
+                fontType.outline = DB().Appearance.Name.FontOutline
+                fontType.monochrome = DB().Appearance.Name.FontMonochrome
+                fontType.height = DB().Appearance.Name.FontSize
+                NAMELABEL_SKIN.Font = fontType
+            end
         return NAMELABEL_SKIN
     end)
 end
@@ -677,7 +700,7 @@ SKIN_STYLE =                                                                    
         -- 队长图标
         LeaderIcon                                                                          = {
             location                                                                        = {
-                Anchor("TOPRIGHT", -3, -2)
+                Anchor("RIGHT", 0, 0, nil, "TOPRIGHT")
             },
             file                                                                            = Wow.UnitIsLeader():Map(function(isLeader)
                 return isLeader and [[Interface\GroupFrame\UI-Group-LeaderIcon]] or nil

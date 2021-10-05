@@ -1,3 +1,6 @@
+## 1.6.3
+- Add font option
+
 ## 1.6.2
 - Fix serveral bugs
 

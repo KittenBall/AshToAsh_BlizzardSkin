@@ -101,6 +101,10 @@ enum "NameStyle" {
 }
 
 GuildColor          = Color(0.25, 1, 0.25, 1)
+-- Default Name Label Font
+NameFont, NameFontSize = GameFontHighlightSmall:GetFont()
+-- Default Health Label Font
+HealthLabelFont, HealthLabelFontSize = SystemFont_Small:GetFont()
 
 function OnLoad()
     _SVDB = SVManager("AshToAsh_BlizzardSkin_DB", "AshToAsh_BlizzardSkin_CharDB")
@@ -136,9 +140,13 @@ function OnLoad()
                 HealthText                                                                                                  = {
                     Style                                                                                                   = HealthTextStyle.NONE,
                     TextFormat                                                                                              = HealthTextFormat.KILO,
-                    ScaleWithFrame                                                                                          = false
+                    ScaleWithFrame                                                                                          = false,
+                    Font                                                                                                    = HealthLabelFont,
+                    FontSize                                                                                                = HealthLabelFontSize,
+                    FontOutline                                                                                             = "NONE",
+                    FontMonochrome                                                                                          = false
                 },
-                Texture                                                                                                     = nil
+                Texture                                                                                                     = nil,
             },
             AuraSize                                                                                                        = 11,
             Background                                                                                                      = nil,
@@ -153,7 +161,11 @@ function OnLoad()
                 FriendsNameColoring                                                                                         = false,
                 GuildColor                                                                                                  = GuildColor,
                 FriendColor                                                                                                 = Color.NORMAL,
-                BNFriendColor                                                                                               = Color.BATTLENET
+                BNFriendColor                                                                                               = Color.BATTLENET,
+                Font                                                                                                        = NameFont,
+                FontSize                                                                                                    = NameFontSize,
+                FontOutline                                                                                                 = "NONE",
+                FontMonochrome                                                                                              = false
             },
             -- 显示面板标签
             DisplayPanelLabel                                                                                               = true,
@@ -191,7 +203,7 @@ end
 function GetLibSharedMedia()
     if not LibSharedMedia then
         if _G.LibStub then
-            LibSharedMedia = _G.LibStub("LibSharedMedia-3.0")
+            LibSharedMedia = _G.LibStub("LibSharedMedia-3.0", true)
         end
     end
     return LibSharedMedia
@@ -208,6 +220,14 @@ function GetLibSharedMediaTexture(type, name)
         end
 
         return LibSharedMedia:Fetch(type, name, true)
+    end
+end
+
+function GetLibSharedMediaFont(name)
+    if not name then return end
+
+    if GetLibSharedMedia() then
+        return LibSharedMedia:Fetch(LibSharedMedia.MediaType.FONT, name, true)
     end
 end
 

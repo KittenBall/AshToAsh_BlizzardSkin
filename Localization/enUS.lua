@@ -24,6 +24,14 @@ L["texture"] = "Texture"
 L["background_texture"] = "Background texture"
 L["unitframe_background"] = "Unitframe background"
 
+L["font"] = "Font"
+L["font_outline"] = "Outline"
+L["font_outline_none"] = "None"
+L["font_outline_normal"] = "Normal"
+L["font_outline_thick"] = "Thick"
+L["font_size"] = "Size"
+L["font_monochrome"] = "Monochrome"
+
 L["aura_size"] = "Aura Size"
 L["aura_size_tips"] = "Adjust the basic size of the aura, which only affects the Buff and Debuff, and the class buff, enlarge debuff, etc. are not affected.\n|cffffffff The aura will still scale with the frame|r"
 
