@@ -145,6 +145,11 @@ class "BuffPanel"(function()
             -- 防护暗影
             [25433]             = true
         },
+
+        SHAMAN                  = {
+            -- 大地之盾
+            [32594]             = true
+        }
     }
 
     local function shouldShowClassBuff(self, spellId)

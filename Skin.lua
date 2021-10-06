@@ -106,7 +106,7 @@ function AshBlzSkinApi.HealthLabelSkin()
         if healthTextStyle == HealthTextStyle.HEALTH then
             SHARE_HEALTHLABEL_SKIN.text  = Wow.UnitHealthFrequent():Map(formatHealth)
         elseif healthTextStyle == HealthTextStyle.LOSTHEALTH then
-            SHARE_HEALTHLABEL_SKIN.text  = Wow.UnitHealthLostFrequent():Map(formatHealth)
+            SHARE_HEALTHLABEL_SKIN.text  = Wow.UnitHealthLostFrequent():Map(formatHealth):Map(function(health) return "-" .. health end)
         elseif healthTextStyle == HealthTextStyle.PERCENT then
             SHARE_HEALTHLABEL_SKIN.text  = Wow.UnitHealthPercentFrequent():Map(function(percent)
                 return percent > 0 and percent.."%" or nil
@@ -700,7 +700,7 @@ SKIN_STYLE =                                                                    
         -- 队长图标
         LeaderIcon                                                                          = {
             location                                                                        = {
-                Anchor("RIGHT", 0, 0, nil, "TOPRIGHT")
+                Anchor("TOPRIGHT", -3, -2)
             },
             file                                                                            = Wow.UnitIsLeader():Map(function(isLeader)
                 return isLeader and [[Interface\GroupFrame\UI-Group-LeaderIcon]] or nil
