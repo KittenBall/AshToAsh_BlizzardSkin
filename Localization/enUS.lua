@@ -32,8 +32,12 @@ L["font_outline_thick"] = "Thick"
 L["font_size"] = "Size"
 L["font_monochrome"] = "Monochrome"
 
+L["aura"] = "Aura"
 L["aura_size"] = "Aura Size"
 L["aura_size_tips"] = "Adjust the basic size of the aura, which only affects the Buff and Debuff, and the class buff, enlarge debuff, etc. are not affected.\n|cffffffff The aura will still scale with the frame|r"
+L["aura_disable_tooltip"] = "Disable tooltip"
+L["aura_disable_tooltip_tips"] = "Disabling game tooltip allows you to hover over the aura to click and cast spells."
+L["aura_show_countdown_numbers_tips"] = "Enabling this option just means that you follow the Blizzard settings, if you are not using OmniCC, you still need to turn on thein the \"".. COUNTDOWN_FOR_COOLDOWNS_TEXT .. "\" option."
 
 L["cast_bar"] = "Cast bar"
 L["power_bar"] = "Power bar"

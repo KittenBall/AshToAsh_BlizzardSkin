@@ -515,10 +515,10 @@ class "PixelGlow"(function(_ENV)
     -- Thickness of lines
     property "Thickness"            {
         type        = Number,
-        default     = 1,
-        get         = function(self) return self._Thickness or 1 end,
+        default     = 2,
+        get         = function(self) return self._Thickness or 2 end,
         set         = function(self, thickness)
-            thickness = thickness > 0 and thickness or 1
+            thickness = thickness > 0 and thickness or 2
             self._Thickness = thickness
             UpdateMask1(self)
             UpdateBorder(self)
@@ -724,7 +724,7 @@ class "PixelGlow"(function(_ENV)
                 [3] = (height * 2 + width - length /2) / perimeter
             }
         end
-        local thickness = self._Thickness or 1
+        local thickness = self._Thickness or 2
         self.step = self.step or 1/8
         if self:IsShown() then
             if not self.masks[1]:IsShown() then

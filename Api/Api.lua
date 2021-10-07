@@ -203,3 +203,17 @@ function AshBlzSkinApi.CastBarTexture()
         return texture or "Interface\\TargetingFrame\\UI-StatusBar"
     end)
 end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.AuraTooltipEnable()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
+        return not DB().Appearance.Aura.DisableTooltip
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.AuraShowCountdownNumbers()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
+        return not DB().Appearance.Aura.ShowCountdownNumbers
+    end)
+end

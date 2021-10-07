@@ -92,15 +92,6 @@ end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.HealthLabelSkin()
-    local fontObserver  = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
-            local fontType = {}
-            fontType.font = GetLibSharedMediaFont(DB().Appearance.HealthBar.HealthText.Font) or HealthLabelFont
-            fontType.outline = DB().Appearance.HealthBar.HealthText.FontOutline
-            fontType.monochrome = DB().Appearance.HealthBar.HealthText.FontMonochrome
-            fontType.height = getDynamicFontHeight(h, DB().Appearance.HealthBar.HealthText.FontSize, 0.6)
-            return fontType
-        end)
-
     return AshBlzSkinApi.OnConfigChanged():Map(function()
         local healthTextStyle = DB().Appearance.HealthBar.HealthText.Style
         if healthTextStyle == HealthTextStyle.HEALTH then
@@ -118,7 +109,14 @@ function AshBlzSkinApi.HealthLabelSkin()
         SHARE_HEALTHLABEL_SKIN.textColor = (healthTextStyle == HealthTextStyle.LOSTHEALTH and Color.RED or Color.WHITE)
         
         if DB().Appearance.HealthBar.HealthText.ScaleWithFrame then
-            SHARE_HEALTHLABEL_SKIN.Font = fontObserver
+            SHARE_HEALTHLABEL_SKIN.Font = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
+                local fontType = {}
+                fontType.font = GetLibSharedMediaFont(DB().Appearance.HealthBar.HealthText.Font) or HealthLabelFont
+                fontType.outline = DB().Appearance.HealthBar.HealthText.FontOutline
+                fontType.monochrome = DB().Appearance.HealthBar.HealthText.FontMonochrome
+                fontType.height = getDynamicFontHeight(h, DB().Appearance.HealthBar.HealthText.FontSize, 0.6)
+                return fontType
+            end)
         else
             local fontType = {}
             fontType.font = GetLibSharedMediaFont(DB().Appearance.HealthBar.HealthText.Font) or HealthLabelFont
@@ -249,6 +247,19 @@ end
 -------------------------------------------------
 -- CastBar
 -------------------------------------------------
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.CastBarLabelFontStyle()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
+            local fontType = {}
+            fontType.font = GetLibSharedMediaFont(DB().Appearance.CastBar.Font) or CastBarLabelFont
+            fontType.outline = DB().Appearance.CastBar.FontOutline
+            fontType.monochrome = DB().Appearance.CastBar.FontMonochrome
+            fontType.height = DB().Appearance.CastBar.FontSize
+        return fontType
+    end)
+end
+
 SHARE_CASTBAR_SKIN                                                                          = {
     frameStrata                                                                             = "MEDIUM",
     useParentLevel                                                                          = true,
@@ -261,6 +272,10 @@ SHARE_CASTBAR_SKIN                                                              
 
     Spark                                                                                   = {
         size                                                                                = Size(24, 24),
+    },
+
+    Label                                                                                   = {
+        font                                                                                = AshBlzSkinApi.CastBarLabelFontStyle()
     }
 }
 
@@ -336,17 +351,16 @@ NAMELABEL_SKIN                                                                  
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.NameSkin()
-    local fontObserver  = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
-        local fontType = {}
-        fontType.font = GetLibSharedMediaFont(DB().Appearance.Name.Font) or NameFont
-        fontType.outline = DB().Appearance.Name.FontOutline
-        fontType.monochrome = DB().Appearance.Name.FontMonochrome
-        fontType.height = getDynamicFontHeight(h, DB().Appearance.Name.FontSize, 0.6)
-        return fontType
-        end)
     return AshBlzSkinApi.OnConfigChanged():Map(function()
             if DB().Appearance.Name.ScaleWithFrame then
-                NAMELABEL_SKIN.Font = fontObserver
+                NAMELABEL_SKIN.Font = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
+                    local fontType = {}
+                    fontType.font = GetLibSharedMediaFont(DB().Appearance.Name.Font) or NameFont
+                    fontType.outline = DB().Appearance.Name.FontOutline
+                    fontType.monochrome = DB().Appearance.Name.FontMonochrome
+                    fontType.height = getDynamicFontHeight(h, DB().Appearance.Name.FontSize, 0.6)
+                    return fontType
+                    end)
             else
                 local fontType = {}
                 fontType.font = GetLibSharedMediaFont(DB().Appearance.Name.Font) or HealthLabelFont
@@ -405,8 +419,8 @@ SHARE_DEBUFFPANEL_SKIN                                                          
 __Static__() __AutoCache__()
 function AshBlzSkinApi.DebuffPanelSkin()
     return AshBlzSkinApi.OnConfigChanged():Map(function()
-        SHARE_DEBUFFPANEL_SKIN.elementWidth = resizeOnUnitFrameChanged(DB().Appearance.AuraSize)
-        SHARE_DEBUFFPANEL_SKIN.elementHeight = resizeOnUnitFrameChanged(DB().Appearance.AuraSize)
+        SHARE_DEBUFFPANEL_SKIN.elementWidth = resizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
+        SHARE_DEBUFFPANEL_SKIN.elementHeight = resizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
         return SHARE_DEBUFFPANEL_SKIN
     end)
 end
@@ -435,8 +449,8 @@ SHARE_BUFFPANEL_SKIN                                                            
 __Static__() __AutoCache__()
 function AshBlzSkinApi.BuffPanelSkin()
     return AshBlzSkinApi.OnConfigChanged():Map(function()
-        SHARE_BUFFPANEL_SKIN.elementWidth = resizeOnUnitFrameChanged(DB().Appearance.AuraSize)
-        SHARE_BUFFPANEL_SKIN.elementHeight = resizeOnUnitFrameChanged(DB().Appearance.AuraSize)
+        SHARE_BUFFPANEL_SKIN.elementWidth = resizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
+        SHARE_BUFFPANEL_SKIN.elementHeight = resizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
         return SHARE_BUFFPANEL_SKIN
     end)
 end

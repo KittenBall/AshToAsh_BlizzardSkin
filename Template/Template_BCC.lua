@@ -505,7 +505,7 @@ Style.UpdateSkin(SKIN_NAME,{
         Label                                                                           = {
             justifyH                                                                    = "CENTER",
             drawLayer                                                                   = "OVERLAY",
-            fontObject                                                                  = GameFontWhiteTiny2,
+            textColor                                                                   = Color.WHITE,
             text                                                                        = Wow.UnitCastName(),
             setAllPoints                                                                = true
         }

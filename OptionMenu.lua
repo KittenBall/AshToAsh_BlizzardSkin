@@ -128,6 +128,62 @@ local function GetAppearanceMenu()
                         end
                     })
                 },
+                -- 字体
+                {
+                    text                                                                                                    = L["font"],
+                    submenu                                                                                                 = {
+                        -- 字体路径
+                        {
+                            text                                                                                            = L["font"],
+                            submenu                                                                                         = GetFontMenu({
+                                get                                                                                         = function()
+                                    return DB().Appearance.CastBar.Font
+                                end,
+                                set                                                                                         = function(value)
+                                    DB().Appearance.CastBar.Font = value
+                                    SendConfigChanged()
+                                end
+                            })
+                        },
+                        -- 字体描边
+                        {
+                            text                                                                                            = L["font_outline"],
+                            submenu                                                                                         = GetFontOutlineMenu({
+                                get                                                                                         = function()
+                                    return DB().Appearance.CastBar.FontOutline
+                                end,
+                                set                                                                                         = function(value)
+                                    DB().Appearance.CastBar.FontOutline = value
+                                    SendConfigChanged()
+                                end
+                            })
+                        },
+                        -- 字体大小
+                        {
+                            text                                                                                            = L["font_size"],
+                            click                                                                                           = function()
+                                local size = PickRange(L["font_size"], 8, 20, 1, DB().Appearance.CastBar.FontSize)
+                                if size then
+                                    DB().Appearance.CastBar.FontSize = size
+                                    SendConfigChanged()
+                                end
+                            end
+                        },
+                        -- 单色
+                        {
+                            text                                                                                            = L["font_monochrome"],
+                            check                                                                                           = {
+                                get                                                                                         = function()
+                                    return DB().Appearance.CastBar.FontMonochrome
+                                end,
+                                set                                                                                         = function(value)
+                                    DB().Appearance.CastBar.FontMonochrome = value
+                                    SendConfigChanged()
+                                end
+                            }
+                        }
+                    }
+                },
             }
         },
         -- 能量条
@@ -434,10 +490,10 @@ local function GetAppearanceMenu()
                             text                                                                                            = L["font"],
                             submenu                                                                                         = GetFontMenu({
                                 get                                                                                         = function()
-                                    return DB().Appearance.Name.Font or DEFAULT_FONT
+                                    return DB().Appearance.Name.Font
                                 end,
                                 set                                                                                         = function(value)
-                                    DB().Appearance.Name.Font = (value ~= DEFAULT_FONT and value or nil)
+                                    DB().Appearance.Name.Font = value
                                     SendConfigChanged()
                                 end
                             })
@@ -575,6 +631,55 @@ local function GetAppearanceMenu()
                 end
             })
         },
+        -- 光环
+        {
+            text                                                                                                            = L["aura"],
+            submenu                                                                                                         = {
+                -- 光环大小
+                {
+                    text                                                                                                    = L["aura_size"],
+                    tiptitle                                                                                                = L["tips"],
+                    tiptext                                                                                                 = L["aura_size_tips"],
+                    click                                                                                                   = function()
+                        local value = PickRange(L["aura_size"], 5, 15, 1, DB().Appearance.Aura.AuraSize)
+                        if value then
+                            DB().Appearance.Aura.AuraSize = value
+                            SendConfigChanged()
+                        end
+                    end
+                },
+                -- 禁用鼠标提示
+                {
+                    text                                                                                                    = L["aura_disable_tooltip"],
+                    tiptitle                                                                                                = L["tips"],
+                    tiptext                                                                                                 = L["aura_disable_tooltip_tips"],
+                    check                                                                                                   = {
+                        get                                                                                                 = function()
+                            return DB().Appearance.Aura.DisableTooltip
+                        end,
+                        set                                                                                                 = function(value)
+                            DB().Appearance.Aura.DisableTooltip = value
+                            SendConfigChanged()
+                        end
+                    }
+                },
+                -- 显示冷却时间
+                {
+                    text                                                                                                    = COUNTDOWN_FOR_COOLDOWNS_TEXT,
+                    tiptitle                                                                                                = L["tips"],
+                    tiptext                                                                                                 = L["aura_show_countdown_numbers_tips"],
+                    check                                                                                                   = {
+                        get                                                                                                 = function()
+                            return DB().Appearance.Aura.ShowCountdownNumbers
+                        end,
+                        set                                                                                                 = function(value)
+                            DB().Appearance.Aura.ShowCountdownNumbers = value
+                            SendConfigChanged()
+                        end
+                    }
+                }
+            }
+        },
         -- 仇恨指示器
         {
             text                                                                                                            = COMPACT_UNIT_FRAME_PROFILE_DISPLAYAGGROHIGHLIGHT,
@@ -642,20 +747,7 @@ local function GetAppearanceMenu()
                     FireSystemEvent("UNIT_AURA", "any")
                 end
             }
-        },
-        -- 光环大小
-        {
-            text                                                                                                            = L["aura_size"],
-            tiptitle                                                                                                        = L["tips"],
-            tiptext                                                                                                         = L["aura_size_tips"],
-            click                                                                                                           = function()
-                local value = PickRange(L["aura_size"], 5, 15, 1, DB().Appearance.AuraSize)
-                if value then
-                    DB().Appearance.AuraSize = value
-                    SendConfigChanged()
-                end
-            end
-        },
+        }
     }
 
     return menu

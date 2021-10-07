@@ -105,6 +105,8 @@ GuildColor          = Color(0.25, 1, 0.25, 1)
 NameFont, NameFontSize = GameFontHighlightSmall:GetFont()
 -- Default Health Label Font
 HealthLabelFont, HealthLabelFontSize = SystemFont_Small:GetFont()
+-- Default CastBar Label Font
+CastBarLabelFont, CastBarLabelFontSize = GameFontWhiteTiny2:GetFont()
 
 function OnLoad()
     _SVDB = SVManager("AshToAsh_BlizzardSkin_DB", "AshToAsh_BlizzardSkin_CharDB")
@@ -122,7 +124,11 @@ function OnLoad()
             -- 施法条
             CastBar                                                                                                         = {
                 Visibility                                                                                                  = Visibility.SHOW_ONLY_PARTY,
-                Texture                                                                                                     = nil
+                Texture                                                                                                     = nil,
+                Font                                                                                                        = CastBarLabelFont,
+                FontSize                                                                                                    = CastBarLabelFontSize,
+                FontOutline                                                                                                 = "NONE",
+                FontMonochrome                                                                                              = false
             },
             -- 能量条
             PowerBar                                                                                                        = {
@@ -148,7 +154,12 @@ function OnLoad()
                 },
                 Texture                                                                                                     = nil,
             },
-            AuraSize                                                                                                        = 11,
+            -- 光环
+            Aura                                                                                                            = {
+                AuraSize                                                                                                    = 11,
+                DisableTooltip                                                                                              = false,
+                ShowCountdownNumbers                                                                                        = false
+            },
             Background                                                                                                      = nil,
             -- 名字
             Name                                                                                                            = {

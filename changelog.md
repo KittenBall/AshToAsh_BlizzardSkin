@@ -1,3 +1,7 @@
+## 1.6.4
+- Add castbar font option
+- Improved aura option
+
 ## 1.6.3
 - Add font option
 

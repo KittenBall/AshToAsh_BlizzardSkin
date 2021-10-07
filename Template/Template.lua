@@ -121,43 +121,39 @@ __Sealed__() class "AshBlzSkinAuraIcon"(function(_ENV)
     end
 end)
 
--- Buff icon
-__Sealed__()
-class "AshBlzSkinBuffIcon"(function()
-    inherit "AshBlzSkinAuraIcon"
+-- 支持OmniCC的Cooldown
+__Sealed__() __ChildProperty__(AshBlzSkinAuraIcon, "AshBlzSkinAuraIconCooldown")
+class "AshBlzSkinAuraIconCooldown"(function()
+    inherit "Cooldown"
 
-    local function OnMouseUp(self, button)
-        local parent            = self:GetParent()
-        if not parent then return end
-        if IsAltKeyDown() and button == "RightButton" then
-            local name, _, _, _, _, _, _, _, _, spellID = UnitAura(parent.Unit, self.AuraIndex, self.AuraFilter)
-
-            if name then
-                _AuraBlackList[spellID] = true
-                FireSystemEvent("ASHTOASH_CONFIG_CHANGED")
-
-                -- Force the refreshing
-                Next(Scorpio.FireSystemEvent, "UNIT_AURA", "any")
+    property "HideCountdownNumbers" {
+        type        = Boolean,
+        handler     = function(self, hideCountdownNumbers)
+            if OmniCC and OmniCC.Cooldown and OmniCC.Cooldown.SetNoCooldownCount then
+                OmniCC.Cooldown.SetNoCooldownCount(self, hideCountdownNumbers)
             end
-        elseif IsControlKeyDown() and button == "LeftButton" and self.AuraFilter:match("HARMFUL") then
-            local name, _, _, _, _, _, _, _, _, spellID = UnitAura(parent.Unit, self.AuraIndex, self.AuraFilter)
+        end
+    }
 
-            if name then
-                _EnlargeDebuffList[spellID] = true
-                FireSystemEvent("ASHTOASH_CONFIG_CHANGED")
-
-                -- Force the refreshing
-                Next(Scorpio.FireSystemEvent, "UNIT_AURA", "any")
-            end
+    function SetCooldown(...)
+        super.SetCooldown(...)
+        if OmniCC and OmniCC.Cooldown then
+            OmniCC.Cooldown.OnSetCooldown(...)
         end
     end
 
-    function __ctor(self)
-        super(self)
-        self.OnMouseUp = OnMouseUp
+    function OnSetCooldownDuration(...)
+        super.SetCooldown(...)
+        if OmniCC and OmniCC.Cooldown then
+            OmniCC.Cooldown.OnSetCooldownDuration(...)
+        end
     end
 
 end)
+
+-- Buff icon
+__Sealed__()
+class "AshBlzSkinBuffIcon" { AshBlzSkinAuraIcon }
 
 -- Debuff icon
 __Sealed__()
@@ -512,10 +508,17 @@ TEMPLATE_SKIN_STYLE                                                             
         }
     },
 
+    -- Cooldown
+    [AshBlzSkinAuraIconCooldown]                                                        = {
+        hideCountdownNumbers                                                            = AshBlzSkinApi.AuraShowCountdownNumbers(),
+        setAllPoints                                                                    = true,
+        reverse                                                                         = true,
+        enableMouse                                                                     = false
+    },
+
     -- AuraIcon
     [AshBlzSkinAuraIcon]                                                                = {
-        enableMouseMotion                                                               = true,
-        enableMouseClicks                                                               = false,
+        enableMouse                                                                     = AshBlzSkinApi.AuraTooltipEnable(),
         
         auraIndex                                                                       = Wow.FromPanelProperty("AuraIndex"),
         auraFilter                                                                      = Wow.FromPanelProperty("AuraFilter"),
@@ -543,11 +546,8 @@ TEMPLATE_SKIN_STYLE                                                             
             end),
         },
 
-        Cooldown                                                                        = {
-            setAllPoints                                                                = true,
-            enableMouse                                                                 = false,
-            cooldown                                                                    = Wow.FromPanelProperty("AuraCooldown"),
-            reverse                                                                     = true,
+        AshBlzSkinAuraIconCooldown                                                      = {
+            cooldown                                                                    = Wow.FromPanelProperty("AuraCooldown")
         },
     },
 
