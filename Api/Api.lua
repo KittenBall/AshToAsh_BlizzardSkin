@@ -212,7 +212,7 @@ function AshBlzSkinApi.AuraTooltipEnable()
 end
 
 __Static__() __AutoCache__()
-function AshBlzSkinApi.AuraShowCountdownNumbers()
+function AshBlzSkinApi.AuraHideCountdownNumbers()
     return AshBlzSkinApi.OnConfigChanged():Map(function()
         return not DB().Appearance.Aura.ShowCountdownNumbers
     end)

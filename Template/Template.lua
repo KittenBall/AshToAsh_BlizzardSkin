@@ -128,24 +128,26 @@ class "AshBlzSkinAuraIconCooldown"(function()
 
     property "HideCountdownNumbers" {
         type        = Boolean,
-        handler     = function(self, hideCountdownNumbers)
+        default     = false,
+        set         = function(self, hideCountdownNumbers)
+            self:SetHideCountdownNumbers(hideCountdownNumbers)
             if OmniCC and OmniCC.Cooldown and OmniCC.Cooldown.SetNoCooldownCount then
                 OmniCC.Cooldown.SetNoCooldownCount(self, hideCountdownNumbers)
             end
         end
     }
 
-    function SetCooldown(...)
-        super.SetCooldown(...)
-        if OmniCC and OmniCC.Cooldown then
-            OmniCC.Cooldown.OnSetCooldown(...)
+    function SetCooldown(self, ...)
+        super.SetCooldown(self, ...)
+        if not self.HideCountdownNumbers and OmniCC and OmniCC.Cooldown then
+            OmniCC.Cooldown.OnSetCooldown(self, ...)
         end
     end
 
-    function OnSetCooldownDuration(...)
-        super.SetCooldown(...)
-        if OmniCC and OmniCC.Cooldown then
-            OmniCC.Cooldown.OnSetCooldownDuration(...)
+    function OnSetCooldownDuration(self, ...)
+        super.SetCooldown(self, ...)
+        if not self.HideCountdownNumbers and OmniCC and OmniCC.Cooldown then
+            OmniCC.Cooldown.OnSetCooldownDuration(self, ...)
         end
     end
 
@@ -544,7 +546,7 @@ TEMPLATE_SKIN_STYLE                                                             
 
     -- Cooldown
     [AshBlzSkinAuraIconCooldown]                                                        = {
-        hideCountdownNumbers                                                            = AshBlzSkinApi.AuraShowCountdownNumbers(),
+        hideCountdownNumbers                                                            = AshBlzSkinApi.AuraHideCountdownNumbers(),
         setAllPoints                                                                    = true,
         reverse                                                                         = true,
         enableMouse                                                                     = false
@@ -617,7 +619,9 @@ TEMPLATE_SKIN_STYLE                                                             
                 return "Interface\\RaidFrame\\Raid-Icon-Debuff"..dtype
             end),
             texCoords                                                                   = RectType(0.125, 0.875, 0.125, 0.875)
-        }
+        },
+
+        AshBlzSkinAuraIconCooldown                                                      = NIL
     },
 
     -- Enlarge debuff icon

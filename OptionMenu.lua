@@ -912,27 +912,3 @@ function ApplyDefaultTemplate()
     DB():Reset()
     ReloadUI()
 end
-
--------------------------------------------------
--- Config Panel
--------------------------------------------------
-
--- ConfigPanel                 = Dialog("AshToAsh_BlzSkinConfigDialog")
--- ConfigPanel:Hide()
-
-
-
--- Style[ConfigPanel]                                      = {
-    
---     size                                                = Size(640, 560),
-
---     Resizer                                             = {
---         visible                                         = false
---     },
-
---     Header                                              = {
---         text                                            = L["menu_title"]
---     },
-
-
--- }
