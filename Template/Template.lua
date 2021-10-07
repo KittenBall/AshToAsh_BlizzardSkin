@@ -153,7 +153,41 @@ end)
 
 -- Buff icon
 __Sealed__()
-class "AshBlzSkinBuffIcon" { AshBlzSkinAuraIcon }
+class "AshBlzSkinBuffIcon"(function()
+    inherit "AshBlzSkinAuraIcon"
+
+    local function OnMouseUp(self, button)
+        local parent            = self:GetParent()
+        if not parent then return end
+        if IsAltKeyDown() and button == "RightButton" then
+            local name, _, _, _, _, _, _, _, _, spellID = UnitAura(parent.Unit, self.AuraIndex, self.AuraFilter)
+
+            if name then
+                _AuraBlackList[spellID] = true
+                FireSystemEvent("ASHTOASH_CONFIG_CHANGED")
+
+                -- Force the refreshing
+                Next(Scorpio.FireSystemEvent, "UNIT_AURA", "any")
+            end
+        elseif IsControlKeyDown() and button == "LeftButton" and self.AuraFilter:match("HARMFUL") then
+            local name, _, _, _, _, _, _, _, _, spellID = UnitAura(parent.Unit, self.AuraIndex, self.AuraFilter)
+
+            if name then
+                _EnlargeDebuffList[spellID] = true
+                FireSystemEvent("ASHTOASH_CONFIG_CHANGED")
+
+                -- Force the refreshing
+                Next(Scorpio.FireSystemEvent, "UNIT_AURA", "any")
+            end
+        end
+    end
+
+    function __ctor(self)
+        super(self)
+        self.OnMouseUp = OnMouseUp
+    end
+
+end)
 
 -- Debuff icon
 __Sealed__()
