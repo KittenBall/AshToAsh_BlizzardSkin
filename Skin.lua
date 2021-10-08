@@ -97,7 +97,7 @@ function AshBlzSkinApi.HealthLabelSkin()
         if healthTextStyle == HealthTextStyle.HEALTH then
             SHARE_HEALTHLABEL_SKIN.text  = Wow.UnitHealthFrequent():Map(formatHealth)
         elseif healthTextStyle == HealthTextStyle.LOSTHEALTH then
-            SHARE_HEALTHLABEL_SKIN.text  = Wow.UnitHealthLostFrequent():Map(formatHealth):Map(function(health) return "-" .. health end)
+            SHARE_HEALTHLABEL_SKIN.text  = Wow.UnitHealthLostFrequent():Map(formatHealth):Map(function(health) return health and ("-" .. health) end)
         elseif healthTextStyle == HealthTextStyle.PERCENT then
             SHARE_HEALTHLABEL_SKIN.text  = Wow.UnitHealthPercentFrequent():Map(function(percent)
                 return percent > 0 and percent.."%" or nil
