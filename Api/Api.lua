@@ -89,7 +89,7 @@ end
 DispellDebuffTypes    = { Magic = true, Curse = true, Disease = true, Poison = true }
 DispellDebuffColor    = {}
 
--- Increase debuff color's Lightness
+-- Increase debuff color's lightness
 function GetDispellDebuffColor(dType)
     local color = DispellDebuffColor[dType]
     if not color then

@@ -458,7 +458,5 @@ _Parent.DefaultTemplate = {
             },
             ["Type"] = "Unit",
         }, -- [8]
-    },
-    ["AuraPriority"] = {
-    },
-} 
+    }
+}
