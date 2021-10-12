@@ -5,6 +5,7 @@ namespace "AshToAsh.Skin.Blizzard"
 import "Scorpio.Secure.UnitFrame"
 
 L = _Locale
+_Core = _M
 
 SKIN_NAME = "AshToAsh.BlizzardSkin"
 Style.RegisterSkin(SKIN_NAME)

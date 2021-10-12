@@ -86,3 +86,11 @@ L["template_apply_tips"] = "Click this option will reload ui.\n|cffff0000 Please
 L["template_default_apply"] = "Apply default template"
 L["template_default_apply_tips"] = "Click this option will apply the default template: 8 vertical party panels"
 L["template_default_apply_confirm"] = "Confirm apply default template ?"
+
+L["feared"] = "Feared"
+L["charmed"] = "Charmed"
+L["stunned"] = "Stunned"
+L["banished"] = "Banished"
+L["silenced"] = "Silenced"
+L["disoriented"] = "Disoriented"
+L["out_of_control"] = "Out of control"

@@ -89,3 +89,11 @@ L["template_apply_tips"] = "点击此选项选项将会重载界面。\n|cffff00
 L["template_default_apply"] = "应用默认模板"
 L["template_default_apply_tips"] = "点击将会应用默认模板：8个垂直排列的小队面板"
 L["template_default_apply_confirm"] = "确定应用默认模板？"
+
+L["feared"] = "被恐惧"
+L["charmed"] = "被魅惑"
+L["stunned"] = "昏迷"
+L["banished"] = "被放逐"
+L["silenced"] = "沉默"
+L["disoriented"] = "被迷惑"
+L["out_of_control"] = "失控"
