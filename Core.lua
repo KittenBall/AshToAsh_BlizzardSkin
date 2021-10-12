@@ -140,6 +140,8 @@ function OnLoad()
             DisplayAggroHighlight                                                                                           = true,
             -- 焦点高亮
             DisplayFocusHighlight                                                                                           = true,
+            -- 可驱散Debuff高亮
+            DisplayDispellableDebuffHighlight                                                                               = true,
             -- 生命条
             HealthBar                                                                                                       = {
                 -- 生命值文本

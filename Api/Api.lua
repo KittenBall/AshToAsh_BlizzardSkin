@@ -129,11 +129,11 @@ function UnitIsInDistance(unit)
 end
 
 -------------------------------------------------
--- Option
+-- Leader, Assistant, MasterLooter etc
 -------------------------------------------------
 
 __Static__() __AutoCache__()
-function AshBlzSkinApi.IsMasterLooter()
+function AshBlzSkinApi.UnitIsMasterLooter()
     return Wow.FromUnitEvent(Wow.FromEvent("GROUP_ROSTER_UPDATER"):Map("=>'any'")):Next():Map(function(unit)
         if UnitExists(unit) then
             local raidIndex = UnitInRaid(unit)
@@ -143,6 +143,31 @@ function AshBlzSkinApi.IsMasterLooter()
             end
         end
         return false
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.UnitIsLeaderOrAssistant()
+    return Wow.FromUnitEvent(Wow.FromEvent("GROUP_ROSTER_UPDATER", "PARTY_LEADER_CHANGED"):Map("=>'any'")):Next():Map(function(unit)
+        if UnitExists(unit) then
+            local raidIndex = UnitInRaid(unit)
+            if raidIndex then
+                local name, rank, subgroup, level, class, fileName, zone, online, isDead, role, loot = GetRaidRosterInfo(raidIndex)
+                return (rank and rank > 0) and rank or false
+            end
+        end
+        return false
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.UnitIsLeaderOrAssistantIcon()
+    return AshBlzSkinApi.UnitIsLeaderOrAssistant():Map(function(rank)
+        if rank == 2 then
+            return "Interface\\GroupFrame\\UI-Group-LeaderIcon"
+        elseif rank == 1 then
+            return "Interface\\GroupFrame\\UI-Group-AssistantIcon"
+        end
     end)
 end
 
@@ -215,5 +240,12 @@ __Static__() __AutoCache__()
 function AshBlzSkinApi.AuraHideCountdownNumbers()
     return AshBlzSkinApi.OnConfigChanged():Map(function()
         return not DB().Appearance.Aura.ShowCountdownNumbers
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.DisplayDispellableDebuffHighlight()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
+        return DB().Appearance.DisplayDispellableDebuffHighlight
     end)
 end

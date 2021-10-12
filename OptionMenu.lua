@@ -706,6 +706,21 @@ local function GetAppearanceMenu()
                 end
             }
         },
+        -- 可驱散Debuff高亮
+        {
+            text                                                                                                            = L["show_dispellable_debuff_indicator"],
+            tiptitle                                                                                                        = L["tips"],
+            tiptext                                                                                                         = L["show_dispellable_debuff_indicator_tips"],
+            check                                                                                                           = {
+                get                                                                                                         = function()
+                    return DB().Appearance.DisplayDispellableDebuffHighlight and true or false
+                end,
+                set                                                                                                         = function(value)
+                    DB().Appearance.DisplayDispellableDebuffHighlight = value
+                    SendConfigChanged()
+                end
+            }
+        },
         -- 显示面板标签
         {
             text                                                                                                            = L["show_panel_label"],

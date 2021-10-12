@@ -9,9 +9,9 @@ local function OnMaskStopMoving(self)
     local parent = self:GetParent()
     if parent then
         -- 非主动移动，恢复原位置
-        if parent.AshToAshBlzSKinLocation then
-            CharSV().Panels[parent.Index].Style.location = parent.AshToAshBlzSKinLocation
-            Style[parent].location = parent.AshToAshBlzSKinLocation
+        if parent.AshToAshBlzSkinLocation then
+            CharSV().Panels[parent.Index].Style.location = parent.AshToAshBlzSkinLocation
+            Style[parent].location = parent.AshToAshBlzSkinLocation
         end
 
         if parent:GetNumPoints() > 1 then return end
@@ -47,7 +47,7 @@ end
 local function OnMaskShow(self)
     local parent = self:GetParent()
     if parent then
-        parent.AshToAshBlzSKinLocation = nil
+        parent.AshToAshBlzSkinLocation = nil
     end
     OnMaskStopMoving(self)
 end
@@ -61,11 +61,11 @@ end
 
 local function PanelStartMoving(self)
     if IsAltKeyDown() then
-        self.AshToAshBlzSKinLocation = nil
+        self.AshToAshBlzSkinLocation = nil
         self:AshToAshBlzSkinOStartMoving()
     else
         -- 保存原来的位置，因为即使不移动，仍然会触发OnStopMoving
-        self.AshToAshBlzSKinLocation = CharSV().Panels[self.Index].Style.location
+        self.AshToAshBlzSkinLocation = CharSV().Panels[self.Index].Style.location
         self.AshToAhBlzSkinMoving = false
     end
 end

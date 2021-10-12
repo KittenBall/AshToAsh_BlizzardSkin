@@ -461,17 +461,76 @@ end
 
 MASTER_LOOTER_SKIN                                                                          = {
     location                                                                                = {
-        Anchor("LEFT", 0, 0, nil, "TOPLEFT")
+        Anchor("RIGHT", -1, 0, "RaidRosterIcon", "LEFT")
     },
     size                                                                                    = Size(12, 12),
     file                                                                                    = "Interface\\GroupFrame\\UI-Group-MasterLooter",
-    visible                                                                                 = AshBlzSkinApi.IsMasterLooter()
+    visible                                                                                 = AshBlzSkinApi.UnitIsMasterLooter()
 }
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.MasterLooterSkin()
     return Observable.Just(not Scorpio.IsRetail):Map(function(display)
         if display then return MASTER_LOOTER_SKIN end
+    end)
+end
+
+-------------------------------------------------
+-- Dispellable debuff
+-------------------------------------------------
+
+DISPELLABLE_DEBUFF_SKIN                                                                     = {
+    drawLayer                                                                               = "BORDER",
+    subLevel                                                                                = 2,
+    location                                                                                = {
+        Anchor("TOPLEFT", 0, 0, "$parent.statusBarTexture", "TOPLEFT"), 
+        Anchor("BOTTOMRIGHT", 0, 0, "$parent.statusBarTexture", "BOTTOMRIGHT")
+    },
+    ignoreParentAlpha                                                                       = true,
+    file                                                                                    = AshBlzSkinApi.HealthBarTexture(),
+    vertexColor                                                                             = AshBlzSkinApi.UnitDebuffCanDispellColor(),
+    visible                                                                                 = AshBlzSkinApi.UnitDebuffCanDispell(),
+
+    AnimationGroup                                                                          = {
+        playing                                                                             = AshBlzSkinApi.UnitDebuffCanDispell(),
+        looping                                                                             = "REPEAT",
+
+        Alpha1                                                                              = {
+            smoothing                                                                       = "OUT",
+            order                                                                           = 1,
+            duration                                                                        = 0.5,
+            fromAlpha                                                                       = 0,
+            toAlpha                                                                         = 1
+        },
+        Alpha2                                                                              = {
+            smoothing                                                                       = "IN",
+            order                                                                           = 2,
+            duration                                                                        = 0.5,
+            fromAlpha                                                                       = 1,
+            toAlpha                                                                         = 0
+        }
+    }
+}
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.DispellableDebuffSkin()
+    return AshBlzSkinApi.DisplayDispellableDebuffHighlight():Map(function(display)
+        return display and DISPELLABLE_DEBUFF_SKIN or nil
+    end)
+end
+
+-------------------------------------------------
+-- Dispellable debuff pixel glow
+-------------------------------------------------
+
+PIXELGLOW_SKIN                                                                              = {
+    visible                                                                                 = AshBlzSkinApi.UnitDebuffCanDispell()
+}
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.DispellableDebuffPixelGlowSkin()
+    return AshBlzSkinApi.DisplayDispellableDebuffHighlight():Map(function(display)
+        return display and PIXELGLOW_SKIN or nil
     end)
 end
 
@@ -587,38 +646,7 @@ SHARE_HEALTHBAR_SKIN                                                            
     end),
 
     -- 拥有驱散debuff的能力
-    IconTexture                                                                             = {
-        drawLayer                                                                           = "BORDER",
-        subLevel                                                                            = 2,
-        location                                                                            = {
-            Anchor("TOPLEFT", 0, 0, "$parent.statusBarTexture", "TOPLEFT"), 
-            Anchor("BOTTOMRIGHT", 0, 0, "$parent.statusBarTexture", "BOTTOMRIGHT")
-        },
-        ignoreParentAlpha                                                                   = true,
-        file                                                                                = AshBlzSkinApi.HealthBarTexture(),
-        vertexColor                                                                         = AshBlzSkinApi.UnitDebuffCanDispellColor(),
-        visible                                                                             = AshBlzSkinApi.UnitDebuffCanDispell(),
-
-        AnimationGroup                                                                      = {
-            playing                                                                         = AshBlzSkinApi.UnitDebuffCanDispell(),
-            looping                                                                         = "REPEAT",
-
-            Alpha1                                                                          = {
-                smoothing                                                                   = "OUT",
-                order                                                                       = 1,
-                duration                                                                    = 0.5,
-                fromAlpha                                                                   = 0,
-                toAlpha                                                                     = 1
-            },
-            Alpha2                                                                          = {
-                smoothing                                                                   = "IN",
-                order                                                                       = 2,
-                duration                                                                    = 0.5,
-                fromAlpha                                                                   = 1,
-                toAlpha                                                                     = 0
-            }
-        }
-    }
+    IconTexture                                                                             = AshBlzSkinApi.DispellableDebuffSkin()
 }
 
 -------------------------------------------------
@@ -651,9 +679,7 @@ SKIN_STYLE =                                                                    
         alpha                                                                               = AshBlzSkinApi.UnitInRange():Map('v=>v and 1 or 0.55'),
 
         -- 可驱散debuff高亮
-        PixelGlow                                                                           = {
-            visible                                                                         = AshBlzSkinApi.UnitDebuffCanDispell()
-        },
+        PixelGlow                                                                           = AshBlzSkinApi.DispellableDebuffPixelGlowSkin(),
 
         BackgroundTexture                                                                   = {
             file                                                                            = AshBlzSkinApi.UnitFrameBackground(),
@@ -716,17 +742,15 @@ SKIN_STYLE =                                                                    
             location                                                                        = {
                 Anchor("TOPRIGHT", -3, -2)
             },
-            file                                                                            = Wow.UnitIsLeader():Map(function(isLeader)
-                return isLeader and [[Interface\GroupFrame\UI-Group-LeaderIcon]] or nil
-            end),
+            file                                                                            = AshBlzSkinApi.UnitIsLeaderOrAssistantIcon(),
             visible                                                                         = true,
             drawLayer                                                                       = "ARTWORK",
             subLevel                                                                        = 2,
-            size                                                                            = Wow.UnitIsLeader():Map(function(isLeader)
+            size                                                                            = AshBlzSkinApi.UnitIsLeaderOrAssistant():Map(function(isLeader)
                 if isLeader then
                     shareSize.width, shareSize.height = 12, 12
                 else
-                    shareSize.width, shareSize.height = 1, 1
+                    shareSize.width, shareSize.height = 1, 12
                 end
                 return shareSize
             end)
@@ -739,8 +763,18 @@ SKIN_STYLE =                                                                    
             },
             drawLayer                                                                       = "ARTWORK",
             subLevel                                                                        = 2,
-            size                                                                            = Size(10, 10),
+            size                                                                            = Wow.UnitGroupRoster():Map(function(assign)
+                if not assign or assign == "NONE" then
+                    shareSize.width, shareSize.height = 1, 12
+                else
+                    shareSize.width, shareSize.height = 12, 12
+                end
+                return shareSize
+            end),
         },
+        
+        -- 团队拾取者
+        AshBlzSkinMasterLooterIcon                                                          = AshBlzSkinApi.MasterLooterSkin(),
 
         -- 标记图标
         RaidTargetIcon                                                                      = SHARE_RAIDTARGET_SKIN,
@@ -767,9 +801,6 @@ SKIN_STYLE =                                                                    
             visible                                                                         = AshBlzSkinApi.UnitCenterStatusIconVisible(),
             unit                                                                            = Wow.Unit()
         },
-
-        -- 团队拾取者
-        AshBlzSkinMasterLooterIcon                                                          = AshBlzSkinApi.MasterLooterSkin(),
 
         -- 血条
         PredictionHealthBar                                                                 = {
