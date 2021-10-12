@@ -44,6 +44,10 @@ class "MasterLooterIcon" { Texture }
 __Sealed__() __ChildProperty__(AshGroupPetPanel, "AshBlzSkinPanelLabel")
 class "PetPanelLabel" { FontString }
 
+-- 失控
+__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinLossOfControlIndicator")
+class "LossOfControlIndicator" { Frame }
+
 -- 解锁按钮
 __Sealed__() __ChildProperty__(AshGroupPanel, "AshBlzSkinUnlockButton")
 class "UnlockButton"(function()

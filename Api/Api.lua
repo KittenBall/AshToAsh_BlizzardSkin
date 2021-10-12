@@ -172,6 +172,26 @@ function AshBlzSkinApi.UnitIsLeaderOrAssistantIcon()
 end
 
 -------------------------------------------------
+-- Loss of control
+-------------------------------------------------
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.UnitLossOfControlLabel()
+    return Wow.UnitAura():Map(function(unit)
+        local displayText
+        local index = 1
+        while not displayText do
+            local name, icon, count, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId = UnitDebuff(unit, index)
+            if not name then break end
+            displayText = _Core.AuraList.LossOfControlList[spellId]
+            index = index + 1
+        end
+
+        return displayText
+    end)
+end
+
+-------------------------------------------------
 -- Option
 -------------------------------------------------
 

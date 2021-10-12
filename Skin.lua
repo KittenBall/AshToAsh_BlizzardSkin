@@ -463,7 +463,7 @@ MASTER_LOOTER_SKIN                                                              
     location                                                                                = {
         Anchor("RIGHT", -1, 0, "RaidRosterIcon", "LEFT")
     },
-    size                                                                                    = Size(12, 12),
+    size                                                                                    = Size(10, 10),
     file                                                                                    = "Interface\\GroupFrame\\UI-Group-MasterLooter",
     visible                                                                                 = AshBlzSkinApi.UnitIsMasterLooter()
 }
@@ -748,9 +748,9 @@ SKIN_STYLE =                                                                    
             subLevel                                                                        = 2,
             size                                                                            = AshBlzSkinApi.UnitIsLeaderOrAssistant():Map(function(isLeader)
                 if isLeader then
-                    shareSize.width, shareSize.height = 12, 12
+                    shareSize.width, shareSize.height = 10, 10
                 else
-                    shareSize.width, shareSize.height = 1, 12
+                    shareSize.width, shareSize.height = 1, 10
                 end
                 return shareSize
             end)
@@ -765,9 +765,9 @@ SKIN_STYLE =                                                                    
             subLevel                                                                        = 2,
             size                                                                            = Wow.UnitGroupRoster():Map(function(assign)
                 if not assign or assign == "NONE" then
-                    shareSize.width, shareSize.height = 1, 12
+                    shareSize.width, shareSize.height = 1, 10
                 else
-                    shareSize.width, shareSize.height = 12, 12
+                    shareSize.width, shareSize.height = 10, 10
                 end
                 return shareSize
             end),
@@ -814,6 +814,32 @@ SKIN_STYLE =                                                                    
 
         -- 施法条
         AshBlzSkinCastBar                                                                   = AshBlzSkinApi.CastBarSkin(),
+
+        -- 失控指示器
+        AshBlzSkinLossOfControlIndicator                                                    = {
+            enableMouse                                                                     = false,
+            setAllPoints                                                                    = true,
+            topLevel                                                                        = true,
+            visible                                                                         = AshBlzSkinApi.UnitLossOfControlLabel():Map(function(value) return value and true or false end),
+
+            Label                                                                           = {
+                location                                                                    = {
+                    Anchor("TOPLEFT", 0, 0, "$parent.$parent.PredictionHealthBar", "TOPLEFT"),
+                    Anchor("BOTTOMRIGHT", 0, 0, "$parent.$parent.PredictionHealthBar", "BOTTOMRIGHT")
+                },
+                text                                                                        = AshBlzSkinApi.UnitLossOfControlLabel(),
+                font                                                                        = {
+                    font                                                                    = STANDARD_TEXT_FONT,
+                    height                                                                  = 18,
+                    outline                                                                 = "NORMAL"
+                },
+                textColor                                                                   = Color.WHITE,
+                justifyH                                                                    = "CENTER",
+                justifyV                                                                    = "MIDDLE",
+                drawLayer                                                                   = "OVERLAY",
+                subLevel                                                                    = 7,
+            }
+        },
 
         -- Buff
         AshBlzSkinBuffPanel                                                                 = AshBlzSkinApi.BuffPanelSkin(),

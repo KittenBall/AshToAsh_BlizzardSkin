@@ -184,11 +184,12 @@ __SystemEvent__()
 function ASHTOASH_OPEN_MENU(panel, menu)
     local originMargin = getPanelAutoAttachMargin(panel)
     if originMargin then
-        tinsert(menu, {
-            text        = L["adjust_auto_attach_margin"]:format(panel.Index),
-            tiptitle    = L["tips"],
-            tiptext     = L["adjust_auto_attach_margin_tips"],
-            click       = function()
+        tinsert(menu, 
+        {
+            text                        = L["adjust_auto_attach_margin"]:format(panel.Index),
+            tiptitle                    = L["tips"],
+            tiptext                     = L["adjust_auto_attach_margin_tips"],
+            click                       = function()
                 if originMargin then
                     local text = Input(L["adjust_auto_attach_margin_input_title"])
                     local margin = tonumber(text) or originMargin
@@ -197,4 +198,53 @@ function ASHTOASH_OPEN_MENU(panel, menu)
             end
         })
     end
+
+    tinsert(menu,
+        -- 调整所有元素宽高
+        {
+            text                        = L["adjust_all_elements"],
+            tiptitle                    = L["tips"],
+            tiptext                     = L["adjust_all_elements_tips"],
+            submenu                     = {
+                {
+                    text                = L["adjust_all_elements_width"],
+                    click               = function()
+                        local value     = PickRange(L["adjust_all_elements_width"], 10, 200, 2, CharSV().Panels[panel.Index].Style.elementWidth)
+                        if value then
+                            local type = CharSV().Panels[panel.Index].Type
+                            
+                            for i, spanel in ipairs(CharSV().Panels) do
+                                if spanel.Type == type then
+                                    local upanel = CURRENT_UNIT_PANELS[i]
+                                    if upanel then
+                                        spanel.Style.elementWidth = value
+                                        Style[upanel].elementWidth = value
+                                    end
+                                end
+                            end
+                        end
+                    end
+                },
+                {
+                    text                = L["adjust_all_elements_height"],
+                    click               = function()
+                        local value     = PickRange(L["adjust_all_elements_height"], 10, 200, 2, CharSV().Panels[panel.Index].Style.elementHeight)
+
+                        if value then
+                            local type = CharSV().Panels[panel.Index].Type
+
+                            for i, spanel in ipairs(CharSV().Panels) do
+                                if spanel.Type == type then
+                                    local upanel = CURRENT_UNIT_PANELS[i]
+                                    if upanel then
+                                        spanel.Style.elementHeight = value
+                                        Style[upanel].elementHeight = value
+                                    end
+                                end
+                            end
+                        end
+                    end
+                }
+            }
+        })
 end

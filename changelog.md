@@ -1,9 +1,6 @@
 ## 1.7.0
--- todo
-- 添加保持面板最大尺寸开关
-- 简化面板设置
-- 生命值、能量值方向垂直/水平配置
-- 添加失控指示器
+- You can adjust all panels element size now
+- Add Loss of control indicator, add more spell id will be added in future versions
 
 ## 1.6.7
 - Add dispelladble debuff highlight option
