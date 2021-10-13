@@ -806,27 +806,12 @@ SKIN_STYLE =                                                                    
 
         -- 失控指示器
         AshBlzSkinLossOfControlIndicator                                                    = {
-            enableMouse                                                                     = false,
             setAllPoints                                                                    = true,
-            topLevel                                                                        = true,
-            visible                                                                         = AshBlzSkinApi.UnitLossOfControlLabel():Map(function(value) return value and true or false end),
 
-            Label                                                                           = {
+            LossOfControlText                                                               = {
                 location                                                                    = {
-                    Anchor("TOPLEFT", 0, 0, "$parent.$parent.PredictionHealthBar", "TOPLEFT"),
-                    Anchor("BOTTOMRIGHT", 0, 0, "$parent.$parent.PredictionHealthBar", "BOTTOMRIGHT")
-                },
-                text                                                                        = AshBlzSkinApi.UnitLossOfControlLabel(),
-                font                                                                        = {
-                    font                                                                    = STANDARD_TEXT_FONT,
-                    height                                                                  = 18,
-                    outline                                                                 = "NORMAL"
-                },
-                textColor                                                                   = Color.WHITE,
-                justifyH                                                                    = "CENTER",
-                justifyV                                                                    = "MIDDLE",
-                drawLayer                                                                   = "OVERLAY",
-                subLevel                                                                    = 7,
+                    Anchor("BOTTOM", 0, 1, "$parent.$parent.PredictionHealthBar", "BOTTOM")
+                }
             }
         },
 

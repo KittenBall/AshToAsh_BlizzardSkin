@@ -44,9 +44,78 @@ class "MasterLooterIcon" { Texture }
 __Sealed__() __ChildProperty__(AshGroupPetPanel, "AshBlzSkinPanelLabel")
 class "PetPanelLabel" { FontString }
 
+-- 支持OmniCC的Cooldown
+__Sealed__() __ChildProperty__(Frame, "OmniCCCooldown")
+class "OmniCCCooldown"(function()
+    inherit "Cooldown"
+
+    property "HideCountdownNumbers" {
+        type        = Boolean,
+        default     = false,
+        set         = function(self, hideCountdownNumbers)
+            self:SetHideCountdownNumbers(hideCountdownNumbers)
+            if OmniCC and OmniCC.Cooldown and OmniCC.Cooldown.SetNoCooldownCount then
+                OmniCC.Cooldown.SetNoCooldownCount(self, hideCountdownNumbers)
+            end
+        end
+    }
+
+    function SetCooldown(self, ...)
+        super.SetCooldown(self, ...)
+        if not self.HideCountdownNumbers and OmniCC and OmniCC.Cooldown then
+            OmniCC.Cooldown.OnSetCooldown(self, ...)
+        end
+    end
+
+    function OnSetCooldownDuration(self, ...)
+        super.SetCooldown(self, ...)
+        if not self.HideCountdownNumbers and OmniCC and OmniCC.Cooldown then
+            OmniCC.Cooldown.OnSetCooldownDuration(self, ...)
+        end
+    end
+
+end)
+
+__Sealed__() struct "LossOfControlData"   {
+    { name = "lossOfControlText",   type = NEString },
+    { name = "name",                type = NEString },
+    { name = "icon",                type = Number   },
+    { name = "duration",            type = Number   },
+    { name = "expirationTime",      type = Number   }
+}
+
 -- 失控
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinLossOfControlIndicator")
-class "LossOfControlIndicator" { Frame }
+class "LossOfControlIndicator"(function()
+    inherit "Frame"
+
+    property "LossOfControlData" {
+        type                 = LossOfControlData,
+        set                  = function(self, data)
+            if data then
+                local lossOfControlText = self:GetChild("LossOfControlText")
+                lossOfControlText:SetText(data.lossOfControlText)
+                
+                local cooldown = self:GetChild("Cooldown")
+                cooldown:SetCooldown(data.expirationTime - data.duration, data.duration)
+
+                self:Show()
+            else
+                self:Hide()
+            end
+        end
+    }
+
+    __Template__{
+        LossOfControlText    = FontString,
+        Icon                 = Texture,
+        Cooldown             = OmniCCCooldown
+    }
+    function __ctor(self)
+        self:Hide()
+    end
+
+end)
 
 -- 解锁按钮
 __Sealed__() __ChildProperty__(AshGroupPanel, "AshBlzSkinUnlockButton")
@@ -123,38 +192,6 @@ __Sealed__() class "AshBlzSkinAuraIcon"(function(_ENV)
         self.OnLeave            = self.OnLeave + OnLeave
         self.OnUpdate           = self.OnUpdate + OnUpdate
     end
-end)
-
--- 支持OmniCC的Cooldown
-__Sealed__() __ChildProperty__(AshBlzSkinAuraIcon, "AshBlzSkinAuraIconCooldown")
-class "AshBlzSkinAuraIconCooldown"(function()
-    inherit "Cooldown"
-
-    property "HideCountdownNumbers" {
-        type        = Boolean,
-        default     = false,
-        set         = function(self, hideCountdownNumbers)
-            self:SetHideCountdownNumbers(hideCountdownNumbers)
-            if OmniCC and OmniCC.Cooldown and OmniCC.Cooldown.SetNoCooldownCount then
-                OmniCC.Cooldown.SetNoCooldownCount(self, hideCountdownNumbers)
-            end
-        end
-    }
-
-    function SetCooldown(self, ...)
-        super.SetCooldown(self, ...)
-        if not self.HideCountdownNumbers and OmniCC and OmniCC.Cooldown then
-            OmniCC.Cooldown.OnSetCooldown(self, ...)
-        end
-    end
-
-    function OnSetCooldownDuration(self, ...)
-        super.SetCooldown(self, ...)
-        if not self.HideCountdownNumbers and OmniCC and OmniCC.Cooldown then
-            OmniCC.Cooldown.OnSetCooldownDuration(self, ...)
-        end
-    end
-
 end)
 
 -- Buff icon
@@ -549,7 +586,7 @@ TEMPLATE_SKIN_STYLE                                                             
     },
 
     -- Cooldown
-    [AshBlzSkinAuraIconCooldown]                                                        = {
+    [OmniCCCooldown]                                                                    = {
         hideCountdownNumbers                                                            = AshBlzSkinApi.AuraHideCountdownNumbers(),
         setAllPoints                                                                    = true,
         reverse                                                                         = true,
@@ -586,7 +623,9 @@ TEMPLATE_SKIN_STYLE                                                             
             end),
         },
 
-        AshBlzSkinAuraIconCooldown                                                      = {
+        Cooldown                                                                        = NIL,
+
+        OmniCCCooldown                                                                  = {
             cooldown                                                                    = Wow.FromPanelProperty("AuraCooldown")
         },
     },
@@ -625,7 +664,7 @@ TEMPLATE_SKIN_STYLE                                                             
             texCoords                                                                   = RectType(0.125, 0.875, 0.125, 0.875)
         },
 
-        AshBlzSkinAuraIconCooldown                                                      = NIL
+        OmniCCCooldown                                                                  = NIL
     },
 
     -- Enlarge debuff icon
@@ -640,6 +679,52 @@ TEMPLATE_SKIN_STYLE                                                             
     [AshBlzSkinClassBuffIcon]                                                           = {
         alpha                                                                           = NIL,
         enableMouse                                                                     = false
+    },
+
+    -- Loss of control
+    [LossOfControlIndicator]                                                            = {
+        LossOfControlData                                                               = AshBlzSkinApi.UnitLossOfControl(),
+        enableMouse                                                                     = false,
+        topLevel                                                                        = true,
+
+        LossOfControlText                                                               = {
+            drawLayer                                                                   = "OVERLAY",
+            subLevel                                                                    = 7,
+            fontObject                                                                  = GameFontRed
+        },
+
+        Cooldown                                                                        = {
+            hideCountdownNumbers                                                        = false,
+            edgeTexture                                                                 = NIL,
+            swipeTexture                                                                = NIL,
+            blingTexture                                                                = NIL,
+            drawSwipe                                                                   = false,
+            drawEdge                                                                    = false,
+            size                                                                        = Size(22, 22),
+            location                                                                    = {
+                Anchor("LEFT", -2, 0, "LossOfControlText", "RIGHT"),
+            }
+        },
+
+        AnimationGroup                                                                  = {
+            playing                                                                     = true,
+            looping                                                                     = "REPEAT",
+    
+            Alpha1                                                                      = {
+                smoothing                                                               = "OUT",
+                order                                                                   = 1,
+                duration                                                                = 0.3,
+                fromAlpha                                                               = 0,
+                toAlpha                                                                 = 1
+            },
+            Alpha2                                                                      = {
+                smoothing                                                               = "IN",
+                order                                                                   = 2,
+                duration                                                                = 0.3,
+                fromAlpha                                                               = 1,
+                toAlpha                                                                 = 0
+            }
+        }
     }
 }
 

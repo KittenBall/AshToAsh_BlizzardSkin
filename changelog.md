@@ -1,3 +1,6 @@
+## 1.7.1
+- Add more loss of control spell id 
+
 ## 1.7.0
 - You can adjust all panels element size now
 - Add Loss of control indicator, add more spell id will be added in future versions

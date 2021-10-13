@@ -100,7 +100,7 @@ _Core.AuraList.LossOfControlList                                    = {
     -- 牧师
     [605]                                                           = L["mind_controlled"], -- 精神控制
     [64044]                                                         = L["stunned"],         -- 心灵惊骇
-    [8122]                                                          = L["disoriented"],     -- 心灵尖啸
+    [8122]                                                          = L["feared"],          -- 心灵尖啸
     [87204]                                                         = L["feared"],          -- 罪与罚
     [15487]                                                         = L["silenced"],        -- 沉默
     [64058]                                                         = L["disarmed"],        -- 心灵惊骇
@@ -114,7 +114,7 @@ _Core.AuraList.LossOfControlList                                    = {
     [1833]                                                          = L["stunned"],         -- 偷袭
     [1776]                                                          = L["incapacitated"],   -- 凿击
     [408]                                                           = L["stunned"],         -- 肾击
-    [6770]                                                          = L["incapacitated"],   -- 闷棍
+    [6770]                                                          = L["sapped"],          -- 闷棍
     [196958]                                                        = L["stunned"],         -- 暗中出击
     [1330]                                                          = L["silenced"],        -- 锁喉-沉默
     [280322]                                                        = L["silenced"],        -- 锁喉-沉默
@@ -147,6 +147,45 @@ _Core.AuraList.LossOfControlList                                    = {
     [5782]                                                          = L["feared"],          -- 恐惧
     [130616]                                                        = L["feared"],          -- 恐惧
     [5484]                                                          = L["feared"],          -- 恐惧嚎叫
+    [22703]                                                         = L["stunned"],         -- 地狱火觉醒
+    [6789]                                                          = L["incapacitated"],   -- 死亡缠绕
+    [30283]                                                         = L["stunned"],         -- 暗影之怒
+    [43523]                                                         = L["silenced"],        -- 痛苦无常
+	[65813]                                                         = L["silenced"],		-- 痛苦无常
+	[196364]                                                        = L["silenced"],		-- 痛苦无常
+	[285155]                                                        = L["silenced"],		-- 痛苦无常
+    [32752]                                                         = L["stunned"],         -- 召唤眩晕
+    [89766]                                                         = L["stunned"],         -- 巨斧投掷
+    [115268]                                                        = L["disoriented"],     -- 迷魅
+    [6358]                                                          = L["disoriented"],     -- 诱惑
+    [171017]                                                        = L["stunned"],         -- 流星打击
+    [171018]                                                        = L["stunned"],         -- 流星打击
+    [213688]                                                        = L["stunned"],         -- 邪能顺劈
+    
+    -- 战士
+    [5246]                                                          = L["disoriented"],     -- 破胆怒吼
+    [132168]                                                        = L["stunned"],         -- 震荡波
+    [107570]                                                        = L["stunned"],         -- 风暴之锤
+    [132169]                                                        = L["stunned"],         -- 风暴之锤
+    [46968]                                                         = L["stunned"],         -- 震荡波
+    [199085]                                                        = L["stunned"],         -- 战路
+
+    -- 盟约技能
+    [331866]                                                        = L["disoriented"],     -- 混沌代理人
+    [314416]                                                        = L["disoriented"],     -- 盲目信仰
+    [323557]                                                        = L["stunned"],         -- 饕餮狂乱
+    [335432]                                                        = L["stunned"],         -- 心能渴望
+    [317589]                                                        = L["silenced"],        -- 折磨反冲
+    [326062]                                                        = L["stunned"],         -- 上古余震
+	[325886]                                                        = L["stunned"],		    -- 上古余震
+	[326083]                                                        = L["stunned"],		    -- 上古余震
+    [296035]                                                        = L["stunned"],         -- 唤引武装
+    [324263]                                                        = L["feared"],          -- 硫磺喷发
+    [347684]                                                        = L["feared"],          -- 硫磺喷发
+    [332423]                                                        = L["stunned"],         -- 闪亮的流波之球核心
+    [325321]                                                        = L["stunned"],         -- 荒猎冲锋
+
+
 
     -- 统御圣所
 
