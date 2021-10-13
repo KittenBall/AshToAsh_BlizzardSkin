@@ -6,62 +6,51 @@ POWERBAR_HEIGHT     = 9
 local shareColor    = ColorType(0, 0, 0, 1)
 local shareSize     = Size(1, 1)
 
-local function resizeOnUnitFrameChanged(size)
-    return Wow.FromFrameSize(UnitFrame):Map(function(w, h)
-        local componentScale = min(w / 72, h / 36)
-        return (size or 10) * componentScale
-    end)
-end
-
-local function resizeUnitFrameIconOnSizeChanged(size)
-    return Wow.FromFrameSize(UnitFrame):Map(function(w, h)
-        local componentScale = min(w / 72, h / 36)
-        shareSize.width = (size or 15) * componentScale
-        shareSize.height = (size or 15) * componentScale
-        return shareSize
-    end)
-end
-
-local shareAnchor1 = Anchor("TOP")
-local shareAnchor2 = Anchor("TOP")
-local shareLocation = {}
-
-local function getAnchor(anchor, point, x, y, relativeTo, relativePoint)
-    anchor.point            = point
-    anchor.x                = x
-    anchor.y                = y
-    anchor.relativeTo       = relativeTo
-    anchor.relativePoint    = relativePoint
-    return anchor
-end
-
-local function getLocation(...)
-    wipe(shareLocation)
-    for i = 1, select("#", ...) do
-        shareLocation[i] = select(i, ...)
-    end
-    return shareLocation
-end
-
-local relocationUnitFrameIconOnSizeChanged = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
-    return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, h/3-4))
-end)
-
 local function getDynamicFontHeight(frameHeight, fontSize, minScale, maxScale)
     local scale = frameHeight / 48
     local minHeight = fontSize * (minScale or 1)
     local maxHeight = fontSize * (maxScale or 1)
+
     if minHeight > maxHeight then
         minHeight = maxHeight
     end
+
     fontSize = fontSize * scale
+
     if fontSize > maxHeight then
         fontSize = maxHeight
     elseif fontSize < minHeight then
         fontSize = minHeight
     end
-
     return fontSize
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.OnUnitFrameSizeChanged()
+    return Wow.FromFrameSize(UnitFrame)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.RelocationUnitFrameBottomIcon()
+    return AshBlzSkinApi.OnUnitFrameSizeChanged():Map(function(w, h)
+        return { Anchor("BOTTOM", 0, h/3-4) }
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.ResizeUnitFrameIcon(size)
+    return AshBlzSkinApi.OnUnitFrameSizeChanged():Map(function(w, h)
+        local componentScale = min(w / 72, h / 36)
+        return Size((size or 15) * componentScale, (size or 15) * componentScale)
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.ResizeOnUnitFrameChanged(size)
+    return AshBlzSkinApi.OnUnitFrameSizeChanged():Map(function(w, h)
+        local componentScale = min(w / 72, h / 36)
+        return (size or 10) * componentScale
+    end)
 end
 
 -------------------------------------------------
@@ -146,16 +135,16 @@ GROUP_PANEL_LABEL_SKIN                                                          
     visible                                                                                  = AshBlzSkinApi.UnitPanelLabelVisible(),
     location                                                                                 = AshBlzSkinApi.UnitPanelOrientation():Map(function(orientation)
         if orientation == Orientation.HORIZONTAL then
-            return getLocation(getAnchor(shareAnchor1, "RIGHT", 0, 0, nil, "LEFT"))
+            return { Anchor("RIGHT", 0, 0, nil, "LEFT") }
         else
-            return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, 1, nil, "TOP"))
+            return { Anchor("BOTTOM", 0, 1, nil, "TOP") }
         end
     end),
 }
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.PanelLableSkin()
-    return Wow.FromEvent("AshToAsh_Blizzard_Skin_Config_Changed", "ASHTOASH_CONFIG_CHANGED"):Map(function()
+    return Wow.FromEvent("ASHTOASH_BLIZZARD_SKIN_CONFIG_CHANGED", "ASHTOASH_CONFIG_CHANGED"):Map(function()
         return DB().Appearance.DisplayPanelLabel and GROUP_PANEL_LABEL_SKIN or nil
     end)
 end
@@ -174,16 +163,16 @@ GROUP_PET_PANEL_LABEL_SKIN                                                      
     visible                                                                                 = AshBlzSkinApi.UnitPetPanelLabelVisible(),
     location                                                                                = AshBlzSkinApi.UnitPetPanelOrientation():Map(function(orientation)
         if orientation == Orientation.HORIZONTAL then
-            return getLocation(getAnchor(shareAnchor1, "RIGHT", 0, 0, nil, "LEFT"))
+            return { Anchor("RIGHT", 0, 0, nil, "LEFT") }
         else
-            return getLocation(getAnchor(shareAnchor1, "BOTTOM", 0, 1, nil, "TOP"))
+            return { Anchor("BOTTOM", 0, 1, nil, "TOP") }
         end
     end),
 }
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.PetPanelLableSkin()
-    return Wow.FromEvent("AshToAsh_Blizzard_Skin_Config_Changed", "ASHTOASH_CONFIG_CHANGED"):Map(function()
+    return Wow.FromEvent("ASHTOASH_BLIZZARD_SKIN_CONFIG_CHANGED", "ASHTOASH_CONFIG_CHANGED"):Map(function()
         return DB().Appearance.DisplayPetPanelLabel and GROUP_PET_PANEL_LABEL_SKIN or nil
     end)
 end
@@ -419,8 +408,8 @@ SHARE_DEBUFFPANEL_SKIN                                                          
 __Static__() __AutoCache__()
 function AshBlzSkinApi.DebuffPanelSkin()
     return AshBlzSkinApi.OnConfigChanged():Map(function()
-        SHARE_DEBUFFPANEL_SKIN.elementWidth = resizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
-        SHARE_DEBUFFPANEL_SKIN.elementHeight = resizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
+        SHARE_DEBUFFPANEL_SKIN.elementWidth = AshBlzSkinApi.ResizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
+        SHARE_DEBUFFPANEL_SKIN.elementHeight = AshBlzSkinApi.ResizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
         return SHARE_DEBUFFPANEL_SKIN
     end)
 end
@@ -449,8 +438,8 @@ SHARE_BUFFPANEL_SKIN                                                            
 __Static__() __AutoCache__()
 function AshBlzSkinApi.BuffPanelSkin()
     return AshBlzSkinApi.OnConfigChanged():Map(function()
-        SHARE_BUFFPANEL_SKIN.elementWidth = resizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
-        SHARE_BUFFPANEL_SKIN.elementHeight = resizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
+        SHARE_BUFFPANEL_SKIN.elementWidth = AshBlzSkinApi.ResizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
+        SHARE_BUFFPANEL_SKIN.elementHeight = AshBlzSkinApi.ResizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
         return SHARE_BUFFPANEL_SKIN
     end)
 end
@@ -483,7 +472,7 @@ DISPELLABLE_DEBUFF_SKIN                                                         
     drawLayer                                                                               = "BORDER",
     subLevel                                                                                = 2,
     location                                                                                = {
-        Anchor("TOPLEFT", 0, 0, "$parent.statusBarTexture", "TOPLEFT"), 
+        Anchor("TOPLEFT", 0, 0, "$parent.statusBarTexture", "TOPLEFT"),
         Anchor("BOTTOMRIGHT", 0, 0, "$parent.statusBarTexture", "BOTTOMRIGHT")
     },
     ignoreParentAlpha                                                                       = true,
@@ -492,7 +481,7 @@ DISPELLABLE_DEBUFF_SKIN                                                         
     visible                                                                                 = AshBlzSkinApi.UnitDebuffCanDispell(),
 
     AnimationGroup                                                                          = {
-        playing                                                                             = AshBlzSkinApi.UnitDebuffCanDispell(),
+        playing                                                                             = true,
         looping                                                                             = "REPEAT",
 
         Alpha1                                                                              = {
@@ -544,8 +533,8 @@ SHARE_ENLARGEBUFFPANEL_SKIN                                                     
     elementType                                                                             = AshBlzSkinEnlargeBuffIcon,
     rowCount                                                                                = 1,
     columnCount                                                                             = 2,
-    elementWidth                                                                            = resizeOnUnitFrameChanged(15),
-    elementHeight                                                                           = resizeOnUnitFrameChanged(15),
+    elementWidth                                                                            = AshBlzSkinApi.ResizeOnUnitFrameChanged(15),
+    elementHeight                                                                           = AshBlzSkinApi.ResizeOnUnitFrameChanged(15),
     marginLeft                                                                              = 0,
     marginTop                                                                               = 0,
     leftToRight                                                                             = false,
@@ -565,8 +554,8 @@ SHARE_ENLARGEDEBUFFPANEL_SKIN                                                   
     elementType                                                                             = AshBlzSkinEnlargeDebuffIcon,
     rowCount                                                                                = 1,
     columnCount                                                                             = 2,
-    elementWidth                                                                            = resizeOnUnitFrameChanged(15),
-    elementHeight                                                                           = resizeOnUnitFrameChanged(15),
+    elementWidth                                                                            = AshBlzSkinApi.ResizeOnUnitFrameChanged(15),
+    elementHeight                                                                           = AshBlzSkinApi.ResizeOnUnitFrameChanged(15),
     marginLeft                                                                              = 0,
     marginTop                                                                               = 0,
     leftToRight                                                                             = true,
@@ -591,8 +580,8 @@ SHARE_DISPELLDEBUFFPANEL_SKIN                                                   
     vSpacing                                                                                = 1,
     marginRight                                                                             = 3,
     marginTop                                                                               = 4,
-    elementWidth                                                                            = resizeOnUnitFrameChanged(9),
-    elementHeight                                                                           = resizeOnUnitFrameChanged(9),
+    elementWidth                                                                            = AshBlzSkinApi.ResizeOnUnitFrameChanged(9),
+    elementHeight                                                                           = AshBlzSkinApi.ResizeOnUnitFrameChanged(9),
     location                                                                                = {
         Anchor("TOPRIGHT", 0, 0, "PredictionHealthBar", "TOPRIGHT")
     }
@@ -609,8 +598,8 @@ SHARE_BOSSDEBUFFPANEL_SKIN                                                      
     marginLeft                                                                              = 0,
     hSpacing                                                                                = 1.5,
     vSpacing                                                                                = 1,
-    elementWidth                                                                            = resizeOnUnitFrameChanged(15),
-    elementHeight                                                                           = resizeOnUnitFrameChanged(15),
+    elementWidth                                                                            = AshBlzSkinApi.ResizeOnUnitFrameChanged(15),
+    elementHeight                                                                           = AshBlzSkinApi.ResizeOnUnitFrameChanged(15),
     location                                                                                = {
         Anchor("BOTTOMLEFT", 3, 1.5, "PredictionHealthBar", "BOTTOMLEFT")
     },
@@ -624,9 +613,9 @@ SHARE_BOSSDEBUFFPANEL_SKIN                                                      
 SHARE_RAIDTARGET_SKIN                                                                       = {
     drawLayer                                                                               = "OVERLAY",
     location                                                                                = {
-        Anchor("TOPRIGHT", -3, -2)      
+        Anchor("TOPRIGHT", -3, -2)
     },
-    size                                                                                    = resizeUnitFrameIconOnSizeChanged(14)
+    size                                                                                    = AshBlzSkinApi.ResizeUnitFrameIcon(14)
 }
 
 -- 血条
@@ -639,9 +628,9 @@ SHARE_HEALTHBAR_SKIN                                                            
     },
     location                                                                                = AshBlzSkinApi.PowerBarVisible():Map(function(powerBarVisible)
         if powerBarVisible then
-            return getLocation(getAnchor(shareAnchor1, "TOPLEFT", 1, -1), getAnchor(shareAnchor2, "BOTTOMRIGHT", -1, POWERBAR_HEIGHT))
+            return { Anchor("TOPLEFT", 1, -1), Anchor("BOTTOMRIGHT", -1, POWERBAR_HEIGHT) }
         else
-            return getLocation(getAnchor(shareAnchor1, "TOPLEFT", 1, -1), getAnchor(shareAnchor2, "BOTTOMRIGHT", -1, 1))
+            return { Anchor("TOPLEFT", 1, -1), Anchor("BOTTOMRIGHT", -1, 1) }
         end
     end),
 
@@ -706,8 +695,8 @@ SKIN_STYLE =                                                                    
 
         -- 死亡图标
         AshBlzSkinDeadIcon                                                                  = {
-            size                                                                            = resizeUnitFrameIconOnSizeChanged(),
-            location                                                                        = relocationUnitFrameIconOnSizeChanged,
+            size                                                                            = AshBlzSkinApi.ResizeUnitFrameIcon(),
+            location                                                                        = AshBlzSkinApi.RelocationUnitFrameBottomIcon(),
         },
 
         -- 角色职责图标
@@ -781,23 +770,23 @@ SKIN_STYLE =                                                                    
 
         -- 离线图标
         DisconnectIcon                                                                      = {
-            location                                                                        = relocationUnitFrameIconOnSizeChanged,
-            size                                                                            = resizeUnitFrameIconOnSizeChanged()
+            location                                                                        = AshBlzSkinApi.RelocationUnitFrameBottomIcon(),
+            size                                                                            = AshBlzSkinApi.ResizeUnitFrameIcon()
         },
 
         -- 准备就绪
         ReadyCheckIcon                                                                      = {
             drawLayer                                                                       = "OVERLAY",
-            location                                                                        = relocationUnitFrameIconOnSizeChanged,
-            size                                                                            = resizeUnitFrameIconOnSizeChanged()
+            location                                                                        = AshBlzSkinApi.RelocationUnitFrameBottomIcon(),
+            size                                                                            = AshBlzSkinApi.ResizeUnitFrameIcon()
         },
 
         -- 中间状态图标
         AshBlzSkinCenterStatusIcon                                                          = {
-            location                                                                        = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
-                return getLocation(getAnchor(shareAnchor1, "CENTER", 0, h / 3 + 2, nil, "BOTTOM"))
+            location                                                                        = AshBlzSkinApi.OnUnitFrameSizeChanged():Map(function(w, h)
+                return { Anchor("CENTER", 0, h / 3 + 2, nil, "BOTTOM") }
             end),
-            size                                                                            = resizeUnitFrameIconOnSizeChanged(22),
+            size                                                                            = AshBlzSkinApi.ResizeUnitFrameIcon(22),
             visible                                                                         = AshBlzSkinApi.UnitCenterStatusIconVisible(),
             unit                                                                            = Wow.Unit()
         },
@@ -854,14 +843,14 @@ SKIN_STYLE =                                                                    
         AshBlzSkinClassBuffPanel                                                            = {
             topLevel                                                                        = true,
             elementType                                                                     = AshBlzSkinClassBuffIcon,
-            location                                                                        = relocationUnitFrameIconOnSizeChanged,
+            location                                                                        = AshBlzSkinApi.RelocationUnitFrameBottomIcon(),
             rowCount                                                                        = 1,
             columnCount                                                                     = 1,
             topToBottom                                                                     = false,
             leftToRight                                                                     = true,
             visible                                                                         = AshBlzSkinApi.UnitIsPlayer(),
-            elementWidth                                                                    = resizeOnUnitFrameChanged(),
-            elementHeight                                                                   = resizeOnUnitFrameChanged(),
+            elementWidth                                                                    = AshBlzSkinApi.ResizeOnUnitFrameChanged(),
+            elementHeight                                                                   = AshBlzSkinApi.ResizeOnUnitFrameChanged(),
             customFilter                                                                    = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID) return _ClassBuffList[name] or _ClassBuffList[spellID] end
         },
 
@@ -918,8 +907,8 @@ SKIN_STYLE =                                                                    
 
         --死亡图标
         AshBlzSkinDeadIcon                                                                  = {
-            size                                                                            = resizeUnitFrameIconOnSizeChanged(),
-            location                                                                        = relocationUnitFrameIconOnSizeChanged,
+            size                                                                            = AshBlzSkinApi.ResizeUnitFrameIcon(),
+            location                                                                        = AshBlzSkinApi.RelocationUnitFrameBottomIcon(),
         },
 
         -- 仇恨指示器

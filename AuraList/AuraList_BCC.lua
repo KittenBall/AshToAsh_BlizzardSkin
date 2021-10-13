@@ -1,10 +1,14 @@
 Scorpio "AshToAsh.BlizzardSkin.AuraList.LossOfControl" ""
 
 _Core.AuraList.LossOfControlList                                    = {
+
+        -- 风暴要塞
+
         -- 空灵机甲
         [34190]                                                     = L["silenced"],       -- 奥术宝珠
 
         -- 大星术师索兰莉安
+        [37135]                                                     = L["charmed"],        -- 支配
         [33390]                                                     = L["silenced"],       -- 奥术洪流
 
         -- 凯尔萨斯·逐日者
@@ -15,6 +19,8 @@ _Core.AuraList.LossOfControlList                                    = {
         [37018]                                                     = L["feared"],          -- 燃烧
         [23171]                                                     = L["stunned"],         -- 遥控玩具
         
+        -- 毒蛇神殿
+
         -- 不稳定的海度丝
         [38235]                                                     = L["stunned"],         -- 水之墓
         

@@ -202,12 +202,12 @@ function OnSpecChanged()
 end
 
 function SendConfigChanged()
-    FireSystemEvent("AshToAsh_Blizzard_Skin_Config_Changed")
+    FireSystemEvent("ASHTOASH_BLIZZARD_SKIN_CONFIG_CHANGED")
 end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.OnConfigChanged()
-    return Wow.FromUnitEvent(Wow.FromEvent("AshToAsh_Blizzard_Skin_Config_Changed"):Map("=> 'any'"))
+    return Wow.FromUnitEvent(Wow.FromEvent("ASHTOASH_BLIZZARD_SKIN_CONFIG_CHANGED"):Map("=> 'any'"))
 end
 
 function ShowError(text)
