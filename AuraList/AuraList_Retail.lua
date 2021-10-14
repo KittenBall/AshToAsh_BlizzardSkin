@@ -249,5 +249,4 @@ _Core.AuraList.LossOfControlList                                    = {
 
     -- 希尔瓦娜斯·风行者
     [353957]                                                        = L["silenced"],        -- 女妖尖啸
-    []
 }

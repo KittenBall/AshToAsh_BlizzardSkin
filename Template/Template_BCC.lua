@@ -118,7 +118,6 @@ class "BuffPanel"(function()
 
         MAGE                    = {
             -- 奥术智慧
-            [1459]              = true,
             [27126]             = true,
             -- 奥术光辉
             [27127]             = true
