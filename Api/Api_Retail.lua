@@ -243,6 +243,8 @@ end
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitDebuffCanDispell()
     return Wow.UnitAura():Map(function(unit)
+            local inInstance, instanceType = IsInInstance()
+            if not inInstance or instanceType == "none" or instanceType == "pvp" then return false end
             local specID = GetSpecializationInfo(GetSpecialization())
             local canDispell, canDispellType
             AuraUtil.ForEachAura(unit, "HARMFUL|RAID", 1, function(_, _, _, dType)

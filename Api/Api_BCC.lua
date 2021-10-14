@@ -152,6 +152,9 @@ __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitDebuffCanDispell()
     local class = UnitClassBase("player")
     return Wow.UnitAura():Map(function(unit)
+            local inInstance, instanceType = IsInInstance()
+            if not inInstance or instanceType == "none" or instanceType == "pvp" then return false end
+            
             local canDispell, canDispellType
             local index = 1
             local name = ""
