@@ -264,6 +264,23 @@ class "BlzSkinAuraPanel"(function()
 
 end)
 
+__Sealed__() struct "AuraData" {
+    { name = "Index"            },
+    { name = "Name"             },
+    { name = "Icon"             },
+    { name = "Count"            },
+    { name = "DebuffType"       },
+    { name = "Cooldown"         },
+    { name = "Stealeable"       },
+    { name = "Caster"           },
+    { name = "SpellID"          },
+    { name = "IsBossAura"       },
+    { name = "CasterByPlayer"   },
+    { name = "Filter"           }
+}
+
+__Sealed__() struct "AuraDatas" { AuraData }
+
 -- BossDebuff Panel
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinBossDebuffPanel")
 class "BossDebuffPanel"(function()
@@ -690,7 +707,8 @@ TEMPLATE_SKIN_STYLE                                                             
         LossOfControlText                                                               = {
             drawLayer                                                                   = "OVERLAY",
             subLevel                                                                    = 7,
-            fontObject                                                                  = GameFontRed
+            fontObject                                                                  = GameFontNormalHuge,
+            textColor                                                                   = Color.RED
         },
 
         Cooldown                                                                        = {

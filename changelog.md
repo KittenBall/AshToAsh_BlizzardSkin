@@ -1,3 +1,6 @@
+## 1.7.4
+- Try to optimize some performance
+
 ## 1.7.1
 - Add more loss of control spell id 
 

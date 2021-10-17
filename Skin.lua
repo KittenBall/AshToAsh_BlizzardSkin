@@ -645,6 +645,7 @@ SHARE_HEALTHBAR_SKIN                                                            
 SKIN_STYLE =                                                                                {
     -- 单位面板
     [AshGroupPanel]                                                                         = {
+        clampedToScreen                                                                     = true,
 
         Label                                                                               = AshBlzSkinApi.PanelLableSkin(),
 
@@ -660,12 +661,15 @@ SKIN_STYLE =                                                                    
 
     -- 宠物面板
     [AshGroupPetPanel]                                                                      = {
+        clampedToScreen                                                                     = true,
+
         Label                                                                               = AshBlzSkinApi.PetPanelLableSkin()
     },
 
     [AshUnitFrame]                                                                          = {
         frameStrata                                                                         = "MEDIUM",
         alpha                                                                               = AshBlzSkinApi.UnitInRange():Map('v=>v and 1 or 0.55'),
+        auraEngine                                                                          = AshBlzSkinApi.AuraEngine(),
 
         -- 可驱散debuff高亮
         PixelGlow                                                                           = AshBlzSkinApi.DispellableDebuffPixelGlowSkin(),

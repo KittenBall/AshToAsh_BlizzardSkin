@@ -1,4 +1,4 @@
-Scorpio "AshToAsh.BlizzardSkin.Api " ""
+Scorpio "AshToAsh.BlizzardSkin.Api" ""
 
 -------------------------------------------------
 -- Unit
@@ -167,33 +167,6 @@ function AshBlzSkinApi.UnitIsLeaderOrAssistantIcon()
             return "Interface\\GroupFrame\\UI-Group-LeaderIcon"
         elseif rank == 1 then
             return "Interface\\GroupFrame\\UI-Group-AssistantIcon"
-        end
-    end)
-end
-
--------------------------------------------------
--- Loss of control
--------------------------------------------------
-
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitLossOfControl()
-    local data = {}
-    return Wow.UnitAura():Map(function(unit)
-        local displayText
-        local index = 1
-        while not displayText do
-            local name, icon, count, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId = UnitDebuff(unit, index)
-            if not name then break end
-            displayText = _Core.AuraList.LossOfControlList[spellId]
-            if displayText then
-                data.lossOfControlText = displayText
-                data.name = name
-                data.icon = icon
-                data.duration = duration
-                data.expirationTime = expirationTime
-                return data
-            end
-            index = index + 1
         end
     end)
 end

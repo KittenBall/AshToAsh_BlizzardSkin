@@ -63,39 +63,6 @@ function AshBlzSkinApi.UnitVehicleVisible()
 end
 
 -------------------------------------------------
--- Aura
--------------------------------------------------
-
-local function isBossAura(...)
-    return select(1, ...), select(12, ...)
-end
-
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitBossAura() 
-    return Wow.UnitAura():Map(function(unit)
-        local hasBossAura = false
-
-        local index = 1
-        local name = ""
-        while not hasBossAura and name do
-            name, hasBossAura = isBossAura(UnitAura(unit, index, "HARMFUL"))
-            index = index + 1
-        end
-
-        if hasBossAura then return true end
-
-        index = 1
-        name = ""
-        while not hasBossAura and name do
-            name, hasBossAura = isBossAura(UnitAura(unit, index, "HELPFUL"))
-            index = index + 1
-        end
-
-        return hasBossAura
-    end)
-end
-
--------------------------------------------------
 -- Center Status
 -------------------------------------------------
 

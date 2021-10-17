@@ -80,42 +80,10 @@ function AshBlzSkinApi.UnitVehicleVisible()
 end
 
 -------------------------------------------------
--- Aura
--------------------------------------------------
-
--- 是否有Boss给的Aura
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitBossAura()
-    return Wow.UnitAura():Map(function(unit)
-        local hasBossAura = false
-
-        AuraUtil.ForEachAura(unit, "HARMFUL", 1, function(...)
-            if select(12, ...) then
-                hasBossAura = true
-                return true
-            end
-            return false
-        end)
-
-        if hasBossAura then return true end
-
-        AuraUtil.ForEachAura(unit, "HELPFUL", 1, function(...)
-            if select(12, ...) then
-                hasBossAura = true
-                return true
-            end
-            return false
-        end)
-
-        return hasBossAura
-    end)
-end
-
--------------------------------------------------
 -- Center Status Icon
 -------------------------------------------------
 
-SummonStatus = _G.Enum
+SummonStatus = _G.Enum.SummonStatus
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitCenterStatusIconVisible()
