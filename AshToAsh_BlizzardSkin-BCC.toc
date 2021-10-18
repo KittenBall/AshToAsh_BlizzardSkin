@@ -24,7 +24,7 @@ GlowAnimation.lua
 Core.lua
 OptionMenu.lua
 BlockBlizzard.lua
-AuraList\AuraList_BCC.xml
+# AuraList\AuraList_BCC.xml
 Api\Api_BCC.xml
 Template\Template_BCC.xml
 Skin.lua

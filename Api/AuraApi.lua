@@ -34,7 +34,6 @@ function ParseAura(unit)
             break
         end
         
-        CheckLossOfControl(unit, name, icon, duration, expirationTime, spellId)
         CheckBossAura(unit, isBossDebuff)
 
         index = index + 1
@@ -52,54 +51,19 @@ function ParseAura(unit)
     --     index = index + 1
     -- end
 
-    ParseAuraEnd()
+    ParseAuraEnd(unit)
 end
 
 local bossAuraFlag = false
-local lossOfControlFlag = false
 local dispellDebuffFlag = false
 
 function ParseAuraStart()
     bossAuraFlag = false
-    lossOfControlFlag = false
     dispellDebuffFlag = false
 end
 
-function ParseAuraEnd()
-    SendLossOfControlData()
-    SendBossAuraData()
-end
-
--------------------------------------------------
--- Loss of control
--------------------------------------------------
-
-local lossOfControlSubject = BehaviorSubject()
-local lossOfControlData = {}
-function CheckLossOfControl(unit, name, icon, duration, expirationTime, spellId)
-    if not lossOfControlFlag then 
-        local displayText = _Core.AuraList.LossOfControlList[spellId]
-        if displayText then
-            lossOfControlFlag = true
-            lossOfControlData.unit = unit
-            lossOfControlData.lossOfControlText = displayText
-            lossOfControlData.name = name
-            lossOfControlData.icon = icon
-            lossOfControlData.duration = duration
-            lossOfControlData.expirationTime = expirationTime
-        end
-    end
-end
-
-function SendLossOfControlData()
-    lossOfControlSubject:OnNext(lossOfControlData.unit, lossOfControlFlag and lossOfControlData or nil)
-end
-
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitLossOfControl()
-    return Wow.FromUnitEvent(lossOfControlSubject):Map(function(unit, data)
-        return data
-    end)
+function ParseAuraEnd(unit)
+    SendBossAuraData(unit)
 end
 
 -------------------------------------------------
@@ -107,18 +71,16 @@ end
 -------------------------------------------------
 
 local bossAuraSubject = BehaviorSubject()
-local bossAuraData = {}
 function CheckBossAura(unit, bossAura)
     if not bossAuraFlag then
         if bossAura then
             bossAuraFlag = true
-            bossAuraData.unit = unit
         end
     end
 end
 
-function SendBossAuraData()
-    bossAuraSubject:OnNext(bossAuraData.unit, bossAuraFlag and true or false)
+function SendBossAuraData(unit)
+    bossAuraSubject:OnNext(unit, bossAuraFlag and true or false)
 end
 
 -- 是否有Boss给的Aura

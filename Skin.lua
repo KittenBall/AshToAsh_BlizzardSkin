@@ -808,17 +808,6 @@ SKIN_STYLE =                                                                    
         -- 施法条
         AshBlzSkinCastBar                                                                   = AshBlzSkinApi.CastBarSkin(),
 
-        -- 失控指示器
-        AshBlzSkinLossOfControlIndicator                                                    = {
-            setAllPoints                                                                    = true,
-
-            LossOfControlText                                                               = {
-                location                                                                    = {
-                    Anchor("BOTTOM", 0, 1, "$parent.$parent.PredictionHealthBar", "BOTTOM")
-                }
-            }
-        },
-
         -- Buff
         AshBlzSkinBuffPanel                                                                 = AshBlzSkinApi.BuffPanelSkin(),
 

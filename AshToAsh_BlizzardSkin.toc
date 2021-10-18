@@ -26,7 +26,7 @@ GlowAnimation.lua
 Core.lua
 OptionMenu.lua
 BlockBlizzard.lua
-AuraList\AuraList_Retail.xml
+# AuraList\AuraList_Retail.xml
 Api\Api_Retail.xml
 Template\Template_Retail.xml
 Skin.lua
