@@ -1,3 +1,6 @@
+## 1.7.6
+- Try to optimize some performance again
+
 ## 1.7.5
 - Remove Loss of control indicator, will be rework
 

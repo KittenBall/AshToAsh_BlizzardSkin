@@ -154,6 +154,9 @@ __Sealed__() class "AshBlzSkinAuraIcon"(function(_ENV)
 
     property "AuraCaster"       { type = String }
 
+    __Template__{
+        
+    }
     function __ctor(self)
         self.OnEnter            = self.OnEnter + OnEnter
         self.OnLeave            = self.OnLeave + OnLeave
@@ -161,8 +164,101 @@ __Sealed__() class "AshBlzSkinAuraIcon"(function(_ENV)
     end
 end)
 
+
+__Sealed__() struct "AuraData" {
+    { name = "Index"            },
+    { name = "Name"             },
+    { name = "Icon"             },
+    { name = "Count"            },
+    { name = "DebuffType"       },
+    { name = "Cooldown"         },
+    { name = "Stealeable"       },
+    { name = "Caster"           },
+    { name = "SpellID"          },
+    { name = "IsBossAura"       },
+    { name = "CasterByPlayer"   },
+    { name = "Filter"           },
+    { name = "Duration"         },
+    { name = "ExpirationTime"   }
+}
+
+__Sealed__()
+class "AshBlzSkinCooldownAuraIcon"(function()
+    inherit "AshBlzSkinAuraIcon"
+
+    property "AuraData" { 
+        type        = AuraData,
+        set         = function(self, data)
+            if data then
+                self:SetAuraData(data)
+                self:Show()
+            else
+                self:Hide()
+            end
+        end
+    }
+
+    function SetAuraData(self, data)
+        self.AuraIndex = data.Index
+        self.AuraFilter = data.Filter
+        self.AuraCaster = data.Caster
+        self:SetIcon(data.Icon)
+        self:SetLabel(data.Count)
+        self:GetChild("Cooldown"):SetCooldown(data.ExpirationTime - data.Duration, data.Duration)
+    end
+
+    function SetLabel(self, auraCount)
+        local label = auraCount
+        if auraCount >= 100 then
+            label = BUFF_STACKS_OVERFLOW
+        elseif auraCount <=0 then
+            label = ""
+        end
+        self:GetChild("Label"):SetText(label)
+    end
+
+    function SetIcon(self, icon)
+        self:GetChild("Icon"):SetTexture(icon)
+    end
+
+    __Template__{
+        Cooldown    = OmniCCCooldown,
+        Icon        = Texture,
+        Label       = FontString
+    }
+    function __ctor(self)
+    end
+end)
+
+-- Class buff icon
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinClassBuffIcon")
-class "ClassBuffIcon" { AshBlzSkinAuraIcon }
+class "ClassBuffIcon" { AshBlzSkinCooldownAuraIcon }
+
+-- Enlarge buff icon
+__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinEnlargeBuffIcon")
+class "EnlargeBuffIcon" { AshBlzSkinCooldownAuraIcon }
+
+-- Boss Debuff icon
+__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinBossDebuffIcon")
+class "BossDebuffIcon"(function()
+    inherit "AshBlzSkinCooldownAuraIcon"
+
+    function SetAuraData(self, data)
+        super.SetAuraData(self, data)
+        local color = DebuffTypeColor[data.DebuffType or ""]
+        self:GetChild("Background"):SetVertexColor(color.r, color.g, color.b, color.a)
+    end
+
+    __Template__{
+        Background      = Texture
+    }
+    function __ctor(self)
+    end
+end)
+
+-- EnlargeDebuff icon
+__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinEnlargeDebuffIcon")
+class "EnlargeDebuffIcon" { BossDebuffIcon }
 
 -- Buff icon
 __Sealed__()
@@ -206,15 +302,9 @@ end)
 __Sealed__()
 class "AshBlzSkinDebuffIcon" { AshBlzSkinBuffIcon }
 
--- Boss Debuff icon
-__Sealed__() class "AshBlzSkinBossDebuffIcon" { AshBlzSkinDebuffIcon }
-
 -- Dispell icon
 __Sealed__()
 class "AshBlzSkinDispellIcon" { AshBlzSkinAuraIcon }
-
--- EnlargeDebuff icon
-__Sealed__() class "AshBlzSkinEnlargeDebuffIcon" { AshBlzSkinAuraIcon }
 
 -- EnlargeBuff icon
 __Sealed__() class "AshBlzSkinEnlargeBuffIcon" { AshBlzSkinAuraIcon }
@@ -228,103 +318,6 @@ class "BlzSkinAuraPanel"(function()
 
     __Indexer__() __Observable__()
     property "AuraCaster" { set = Toolset.fakefunc }
-
-end)
-
-__Sealed__() struct "AuraData" {
-    { name = "Index"            },
-    { name = "Name"             },
-    { name = "Icon"             },
-    { name = "Count"            },
-    { name = "DebuffType"       },
-    { name = "Cooldown"         },
-    { name = "Stealeable"       },
-    { name = "Caster"           },
-    { name = "SpellID"          },
-    { name = "IsBossAura"       },
-    { name = "CasterByPlayer"   },
-    { name = "Filter"           }
-}
-
-__Sealed__() struct "AuraDatas" { AuraData }
-
--- BossDebuff Panel
-__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinBossDebuffPanel")
-class "BossDebuffPanel"(function()
-    inherit "BlzSkinAuraPanel"
-
-    local shareCooldown         = { start = 0, duration = 0 }
-    local bossDebuffs           = {}
-    local bossBuffs             = {}
-
-    local function refreshAura(self, unit, filter, eleIdx, auraIdx, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
-        if not name then return end
-
-        if not self.CustomFilter or self.CustomFilter(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...) then
-            if isBossAura then
-                if filter == "HARMFUL" then
-                    tinsert(bossDebuffs, auraIdx)
-                elseif filter == "HELPFUL" then
-                    tinsert(bossBuffs, auraIdx)
-                end
-            end
-        end
-
-        auraIdx                 = auraIdx + 1
-        return refreshAura(self, unit, filter, eleIdx, auraIdx, UnitAura(unit, auraIdx, filter))
-    end
-
-    local function showElements(self, unit, filter, auras, eleIdx)
-        if eleIdx > self.MaxCount then return eleIdx end
-
-        for _, auraIdx in ipairs(auras) do
-            if auraIdx then
-                local name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, castByPlayer =  UnitAura(unit, auraIdx, filter)
-
-                self.Elements[eleIdx]:Show()
-
-                shareCooldown.start             = expires - duration
-                shareCooldown.duration          = duration
-
-                self.AuraIndex[eleIdx]          = auraIdx
-                self.AuraName[eleIdx]           = name
-                self.AuraIcon[eleIdx]           = icon
-                self.AuraCount[eleIdx]          = count
-                self.AuraDebuff[eleIdx]         = dtype
-                self.AuraCooldown[eleIdx]       = shareCooldown
-                self.AuraStealable[eleIdx]      = isStealable and not UnitIsUnit(unit, "player")
-                self.AuraCaster[eleIdx]         = caster
-                self.AuraSpellID[eleIdx]        = spellID
-                self.AuraBossDebuff[eleIdx]     = isBossDebuff
-                self.AuraCastByPlayer[eleIdx]   = castByPlayer
-                self.AuraFilter[eleIdx]         = filter
-
-                eleIdx = eleIdx + 1
-                
-                if eleIdx > self.MaxCount then return eleIdx end
-            end
-        end
-        return eleIdx
-    end
-
-    property "Refresh"          {
-        set                     = function(self, unit)
-            self.Unit           = unit
-            if not (unit and self:IsVisible()) then self.Count = 0 return end
-            wipe(bossDebuffs)
-            wipe(bossBuffs)
-            
-            local filterHarmful = "HARMFUL"
-            local filterHelpful = "HELPFUL"
-            refreshAura(self, unit, filterHarmful, 1, 1, UnitAura(unit, 1, filterHarmful))
-            refreshAura(self, unit, filterHelpful, 1, 1, UnitAura(unit, 1, filterHelpful))
-
-            local eleIdx = 1
-            eleIdx = showElements(self, unit, filterHarmful, bossDebuffs, eleIdx)
-            eleIdx = showElements(self, unit, filterHelpful, bossBuffs, eleIdx)
-            self.Count = eleIdx -1
-        end
-    }
 
 end)
 
@@ -385,100 +378,6 @@ class "DispellDebuffPanel" (function(_ENV)
     property "AuraPriority"     { set = false }
 
     property "CustomFilter"     { set = false }
-
-end)
-
-__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinEnlargeDebuffPanel")
-class "EnlargeDebuffPanel" (function(_ENV)
-    inherit "BlzSkinAuraPanel"
-
-    local shareCooldown         = { start = 0, duration = 0 }
-
-    local function refreshAura(self, unit, filter, eleIdx, auraIdx, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
-        if not name or eleIdx > self.MaxCount then return eleIdx end
-
-        if not self.CustomFilter or self.CustomFilter(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...) then
-            self.Elements[eleIdx]:Show()
-
-            shareCooldown.start             = expires - duration
-            shareCooldown.duration          = duration
-
-            self.AuraIndex[eleIdx]          = auraIdx
-            self.AuraName[eleIdx]           = name
-            self.AuraIcon[eleIdx]           = icon
-            self.AuraCount[eleIdx]          = count
-            self.AuraDebuff[eleIdx]         = dtype
-            self.AuraCooldown[eleIdx]       = shareCooldown
-            self.AuraStealable[eleIdx]      = isStealable and not UnitIsUnit(unit, "player")
-            self.AuraCaster[eleIdx]         = caster
-            self.AuraSpellID[eleIdx]        = spellID
-            self.AuraBossDebuff[eleIdx]     = isBossAura
-            self.AuraCastByPlayer[eleIdx]   = castByPlayer
-            self.AuraFilter[eleIdx]         = filter
-
-            eleIdx = eleIdx + 1
-        end
-        
-        auraIdx = auraIdx + 1
-        return refreshAura(self, unit, filter, eleIdx, auraIdx, UnitAura(unit, auraIdx, filter))
-    end
-
-    property "Refresh"          {
-        set                     = function(self, unit)
-            self.Unit           = unit
-            if not (unit and self:IsVisible()) then self.Count = 0 return end
-            
-            local filter        = "HARMFUL"
-            self.Count          = refreshAura(self, unit, filter, 1, 1, UnitAura(unit, 1, filter)) - 1
-        end
-    }
-
-end)
-
-__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinEnlargeBuffPanel")
-class "EnlargeBuffPanel" (function(_ENV)
-    inherit "BlzSkinAuraPanel"
-
-    local shareCooldown         = { start = 0, duration = 0 }
-
-    local function refreshAura(self, unit, filter, eleIdx, auraIdx, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
-        if not name or eleIdx > self.MaxCount then return eleIdx end
-
-        if not self.CustomFilter or self.CustomFilter(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...) then
-            self.Elements[eleIdx]:Show()
-
-            shareCooldown.start             = expires - duration
-            shareCooldown.duration          = duration
-
-            self.AuraIndex[eleIdx]          = auraIdx
-            self.AuraName[eleIdx]           = name
-            self.AuraIcon[eleIdx]           = icon
-            self.AuraCount[eleIdx]          = count
-            self.AuraDebuff[eleIdx]         = dtype
-            self.AuraCooldown[eleIdx]       = shareCooldown
-            self.AuraStealable[eleIdx]      = isStealable and not UnitIsUnit(unit, "player")
-            self.AuraCaster[eleIdx]         = caster
-            self.AuraSpellID[eleIdx]        = spellID
-            self.AuraBossDebuff[eleIdx]     = isBossAura
-            self.AuraCastByPlayer[eleIdx]   = castByPlayer
-            self.AuraFilter[eleIdx]         = filter
-
-            eleIdx = eleIdx + 1
-        end
-        
-        auraIdx = auraIdx + 1
-        return refreshAura(self, unit, filter, eleIdx, auraIdx, UnitAura(unit, auraIdx, filter))
-    end
-
-    property "Refresh"          {
-        set                     = function(self, unit)
-            self.Unit           = unit
-            if not (unit and self:IsVisible()) then self.Count = 0 return end
-            
-            local filter        = "HELPFUL"
-            self.Count          = refreshAura(self, unit, filter, 1, 1, UnitAura(unit, 1, filter)) - 1
-        end
-    }
 
 end)
 
@@ -565,6 +464,24 @@ TEMPLATE_SKIN_STYLE                                                             
         },
     },
 
+    -- 自带冷却组件的AuraIcon
+    [AshBlzSkinCooldownAuraIcon]                                                        = {
+        enableMouse                                                                     = AshBlzSkinApi.AuraTooltipEnable(),
+
+        Icon                                                                            = {
+            drawLayer                                                                   = "ARTWORK",
+            setAllPoints                                                                = true,
+        },
+
+        Label                                                                           = {
+            drawLayer                                                                   = "OVERLAY",
+            fontObject                                                                  = NumberFontNormalSmall,
+            location                                                                    = {
+                Anchor("BOTTOMRIGHT", 0, 0)
+            }
+        }
+    },
+
     -- Buff icon
     [AshBlzSkinBuffIcon]                                                                = {
         alpha                                                                           = Wow.FromPanelProperty("AuraCaster"):Map(function(caster)
@@ -602,17 +519,42 @@ TEMPLATE_SKIN_STYLE                                                             
         OmniCCCooldown                                                                  = NIL
     },
 
+    -- Class buff icon
+    [ClassBuffIcon]                                                                     = {
+        auraData                                                                        = AshBlzSkinApi.UnitClassBuff(),
+        enableMouse                                                                     = false
+    },
+
+    -- Boss debuff icon
+    [BossDebuffIcon]                                                                    = {
+        auraData                                                                        = AshBlzSkinApi.UnitBossDebuff(),
+
+        Background                                                                      = {
+            drawLayer                                                                   = "OVERLAY",
+            file                                                                        = "Interface\\Buttons\\UI-Debuff-Overlays",
+            location                                                                    = {
+                Anchor("TOPLEFT", -1, 1),
+                Anchor("BOTTOMRIGHT", 1, -1)
+            },
+            texCoords                                                                   = RectType(0.296875, 0.5703125, 0, 0.515625)
+        },
+    },
+
     -- Enlarge debuff icon
-    [AshBlzSkinEnlargeDebuffIcon]                                                       = {
+    [EnlargeDebuffIcon]                                                                 = {
+        topLevel                                                                        = true,
+        auraData                                                                        = AshBlzSkinApi.UnitEnlargeDebuff(),
+
         PixelGlow                                                                       = {
             period                                                                      = 2,
             visible                                                                     = true
         }
     },
 
-    -- Class buff icon
-    [AshBlzSkinClassBuffIcon]                                                           = {
-        enableMouse                                                                     = false
+    -- Enlarge buff icon
+    [EnlargeBuffIcon]                                                                   = {
+        topLevel                                                                        = true,
+        auraData                                                                        = AshBlzSkinApi.UnitEnlargeBuff(),
     }
 }
 

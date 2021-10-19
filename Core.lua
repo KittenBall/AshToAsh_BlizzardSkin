@@ -210,6 +210,18 @@ function AshBlzSkinApi.OnConfigChanged()
     return Wow.FromUnitEvent(Wow.FromEvent("ASHTOASH_BLIZZARD_SKIN_CONFIG_CHANGED"):Map("=> 'any'"))
 end
 
+EnlargeBuffList        = {}
+
+__SystemEvent__()
+function ASHTOASH_CONFIG_CHANGED()
+    wipe(EnlargeBuffList)
+    if _AuraPriority then
+        for _, spellId in ipairs(_AuraPriority) do
+            EnlargeBuffList[spellId] = true
+        end
+    end
+end
+
 function ShowError(text)
     UIErrorsFrame:AddMessage(text, 1.0, 0.0, 0.0, 1, 4)
 end

@@ -45,8 +45,8 @@ end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitInRange()
-    return Wow.FromUnitEvent(Observable.Interval(0.5):Map("=>'any'"):ToSubject()):Map(function(unit)
-        return UnitIsUnit(unit, "player") or UnitInRange(unit)
+    return Wow.UnitTimer():Map(function(unit)
+        return UnitExists(unit) and UnitIsUnit(unit, "player") or UnitInRange(unit)
     end)
 end
 

@@ -39,13 +39,12 @@ local function GetTextureMenus(type, check)
 end
 
 local function GetFontMenu(check)
-    local menu = {}
-    menu.check                                                                                                              = check
-
     local libSharedMedia = GetLibSharedMedia()
     if libSharedMedia then
         local fonts = libSharedMedia:List(libSharedMedia.MediaType.FONT)
         if fonts then
+            local menu                                                                                                      = {}
+            menu.check                                                                                                      = check
             for _, name in ipairs_reverse(fonts) do
                 tinsert(menu, {
                     text                                                                                                    = name,
