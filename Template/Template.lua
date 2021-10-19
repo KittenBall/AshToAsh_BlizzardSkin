@@ -161,6 +161,9 @@ __Sealed__() class "AshBlzSkinAuraIcon"(function(_ENV)
     end
 end)
 
+__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinClassBuffIcon")
+class "ClassBuffIcon" { AshBlzSkinAuraIcon }
+
 -- Buff icon
 __Sealed__()
 class "AshBlzSkinBuffIcon"(function()
@@ -205,9 +208,6 @@ class "AshBlzSkinDebuffIcon" { AshBlzSkinBuffIcon }
 
 -- Boss Debuff icon
 __Sealed__() class "AshBlzSkinBossDebuffIcon" { AshBlzSkinDebuffIcon }
-
--- ClassBuff icon
-__Sealed__() class "AshBlzSkinClassBuffIcon" { AshBlzSkinBuffIcon }
 
 -- Dispell icon
 __Sealed__()
@@ -482,53 +482,6 @@ class "EnlargeBuffPanel" (function(_ENV)
 
 end)
 
-__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinClassBuffPanel")
-class "ClassBuffPanel" (function(_ENV)
-    inherit "BlzSkinAuraPanel"
-
-    local shareCooldown         = { start = 0, duration = 0 }
-
-    local function refreshAura(self, unit, filter, eleIdx, auraIdx, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
-        if not name or eleIdx > self.MaxCount then return eleIdx end
-
-        if not self.CustomFilter or self.CustomFilter(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...) then
-            self.Elements[eleIdx]:Show()
-
-            shareCooldown.start             = expires - duration
-            shareCooldown.duration          = duration
-
-            self.AuraIndex[eleIdx]          = auraIdx
-            self.AuraName[eleIdx]           = name
-            self.AuraIcon[eleIdx]           = icon
-            self.AuraCount[eleIdx]          = count
-            self.AuraDebuff[eleIdx]         = dtype
-            self.AuraCooldown[eleIdx]       = shareCooldown
-            self.AuraStealable[eleIdx]      = isStealable and not UnitIsUnit(unit, "player")
-            self.AuraCaster[eleIdx]         = caster
-            self.AuraSpellID[eleIdx]        = spellID
-            self.AuraBossDebuff[eleIdx]     = isBossAura
-            self.AuraCastByPlayer[eleIdx]   = castByPlayer
-            self.AuraFilter[eleIdx]         = filter
-
-            eleIdx = eleIdx + 1
-        end
-        
-        auraIdx = auraIdx + 1
-        return refreshAura(self, unit, filter, eleIdx, auraIdx, UnitAura(unit, auraIdx, filter))
-    end
-
-    property "Refresh"          {
-        set                     = function(self, unit)
-            self.Unit           = unit
-            if not (unit and self:IsVisible()) then self.Count = 0 return end
-            
-            local filter        = "HELPFUL"
-            self.Count          = refreshAura(self, unit, filter, 1, 1, UnitAura(unit, 1, filter)) - 1
-        end
-    }
-
-end)
-
 TEMPLATE_SKIN_STYLE                                                                     = {
     [BlzSkinAuraPanel]                                                                  = {
         refresh                                                                         = AshBlzSkinApi.UnitAura()
@@ -607,8 +560,6 @@ TEMPLATE_SKIN_STYLE                                                             
             end),
         },
 
-        Cooldown                                                                        = NIL,
-
         OmniCCCooldown                                                                  = {
             cooldown                                                                    = Wow.FromPanelProperty("AuraCooldown")
         },
@@ -661,7 +612,6 @@ TEMPLATE_SKIN_STYLE                                                             
 
     -- Class buff icon
     [AshBlzSkinClassBuffIcon]                                                           = {
-        alpha                                                                           = NIL,
         enableMouse                                                                     = false
     }
 }

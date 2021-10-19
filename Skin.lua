@@ -452,7 +452,7 @@ MASTER_LOOTER_SKIN                                                              
     location                                                                                = {
         Anchor("RIGHT", -1, 0, "RaidRosterIcon", "LEFT")
     },
-    size                                                                                    = Size(10, 10),
+    size                                                                                    = Size(11, 11),
     file                                                                                    = "Interface\\GroupFrame\\UI-Group-MasterLooter",
     visible                                                                                 = AshBlzSkinApi.UnitIsMasterLooter()
 }
@@ -741,9 +741,9 @@ SKIN_STYLE =                                                                    
             subLevel                                                                        = 2,
             size                                                                            = AshBlzSkinApi.UnitIsLeaderOrAssistant():Map(function(isLeader)
                 if isLeader then
-                    shareSize.width, shareSize.height = 10, 10
+                    shareSize.width, shareSize.height = 11, 11
                 else
-                    shareSize.width, shareSize.height = 1, 10
+                    shareSize.width, shareSize.height = 1, 11
                 end
                 return shareSize
             end)
@@ -758,9 +758,9 @@ SKIN_STYLE =                                                                    
             subLevel                                                                        = 2,
             size                                                                            = Wow.UnitGroupRoster():Map(function(assign)
                 if not assign or assign == "NONE" then
-                    shareSize.width, shareSize.height = 1, 10
+                    shareSize.width, shareSize.height = 1, 11
                 else
-                    shareSize.width, shareSize.height = 10, 10
+                    shareSize.width, shareSize.height = 11, 11
                 end
                 return shareSize
             end),
