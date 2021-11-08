@@ -416,26 +416,33 @@ function AshBlzSkinApi.DebuffPanelSkin()
     end)
 end
 
-BUFF_ICON_LOCATIONS                                                                         = {
-    {
-        Anchor("BOTTOMRIGHT", 0, 1.5, "PredictionHealthBar", "BOTTOMRIGHT")
+-------------------------------------------------
+-- Buff
+-------------------------------------------------
+SHARE_BUFFPANEL_SKIN                                                                        = {
+    elementType                                                                             = AshBlzSkinBuffIcon,
+    orientation                                                                             = Orientation.HORIZONTAL,
+    marginRight                                                                             = 3,
+    rowCount                                                                                = 1,
+    columnCount                                                                             = 3,
+    hSpacing                                                                                = 0,
+    leftToRight                                                                             = false,
+    topToBottom                                                                             = false,
+    location                                                                                = {
+        Anchor("BOTTOMRIGHT", 0, 1.5, "PredictionHealthBar", "BOTTOMRIGHT") 
     },
-    {
-        Anchor("RIGHT", 0, 0, "AshBlzSkinBuffIcon1", "LEFT")
-    },
-    {
-        Anchor("RIGHT", 0, 1.5, "AshBlzSkinBuffIcon2", "LEFT")
-    }
+        
+    customFilter                                                                            = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID) 
+        return not _AuraBlackList[spellID] and not (_ClassBuffList[name] or _ClassBuffList[spellID]) and not EnlargeBuffList[spellID]
+    end,
 }
 
 __Static__() __AutoCache__()
-function AshBlzSkinApi.BuffIconSkin(index)
+function AshBlzSkinApi.BuffPanelSkin()
     return AshBlzSkinApi.OnConfigChanged():Map(function()
-        local skin = {}
-        SHARE_BUFFICON_SKIN.width = AshBlzSkinApi.ResizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
-        SHARE_BUFFICON_SKIN.height = AshBlzSkinApi.ResizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
-        SHARE_BUFFICON_SKIN.location = BUFF_ICON_LOCATIONS[index]
-        return skin
+        SHARE_BUFFPANEL_SKIN.elementWidth = AshBlzSkinApi.ResizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
+        SHARE_BUFFPANEL_SKIN.elementHeight = AshBlzSkinApi.ResizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
+        return SHARE_BUFFPANEL_SKIN
     end)
 end
 
@@ -766,10 +773,8 @@ SKIN_STYLE =                                                                    
         -- 施法条
         AshBlzSkinCastBar                                                                   = AshBlzSkinApi.CastBarSkin(),
 
-        -- Buff icons
-        AshBlzSkinBuffIcon1                                                                 = AshBlzSkinApi.BuffIconSkin(1),
-        AshBlzSkinBuffIcon2                                                                 = AshBlzSkinApi.BuffIconSkin(2),
-        AshBlzSkinBuffIcon3                                                                 = AshBlzSkinApi.BuffIconSkin(3),
+        -- Buff
+        AshBlzSkinBuffPanel                                                                 = AshBlzSkinApi.BuffPanelSkin(),
 
         -- Debuff
         AshBlzSkinDebuffPanel                                                               = AshBlzSkinApi.DebuffPanelSkin(),
@@ -862,10 +867,8 @@ SKIN_STYLE =                                                                    
         -- 施法条
         AshBlzSkinCastBar                                                                   = AshBlzSkinApi.CastBarSkin(),
 
-        -- Buff icons
-        AshBlzSkinBuffIcon1                                                                 = AshBlzSkinApi.BuffIconSkin(1),
-        AshBlzSkinBuffIcon2                                                                 = AshBlzSkinApi.BuffIconSkin(2),
-        AshBlzSkinBuffIcon3                                                                 = AshBlzSkinApi.BuffIconSkin(3),
+        -- Buff
+        AshBlzSkinBuffPanel                                                                 = AshBlzSkinApi.BuffPanelSkin(),
         
         -- Debuff
         AshBlzSkinDebuffPanel                                                               = AshBlzSkinApi.DebuffPanelSkin(),

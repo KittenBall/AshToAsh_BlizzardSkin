@@ -78,6 +78,185 @@ class "CenterStatusIcon"(function()
     end
 end)
 
+-- Buff panel
+__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinBuffPanel")
+class "BuffPanel"(function()
+    inherit "BlzSkinAuraPanel"
+
+    local shareCooldown         = { start = 0, duration = 0 }
+    local buffs                 = {}
+    local classBuffs            = {}
+
+    -- 同一个职业会互相顶的Buff
+    local classBuffList         = {
+        PALADIN                 = {
+            -- 强效王者祝福
+            [25898]             = true,
+            -- 王者祝福
+            [20217]             = true,
+            -- 强效庇护祝福
+            [27169]             = true,
+            -- 庇护祝福
+            [27168]             = true,
+            -- 强效力量祝福
+            [27141]             = true,
+            -- 力量祝福
+            [27140]             = true,
+            -- 强效智慧祝福
+            [27143]             = true,
+            -- 智慧祝福
+            [27142]             = true,
+            -- 强效光明祝福
+            [27145]             = true,
+            -- 光明祝福
+            [27144]             = true,
+            -- 强效拯救祝福
+            [25895]             = true,
+            -- 拯救祝福
+            [1038]              = true
+        },
+
+        MAGE                    = {
+            -- 奥术智慧
+            [27126]             = true,
+            -- 奥术光辉
+            [27127]             = true
+        },
+
+        DRUID                   = {
+            -- 野性赐福
+            [26991]             = true,
+            -- 野性印记
+            [26990]             = true
+        },
+
+        PRIEST                  = {
+            -- 坚韧祷言
+            [25392]             = true,
+            -- 真言术：韧
+            [25389]             = true,
+            -- 精神祷言
+            [32999]             = true,
+            -- 神圣之灵
+            [25312]             = true,
+            -- 暗影防护祷言
+            [39374]             = true,
+            -- 防护暗影
+            [25433]             = true
+        },
+
+        SHAMAN                  = {
+            -- 大地之盾
+            [32594]             = true
+        }
+    }
+
+    local function shouldShowClassBuff(self, spellId)
+        local buffs = classBuffList[self.class]
+        return buffs and buffs[spellId]
+    end
+
+    local function shouldDisplayBuff(self, unitCaster, spellId, canApplyAura)
+        local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
+
+        local isClassBuff = shouldShowClassBuff(self, spellId)
+        if ( hasCustom ) then
+            return showForMySpec or (alwaysShowMine and (unitCaster == "player" or isClassBuff or unitCaster == "pet" or unitCaster == "vehicle")), isClassBuff
+        else
+            return (unitCaster == "player" or isClassBuff or unitCaster == "pet" or unitCaster == "vehicle") and canApplyAura and not SpellIsSelfBuff(spellId), isClassBuff
+        end
+    end
+
+    local function refreshAura(self, unit, filter, eleIdx, auraIdx, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
+        if not name then return end
+
+        if not self.CustomFilter or self.CustomFilter(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...) then
+            local displayBuff, isClassBuff = shouldDisplayBuff(self, caster, spellID, canApplyAura)
+            if displayBuff and not isBossAura then
+                -- 区分职业buff和非职业buff
+                if isClassBuff then
+                    tinsert(classBuffs, auraIdx)
+                elseif not isClassBuff then
+                    tinsert(buffs, auraIdx)
+                end
+            end
+        end
+        
+        auraIdx = auraIdx + 1
+        return refreshAura(self, unit, filter, eleIdx, auraIdx, UnitAura(unit, auraIdx, filter))
+    end
+
+    local function showElements(self, unit, filter, auras, eleIdx)
+        if eleIdx > self.MaxCount then return eleIdx end
+
+        for _, auraIdx in ipairs(auras) do
+            if auraIdx then
+                local name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossDebuff, castByPlayer =  UnitAura(unit, auraIdx, filter)
+
+                self.Elements[eleIdx]:Show()
+
+                shareCooldown.start             = expires - duration
+                shareCooldown.duration          = duration
+
+                self.AuraIndex[eleIdx]          = auraIdx
+                self.AuraName[eleIdx]           = name
+                self.AuraIcon[eleIdx]           = icon
+                self.AuraCount[eleIdx]          = count
+                self.AuraDebuff[eleIdx]         = dtype
+                self.AuraCooldown[eleIdx]       = shareCooldown
+                self.AuraStealable[eleIdx]      = isStealable and not UnitIsUnit(unit, "player")
+                self.AuraCaster[eleIdx]         = caster
+                self.AuraSpellID[eleIdx]        = spellID
+                self.AuraBossDebuff[eleIdx]     = isBossDebuff
+                self.AuraCastByPlayer[eleIdx]   = castByPlayer
+                self.AuraFilter[eleIdx]         = filter
+
+                eleIdx = eleIdx + 1
+                
+                if eleIdx > self.MaxCount then return eleIdx end
+            end
+        end
+        return eleIdx
+    end
+
+    -- 添加职业buff，将职业buff显示在最前面
+    local function fillClassBuffIntoBuffList(self)
+        local buffSize = #buffs
+        if buffSize < self.MaxCount then
+            for i = 1, self.MaxCount - buffSize do
+                local spellId = classBuffs[i]
+                if spellId then
+                    tinsert(buffs, i, spellId)
+                end
+            end
+        end
+    end
+
+    property "Refresh"          {
+        set                     = function(self, unit)
+            self.Unit           = unit
+            if not (unit and self:IsVisible()) then self.Count = 0 return end
+
+            wipe(buffs)
+            wipe(classBuffs)
+
+            local filter        = "HELPFUL"
+            refreshAura(self, unit, filter, 1, 1, UnitAura(unit, 1, filter))
+            fillClassBuffIntoBuffList(self)
+
+            local eleIdx = 1
+            eleIdx = showElements(self, unit, filter, buffs, eleIdx)
+            self.Count = eleIdx -1
+        end
+    }
+
+    function __ctor(self)
+        super(self)
+        self.class = UnitClassBase("player")
+    end
+
+end)
+
 -- Debuff panel
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinDebuffPanel")
 class "DebuffPanel"(function()
