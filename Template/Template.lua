@@ -184,7 +184,45 @@ __Sealed__() struct "AuraData" {
 
 __Sealed__()
 class "AshBlzSkinCooldownAuraIcon"(function()
-    inherit "AshBlzSkinAuraIcon"
+    inherit "Frame"
+
+    local function OnEnter(self)
+        if self.ShowTooltip and self.AuraIndex then
+            local parent        = self:GetParent()
+            if not parent then return end
+
+            GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
+            GameTooltip:SetUnitAura(parent.Unit, self.AuraIndex, self.AuraFilter)
+        end
+    end
+
+    local function OnUpdate(self, elapsed)
+        self.timer = (self.timer or 0) + elapsed
+        if self.timer < 0.5 then
+            return
+        end
+        self.timer = 0
+
+        local parent        = self:GetParent()
+        if not parent then return end
+        if self.ShowTooltip and GameTooltip:IsOwned(self) then
+            GameTooltip:SetUnitAura(parent.Unit, self.AuraIndex, self.AuraFilter)
+        end
+    end
+
+    local function OnLeave(self)
+        GameTooltip:Hide()
+    end
+
+    property "ShowTooltip"      { type = Boolean, default = true }
+
+    property "AuraIndex"        { type = Number }
+
+    property "AuraFilter"       { type = String }
+
+    property "AuraCaster"       { type = String }
+
+    property "Unit"             { type = String }
 
     property "AuraData" { 
         type        = AuraData,
@@ -227,7 +265,49 @@ class "AshBlzSkinCooldownAuraIcon"(function()
         Label       = FontString
     }
     function __ctor(self)
+        self.OnEnter            = self.OnEnter + OnEnter
+        self.OnLeave            = self.OnLeave + OnLeave
+        self.OnUpdate           = self.OnUpdate + OnUpdate
     end
+end)
+
+-- Buff icon
+__Sealed__()
+__ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinBuffIcon1")
+__ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinBuffIcon2")
+__ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinBuffIcon3")
+class "BuffIcon"(function()
+    inherit "AshBlzSkinCooldownAuraIcon"
+
+    local function OnMouseUp(self, button)
+        if IsAltKeyDown() and button == "RightButton" then
+            local name, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Unit, self.AuraIndex, self.AuraFilter)
+
+            if name then
+                _AuraBlackList[spellID] = true
+                FireSystemEvent("ASHTOASH_CONFIG_CHANGED")
+
+                -- Force the refreshing
+                Next(Scorpio.FireSystemEvent, "UNIT_AURA", "any")
+            end
+        elseif IsControlKeyDown() and button == "LeftButton" and self.AuraFilter:match("HARMFUL") then
+            local name, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Unit, self.AuraIndex, self.AuraFilter)
+
+            if name then
+                _EnlargeDebuffList[spellID] = true
+                FireSystemEvent("ASHTOASH_CONFIG_CHANGED")
+
+                -- Force the refreshing
+                Next(Scorpio.FireSystemEvent, "UNIT_AURA", "any")
+            end
+        end
+    end
+
+    function __ctor(self)
+        super(self)
+        self.OnMouseUp = OnMouseUp
+    end
+
 end)
 
 -- Class buff icon
@@ -464,24 +544,6 @@ TEMPLATE_SKIN_STYLE                                                             
         },
     },
 
-    -- 自带冷却组件的AuraIcon
-    [AshBlzSkinCooldownAuraIcon]                                                        = {
-        enableMouse                                                                     = AshBlzSkinApi.AuraTooltipEnable(),
-
-        Icon                                                                            = {
-            drawLayer                                                                   = "ARTWORK",
-            setAllPoints                                                                = true,
-        },
-
-        Label                                                                           = {
-            drawLayer                                                                   = "OVERLAY",
-            fontObject                                                                  = NumberFontNormalSmall,
-            location                                                                    = {
-                Anchor("BOTTOMRIGHT", 0, 0)
-            }
-        }
-    },
-
     -- Buff icon
     [AshBlzSkinBuffIcon]                                                                = {
         alpha                                                                           = Wow.FromPanelProperty("AuraCaster"):Map(function(caster)
@@ -517,6 +579,24 @@ TEMPLATE_SKIN_STYLE                                                             
         },
 
         OmniCCCooldown                                                                  = NIL
+    },
+
+    -- 自带冷却组件的AuraIcon
+    [AshBlzSkinCooldownAuraIcon]                                                        = {
+        enableMouse                                                                     = AshBlzSkinApi.AuraTooltipEnable(),
+
+        Icon                                                                            = {
+            drawLayer                                                                   = "ARTWORK",
+            setAllPoints                                                                = true,
+        },
+
+        Label                                                                           = {
+            drawLayer                                                                   = "OVERLAY",
+            fontObject                                                                  = NumberFontNormalSmall,
+            location                                                                    = {
+                Anchor("BOTTOMRIGHT", 0, 0)
+            }
+        }
     },
 
     -- Class buff icon

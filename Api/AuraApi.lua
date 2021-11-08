@@ -7,9 +7,35 @@ UI.Property             {
     set                 = Toolset.fakefunc
 }
 
+function OnEnable()
+    PlayerClass = UnitClassBase("player")
+    AuraPool = Recycle()
+    AuraPool.OnPush = function(self, obj) wipe(obj) end
+end
+
 __Static__() __AutoCache__()
 function AshBlzSkinApi.AuraEngine()
     return Wow.UnitAura():Map(ParseAura)
+end
+
+local function GetAuraData(unit, index, filter)
+    local name, icon, count, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll = UnitAura(unit, index, filter)
+    local data = AuraPool()
+    data.Index = index
+    data.Name = name
+    data.Icon = icon
+    data.Count = count
+    data.DebuffType = dispelType
+    data.Duration = duration
+    data.ExpirationTime = expirationTime
+    data.Stealeable = isStealable and not UnitIsUnit(unit, "player")
+    data.Caster = source
+    data.SpellID = spellId
+    data.IsBossAura = isBossDebuff
+    data.CasterByPlayer = castByPlayer
+    data.Filter = filter
+
+    return data
 end
 
 function ParseAura(unit)
@@ -22,6 +48,7 @@ function ParseAura(unit)
             break
         end
 
+        CheckBuff(unit, index, "HELPFUL", name, icon, count, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll)
         CheckBossAura(unit, index, "HELPFUL", name, icon, count, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll)
         CheckClassBuff(unit, index, "HELPFUL", name, icon, count, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll)
         CheckEnlargeBuff(unit, index, "HELPFUL", name, icon, count, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll)
@@ -67,6 +94,7 @@ function ParseAuraStart()
     classBuffFlag = false
     enlargeDebuffFlag = false
     enlargeBuffFlag = false
+    CheckBuffStart()
 end
 
 function ParseAuraEnd(unit)
@@ -74,6 +102,7 @@ function ParseAuraEnd(unit)
     SendClassBuffData(unit)
     SendEnlargeDebuffData(unit)
     SendEnlargeBuffData(unit)
+    SendBuffData(unit)
 end
 
 -------------------------------------------------
@@ -121,6 +150,7 @@ function AshBlzSkinApi.UnitBossDebuff()
     local data = {}
     return Wow.FromUnitEvent(bossAuraSubject):Map(function(unit, bossDebuffData)
         if bossDebuffData then
+            data.Unit = unit
             data.Index = bossDebuffData.Index
             data.Name = bossDebuffData.Name
             data.Icon = bossDebuffData.Icon
@@ -175,6 +205,7 @@ function AshBlzSkinApi.UnitClassBuff()
     local data = {}
     return Wow.FromUnitEvent(classBuffSubject):Map(function(unit, classBuffData)
         if classBuffData then
+            data.Unit = unit
             data.Index = classBuffData.Index
             data.Name = classBuffData.Name
             data.Icon = classBuffData.Icon
@@ -229,6 +260,7 @@ function AshBlzSkinApi.UnitEnlargeDebuff()
     local data = {}
     return Wow.FromUnitEvent(enlargeDebuffSubject):Map(function(unit, enlargeDebuffData)
         if enlargeDebuffData then
+            data.Unit = unit
             data.Index = enlargeDebuffData.Index
             data.Name = enlargeDebuffData.Name
             data.Icon = enlargeDebuffData.Icon
@@ -283,6 +315,7 @@ function AshBlzSkinApi.UnitEnlargeBuff()
     local data = {}
     return Wow.FromUnitEvent(enlargeBuffSubject):Map(function(unit, enlargeBuffData)
         if enlargeBuffData then
+            data.Unit = unit
             data.Index = enlargeBuffData.Index
             data.Name = enlargeBuffData.Name
             data.Icon = enlargeBuffData.Icon
@@ -299,4 +332,204 @@ function AshBlzSkinApi.UnitEnlargeBuff()
             return data
         end
     end)
+end
+
+-------------------------------------------------
+-- Buff
+-------------------------------------------------
+
+local buffSubjects = {}
+local buffCount = 3
+
+for i = 1, buffCount do
+    local subject = BehaviorSubject()
+    tinsert(buffSubjects, subject)
+
+    __Static__() __AutoCache__()
+    AshBlzSkinApi["UnitBuff"..i] = function()
+        local data = {}
+        return Wow.FromUnitEvent(subject):Map(function(unit, buffData)
+            if buffData then
+                data.Unit = unit
+                data.Index = buffData.Index
+                data.Name = buffData.Name
+                data.Icon = buffData.Icon
+                data.Count = buffData.Count
+                data.DebuffType = buffData.DebuffType
+                data.Duration = buffData.Duration
+                data.ExpirationTime = buffData.ExpirationTime
+                data.Stealeable = buffData.Stealeable
+                data.Caster = buffData.Caster
+                data.SpellID = buffData.SpellID
+                data.IsBossAura = buffData.IsBossAura
+                data.CasterByPlayer = buffData.CasterByPlayer
+                data.Filter = buffData.Filter
+
+                AuraPool(buffData)
+                return data
+            end
+        end)
+    end
+end
+
+if Scorpio.IsRetail then
+    local shouldDisplayBuff     = function(unitCaster, spellId, canApplyAura)
+        local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
+        
+        if ( hasCustom ) then
+            return showForMySpec or (alwaysShowMine and (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle"))
+        else
+            return (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle") and canApplyAura and not SpellIsSelfBuff(spellId)
+        end
+    end
+
+    local buffs = {}
+
+    function CheckBuffStart()
+        wipe(buffs)
+    end
+
+    function CheckBuff(unit, index, filter, name, icon, count, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll)
+        if #buffs >= buffCount then return end
+
+        if not _AuraBlackList[spellID] and not (_ClassBuffList[name] or _ClassBuffList[spellID]) and not EnlargeBuffList[spellID] then
+            if shouldDisplayBuff(source, spellId, canApplyAura) and not isBossDebuff then
+                tinsert(buffs, index)
+            end
+        end
+    end
+
+    function SendBuffData(unit)
+        for i = 1, buffCount do
+            local index = buffs[i]
+            if index then
+                buffSubjects[index]:OnNext(unit, GetAuraData(unit, index, "HELPFUL"))
+            else
+                buffSubjects[index]:OnNext(unit, nil)
+            end
+        end
+    end
+else
+    -- 同一个职业会互相顶的Buff
+    local classBuffList         = {
+        PALADIN                 = {
+            -- 强效王者祝福
+            [25898]             = true,
+            -- 王者祝福
+            [20217]             = true,
+            -- 强效庇护祝福
+            [27169]             = true,
+            -- 庇护祝福
+            [27168]             = true,
+            -- 强效力量祝福
+            [27141]             = true,
+            -- 力量祝福
+            [27140]             = true,
+            -- 强效智慧祝福
+            [27143]             = true,
+            -- 智慧祝福
+            [27142]             = true,
+            -- 强效光明祝福
+            [27145]             = true,
+            -- 光明祝福
+            [27144]             = true,
+            -- 强效拯救祝福
+            [25895]             = true,
+            -- 拯救祝福
+            [1038]              = true
+        },
+
+        MAGE                    = {
+            -- 奥术智慧
+            [27126]             = true,
+            -- 奥术光辉
+            [27127]             = true
+        },
+
+        DRUID                   = {
+            -- 野性赐福
+            [26991]             = true,
+            -- 野性印记
+            [26990]             = true
+        },
+
+        PRIEST                  = {
+            -- 坚韧祷言
+            [25392]             = true,
+            -- 真言术：韧
+            [25389]             = true,
+            -- 精神祷言
+            [32999]             = true,
+            -- 神圣之灵
+            [25312]             = true,
+            -- 暗影防护祷言
+            [39374]             = true,
+            -- 防护暗影
+            [25433]             = true
+        },
+
+        SHAMAN                  = {
+            -- 大地之盾
+            [32594]             = true
+        }
+    }
+
+    local shouldShowClassBuff   = function(spellId)
+        local buffs = classBuffList[PlayerClass]
+        return buffs and buffs[spellId]
+    end
+
+    local shouldDisplayBuff     = function(unitCaster, spellId, canApplyAura)
+        local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
+
+        local isClassBuff = shouldShowClassBuff(spellId)
+        if ( hasCustom ) then
+            return showForMySpec or (alwaysShowMine and (unitCaster == "player" or isClassBuff or unitCaster == "pet" or unitCaster == "vehicle")), isClassBuff
+        else
+            return (unitCaster == "player" or isClassBuff or unitCaster == "pet" or unitCaster == "vehicle") and canApplyAura and not SpellIsSelfBuff(spellId), isClassBuff
+        end
+    end
+
+    local buffs                 = {}
+    local classBuffs            = {}
+
+    function CheckBuffStart()
+        wipe(buffs)
+        wipe(classBuffs)
+    end
+
+    function CheckBuff(unit, index, filter, name, icon, count, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll)
+        if not _AuraBlackList[spellID] and not (_ClassBuffList[name] or _ClassBuffList[spellID]) and not EnlargeBuffList[spellID] then
+            local displayBuff, isClassBuff = shouldDisplayBuff(source, spellId, canApplyAura)
+            if displayBuff and not isBossDebuff then
+                -- 区分职业buff和非职业buff
+                if isClassBuff then
+                    tinsert(classBuffs, index)
+                elseif not isClassBuff then
+                    tinsert(buffs, index)
+                end
+            end
+        end
+    end
+
+    function SendBuffData(unit)
+        local buffSize = #buffs
+        if buffSize < buffCount then
+            for i = 1, buffCount - buffSize do
+                local index = classBuffs[i]
+                if index then
+                    tinsert(buffs, i, index)
+                end
+            end
+        end
+
+        for i = 1, buffCount do
+            local index = buffs[i]
+            if index then
+                buffSubjects[index]:OnNext(unit, GetAuraData(unit, index, "HELPFUL"))
+            else
+                buffSubjects[index]:OnNext(unit, nil)
+            end
+        end
+    end
 end
