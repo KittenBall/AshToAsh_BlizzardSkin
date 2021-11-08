@@ -40,7 +40,7 @@ class "CenterStatusIcon"(function()
         if UnitInOtherParty(unit) then
             texture:SetTexture("Interface\\LFGFrame\\LFG-Eye")
             texture:SetTexCoord(0.125, 0.25, 0.25, 0.5)
-            border:SetTexure("Interface\\Common\\RingBorder")
+            border:SetTexture("Interface\\Common\\RingBorder")
             border:Show()
             self.tooltip = PARTY_IN_PUBLIC_GROUP_MESSAGE
         elseif UnitHasIncomingResurrection(unit) then
