@@ -464,24 +464,6 @@ TEMPLATE_SKIN_STYLE                                                             
         },
     },
 
-    -- 自带冷却组件的AuraIcon
-    [AshBlzSkinCooldownAuraIcon]                                                        = {
-        enableMouse                                                                     = AshBlzSkinApi.AuraTooltipEnable(),
-
-        Icon                                                                            = {
-            drawLayer                                                                   = "ARTWORK",
-            setAllPoints                                                                = true,
-        },
-
-        Label                                                                           = {
-            drawLayer                                                                   = "OVERLAY",
-            fontObject                                                                  = NumberFontNormalSmall,
-            location                                                                    = {
-                Anchor("BOTTOMRIGHT", 0, 0)
-            }
-        }
-    },
-
     -- Buff icon
     [AshBlzSkinBuffIcon]                                                                = {
         alpha                                                                           = Wow.FromPanelProperty("AuraCaster"):Map(function(caster)
@@ -517,44 +499,6 @@ TEMPLATE_SKIN_STYLE                                                             
         },
 
         OmniCCCooldown                                                                  = NIL
-    },
-
-    -- Class buff icon
-    [ClassBuffIcon]                                                                     = {
-        auraData                                                                        = AshBlzSkinApi.UnitClassBuff(),
-        enableMouse                                                                     = false
-    },
-
-    -- Boss debuff icon
-    [BossDebuffIcon]                                                                    = {
-        auraData                                                                        = AshBlzSkinApi.UnitBossDebuff(),
-
-        Background                                                                      = {
-            drawLayer                                                                   = "OVERLAY",
-            file                                                                        = "Interface\\Buttons\\UI-Debuff-Overlays",
-            location                                                                    = {
-                Anchor("TOPLEFT", -1, 1),
-                Anchor("BOTTOMRIGHT", 1, -1)
-            },
-            texCoords                                                                   = RectType(0.296875, 0.5703125, 0, 0.515625)
-        },
-    },
-
-    -- Enlarge debuff icon
-    [EnlargeDebuffIcon]                                                                 = {
-        topLevel                                                                        = true,
-        auraData                                                                        = AshBlzSkinApi.UnitEnlargeDebuff(),
-
-        PixelGlow                                                                       = {
-            period                                                                      = 2,
-            visible                                                                     = true
-        }
-    },
-
-    -- Enlarge buff icon
-    [EnlargeBuffIcon]                                                                   = {
-        topLevel                                                                        = true,
-        auraData                                                                        = AshBlzSkinApi.UnitEnlargeBuff(),
     }
 }
 
