@@ -1,6 +1,7 @@
 Scorpio "AshToAsh.BlizzardSkin.Template.AuraContainer" ""
 
 __Sealed__() struct "AuraData" {
+    { name = "Unit"             },
     { name = "Index"            },
     { name = "Name"             },
     { name = "Icon"             },
@@ -18,16 +19,13 @@ __Sealed__() struct "AuraData" {
 }
 
 __Sealed__()
-class "AshBlzSkinCooldownAuraIcon"(function()
+class "AuraIcon"(function()
     inherit "Frame"
 
     local function OnEnter(self)
         if self.ShowTooltip and self.AuraIndex then
-            local parent        = self:GetParent()
-            if not parent then return end
-
             GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
-            GameTooltip:SetUnitAura(parent.Unit, self.AuraIndex, self.AuraFilter)
+            GameTooltip:SetUnitAura(self.Unit, self.AuraIndex, self.AuraFilter)
         end
     end
 
@@ -38,10 +36,8 @@ class "AshBlzSkinCooldownAuraIcon"(function()
         end
         self.timer = 0
 
-        local parent        = self:GetParent()
-        if not parent then return end
         if self.ShowTooltip and GameTooltip:IsOwned(self) then
-            GameTooltip:SetUnitAura(parent.Unit, self.AuraIndex, self.AuraFilter)
+            GameTooltip:SetUnitAura(self.Unit, self.AuraIndex, self.AuraFilter)
         end
     end
 
@@ -72,7 +68,7 @@ class "AshBlzSkinCooldownAuraIcon"(function()
         self:GetChild("Icon"):SetTexture(icon)
     end
 
-    property "AuraData" { 
+    property "AuraData" {
         type        = AuraData,
         set         = function(self, data)
             if data then
@@ -102,17 +98,47 @@ class "AshBlzSkinCooldownAuraIcon"(function()
         self.OnLeave            = self.OnLeave + OnLeave
         self.OnUpdate           = self.OnUpdate + OnUpdate
     end
+
 end)
 
--- Class buff icon
-class "ClassBuffIcon" { AshBlzSkinCooldownAuraIcon }
+-- Buff icon
+class "BuffIcon"(function()
+    inherit "AuraIcon"
 
--- Enlarge buff icon
-class "EnlargeBuffIcon" { AshBlzSkinCooldownAuraIcon }
+    local function OnMouseUp(self, button)
+        if IsAltKeyDown() and button == "RightButton" then
+            local name, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Unit, self.AuraIndex, self.AuraFilter)
 
--- Boss Debuff icon
-class "BossDebuffIcon"(function()
-    inherit "AshBlzSkinCooldownAuraIcon"
+            if name then
+                _AuraBlackList[spellID] = true
+                FireSystemEvent("ASHTOASH_CONFIG_CHANGED")
+
+                -- Force the refreshing
+                Next(Scorpio.FireSystemEvent, "UNIT_AURA", "any")
+            end
+        elseif IsControlKeyDown() and button == "LeftButton" and self.AuraFilter:match("HARMFUL") then
+            local name, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Unit, self.AuraIndex, self.AuraFilter)
+
+            if name then
+                _EnlargeDebuffList[spellID] = true
+                FireSystemEvent("ASHTOASH_CONFIG_CHANGED")
+
+                -- Force the refreshing
+                Next(Scorpio.FireSystemEvent, "UNIT_AURA", "any")
+            end
+        end
+    end
+
+    function __ctor(self)
+        super(self)
+        self.OnMouseUp = OnMouseUp
+    end
+
+end)
+
+-- Debuff icon
+class "DebuffIcon"(function()
+    inherit "BuffIcon"
 
     function SetAuraData(self, data)
         super.SetAuraData(self, data)
@@ -127,14 +153,38 @@ class "BossDebuffIcon"(function()
     end
 end)
 
--- EnlargeDebuff icon
-class "EnlargeDebuffIcon" { BossDebuffIcon }
+-- Boss Debuff icon
+class "BossDebuffIcon" { DebuffIcon }
+
+-- Class buff icon
+class "ClassBuffIcon" { AuraIcon }
+
+-- Enlarge buff icon
+class "EnlargeBuffIcon" { AuraIcon }
+
+-- Enlarge Debuff icon
+class "EnlargeDebuffIcon" { DebuffIcon }
 
 __Sealed__()
 class "AuraContainer"(function()
 
+    local AuraTypes = {
+        Buff                        = true,
+        Debuff                      = true,
+        BossDebuff                  = true,
+        EnlargeDebuff               = true,
+        EnlargeBuff                 = true,
+        DispelDebuff                = true,
+        ClassBuff                   = true
+    }
+
     local function GenerateAuraIcon(type, count)
-        
+        local icons = self[type .. "Icons"]
+        for i = 1, count do
+            if not icons[i] then
+                -- local icon = 
+            end
+        end
     end
 
     property "BuffCount"            {
@@ -149,7 +199,8 @@ class "AuraContainer"(function()
 
     property "BossDebuffCount"      {
         type                        = NaturalNumber,
-        default                     = 1
+        default                     = 1,
+        set                         = Toolset.fakefunc
     }
 
     property "EnlargeDebuffCount"   {
@@ -168,18 +219,15 @@ class "AuraContainer"(function()
     }
 
     function __ctor(self)
-        self.BuffIcons              = {}
-        self.DebuffIcons            = {}
-        self.BossDebuffIcons        = {}
-        self.EnlargeDebuffIcons     = {}
-        self.EnlargeBuffIcons       = {}
-        self.DispelDebuffIcons      = {}
+        for _, auraType in pairs(AuraTypes) do
+            self[auraType .. "Icons"] = {}
+        end
     end
 end)
 
 TEMPLATE_SKIN_STYLE                                                                     = {
     -- 自带冷却组件的AuraIcon
-    [AshBlzSkinCooldownAuraIcon]                                                        = {
+    [AuraIcon]                                                                          = {
         enableMouse                                                                     = AshBlzSkinApi.AuraTooltipEnable(),
 
         Icon                                                                            = {
@@ -198,14 +246,12 @@ TEMPLATE_SKIN_STYLE                                                             
 
     -- Class buff icon
     [ClassBuffIcon]                                                                     = {
-        auraData                                                                        = AshBlzSkinApi.UnitClassBuff(),
+        topLevel                                                                        = true,
         enableMouse                                                                     = false
     },
 
-    -- Boss debuff icon
-    [BossDebuffIcon]                                                                    = {
-        auraData                                                                        = AshBlzSkinApi.UnitBossDebuff(),
-
+    -- Debuff icon
+    [DebuffIcon]                                                                        = {
         Background                                                                      = {
             drawLayer                                                                   = "OVERLAY",
             file                                                                        = "Interface\\Buttons\\UI-Debuff-Overlays",
@@ -220,7 +266,6 @@ TEMPLATE_SKIN_STYLE                                                             
     -- Enlarge debuff icon
     [EnlargeDebuffIcon]                                                                 = {
         topLevel                                                                        = true,
-        auraData                                                                        = AshBlzSkinApi.UnitEnlargeDebuff(),
 
         PixelGlow                                                                       = {
             period                                                                      = 2,
@@ -231,7 +276,6 @@ TEMPLATE_SKIN_STYLE                                                             
     -- Enlarge buff icon
     [EnlargeBuffIcon]                                                                   = {
         topLevel                                                                        = true,
-        auraData                                                                        = AshBlzSkinApi.UnitEnlargeBuff(),
     }
 }
 
