@@ -113,6 +113,7 @@ class "UnlockButton"(function()
         self.OnEnter = self.OnEnter + OnEnter
         self.OnLeave = self.OnLeave + OnLeave
     end
+    
 end)
 
 __Sealed__() class "AshBlzSkinAuraIcon"(function(_ENV)
@@ -154,37 +155,14 @@ __Sealed__() class "AshBlzSkinAuraIcon"(function(_ENV)
 
     property "AuraCaster"       { type = String }
 
-    __Template__{
-        
-    }
     function __ctor(self)
+        super(self)
         self.OnEnter            = self.OnEnter + OnEnter
         self.OnLeave            = self.OnLeave + OnLeave
         self.OnUpdate           = self.OnUpdate + OnUpdate
     end
+
 end)
-
--- Boss Debuff icon
-__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinBossDebuffIcon")
-class "BossDebuffIcon"(function()
-    inherit "AshBlzSkinCooldownAuraIcon"
-
-    function SetAuraData(self, data)
-        super.SetAuraData(self, data)
-        local color = DebuffTypeColor[data.DebuffType or ""]
-        self:GetChild("Background"):SetVertexColor(color.r, color.g, color.b, color.a)
-    end
-
-    __Template__{
-        Background      = Texture
-    }
-    function __ctor(self)
-    end
-end)
-
--- EnlargeDebuff icon
-__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinEnlargeDebuffIcon")
-class "EnlargeDebuffIcon" { BossDebuffIcon }
 
 -- Buff icon
 __Sealed__()

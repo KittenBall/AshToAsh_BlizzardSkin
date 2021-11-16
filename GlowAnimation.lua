@@ -42,7 +42,7 @@ interface "GlowAnimation"(function(_ENV)
 
     -------------------------------------------------
     -- Functions
-    -------------------------------------------------    
+    -------------------------------------------------
     function AcquireTexture(self)
         return texturePool()
     end

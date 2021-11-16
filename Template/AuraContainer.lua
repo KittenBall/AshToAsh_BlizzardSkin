@@ -1,5 +1,10 @@
 Scorpio "AshToAsh.BlizzardSkin.Template.AuraContainer" ""
 
+-------------------------------------------------
+-- Auras
+-------------------------------------------------
+
+-- Aura data
 __Sealed__() struct "AuraData" {
     { name = "Unit"             },
     { name = "Index"            },
@@ -18,8 +23,9 @@ __Sealed__() struct "AuraData" {
     { name = "ExpirationTime"   }
 }
 
+-- Base aura icon
 __Sealed__()
-class "AuraIcon"(function()
+class "BaseAuraIcon"(function()
     inherit "Frame"
 
     local function OnEnter(self)
@@ -45,27 +51,8 @@ class "AuraIcon"(function()
         GameTooltip:Hide()
     end
 
+    __Abstract__()
     function SetAuraData(self, data)
-        self.AuraIndex = data.Index
-        self.AuraFilter = data.Filter
-        self.AuraCaster = data.Caster
-        self:SetIcon(data.Icon)
-        self:SetLabel(data.Count)
-        self:GetChild("Cooldown"):SetCooldown(data.ExpirationTime - data.Duration, data.Duration)
-    end
-
-    function SetLabel(self, auraCount)
-        local label = auraCount
-        if auraCount >= 100 then
-            label = BUFF_STACKS_OVERFLOW
-        elseif auraCount <=0 then
-            label = ""
-        end
-        self:GetChild("Label"):SetText(label)
-    end
-
-    function SetIcon(self, icon)
-        self:GetChild("Icon"):SetTexture(icon)
     end
 
     property "AuraData" {
@@ -88,15 +75,44 @@ class "AuraIcon"(function()
 
     property "AuraCaster"       { type = String }
 
+    function __ctor(self)
+        self.OnEnter            = self.OnEnter + OnEnter
+        self.OnLeave            = self.OnLeave + OnLeave
+        self.OnUpdate           = self.OnUpdate + OnUpdate
+    end
+
+end)
+
+-- Aura icon
+__Sealed__()
+class "AuraIcon"(function()
+    inherit "BaseAuraIcon"
+
+    function SetAuraData(self, data)
+        self.AuraIndex = data.Index
+        self.AuraFilter = data.Filter
+        self.AuraCaster = data.Caster
+        self:SetLabel(data.Count)
+        self:GetChild("Icon"):SetTexture(data.Icon)
+        self:GetChild("Cooldown"):SetCooldown(data.ExpirationTime - data.Duration, data.Duration)
+    end
+
+    function SetLabel(self, auraCount)
+        local label = auraCount
+        if auraCount >= 100 then
+            label = BUFF_STACKS_OVERFLOW
+        elseif auraCount <=0 then
+            label = ""
+        end
+        self:GetChild("Label"):SetText(label)
+    end
+
     __Template__{
         Cooldown    = OmniCCCooldown,
         Icon        = Texture,
         Label       = FontString
     }
     function __ctor(self)
-        self.OnEnter            = self.OnEnter + OnEnter
-        self.OnLeave            = self.OnLeave + OnLeave
-        self.OnUpdate           = self.OnUpdate + OnUpdate
     end
 
 end)
@@ -151,6 +167,28 @@ class "DebuffIcon"(function()
     }
     function __ctor(self)
     end
+
+end)
+
+-- Dispel debuff icon
+class "DispelDebuffIcon"(function()
+    inherit "BaseAuraIcon"
+
+    function SetAuraData(self, data)
+        self.AuraIndex = data.Index
+        self.AuraFilter = data.Filter
+        self.AuraCaster = data.Caster
+        if data.DebuffType then
+            self:GetChild("Icon"):SetTexture("Interface\\RaidFrame\\Raid-Icon-Debuff" .. data.DebuffType)
+        end
+    end
+
+    __Template__{
+        Icon        = Texture
+    }
+    function __ctor(self)
+    end
+
 end)
 
 -- Boss Debuff icon
@@ -167,25 +205,11 @@ class "EnlargeDebuffIcon" { DebuffIcon }
 
 __Sealed__()
 class "AuraContainer"(function()
+    inherit "Frame"
 
-    local AuraTypes = {
-        Buff                        = true,
-        Debuff                      = true,
-        BossDebuff                  = true,
-        EnlargeDebuff               = true,
-        EnlargeBuff                 = true,
-        DispelDebuff                = true,
-        ClassBuff                   = true
-    }
-
-    local function GenerateAuraIcon(type, count)
-        local icons = self[type .. "Icons"]
-        for i = 1, count do
-            if not icons[i] then
-                -- local icon = 
-            end
-        end
-    end
+    -------------------------------------------------
+    -- Propertys
+    -------------------------------------------------
 
     property "BuffCount"            {
         type                        = NaturalNumber,
@@ -218,18 +242,60 @@ class "AuraContainer"(function()
         default                     = 4
     }
 
-    function __ctor(self)
-        for _, auraType in pairs(AuraTypes) do
-            self[auraType .. "Icons"] = {}
+    property "ClassBuffCount"       {
+        type                        = NaturlNumber,
+        default                     = 1,
+        set                         = Toolset.fakefunc
+    }
+
+    property "Refresh"              {
+        set                         = "Refresh"
+    }
+
+    -------------------------------------------------
+    -- Functions
+    -------------------------------------------------
+
+    function Refresh(self, unit)
+        if not (unit and self:IsVisible()) then return self:HideAllAuras() end
+
+        
+    end
+
+    function HideAllAuras(self)
+        self:HideAuras(self.BuffIcons)
+        self:HideAuras(self.DebuffIcons)
+        self:HideAuras(self.EnlargeDebuffIcons)
+        self:HideAuras(self.EnlargeBuffIcons)
+        self:HideAuras(self.ClassBuffIcons)
+        self:HideAuras(self.DispelDebuffIcons)
+        self:HideAuras(self.BossDebuffIcons)
+    end
+
+    function HideAuras(self, auras)
+        for i = 1, #auras do
+            auras[i]:Hide()
         end
     end
+
+    function __ctor(self)
+        self.BuffIcons              = {}
+        self.DebuffIcons            = {}
+        self.EnlargeDebuffIcons     = {}
+        self.EnlargeBuffIcons       = {}
+        self.ClassBuffIcons         = {}
+        self.DispelDebuffIcons      = {}
+        self.BossDebuffIcons        = {}
+    end
+
 end)
 
 TEMPLATE_SKIN_STYLE                                                                     = {
-    -- 自带冷却组件的AuraIcon
-    [AuraIcon]                                                                          = {
+    [BaseAuraIcon]                                                                      = {
         enableMouse                                                                     = AshBlzSkinApi.AuraTooltipEnable(),
+    },
 
+    [AuraIcon]                                                                          = {
         Icon                                                                            = {
             drawLayer                                                                   = "ARTWORK",
             setAllPoints                                                                = true,
@@ -276,6 +342,15 @@ TEMPLATE_SKIN_STYLE                                                             
     -- Enlarge buff icon
     [EnlargeBuffIcon]                                                                   = {
         topLevel                                                                        = true,
+    },
+
+    -- Dispel debuff icon
+    [DispelDebuffIcon]                                                                  = {
+        Icon                                                                            = {
+            drawLayer                                                                   = "ARTWORK",
+            setAllPoints                                                                = true,
+            texCoords                                                                   = RectType(0.125, 0.875, 0.125, 0.875)
+        }
     }
 }
 
