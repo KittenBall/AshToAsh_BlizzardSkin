@@ -31,7 +31,7 @@ end
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitName()
     local nicknameIndicator = "|TInterface\\AddOns\\AshToAsh_BlizzardSkin\\Media\\indicator_nickname:10|t"
-    return Wow.FromUnitEvent(Wow.FromEvent("UNIT_NAME_UPDATE", "GROUP_ROSTER_UPDATE", "ASHTOASH_BLZ_SKIN_NICK_NAME_UPDATE")):Next():Map(function(unit)
+    return Wow.FromUnitEvent(Wow.FromEvent("UNIT_NAME_UPDATE", "GROUP_ROSTER_UPDATE", "ASHTOASH_BLZ_SKIN_NICK_NAME_UPDATE"):Map("unit => unit or 'any'")):Next():Map(function(unit)
         -- 显示自己的昵称
         if UnitIsUnit("player", unit) and DB().Appearance.Name.ShowNicknameOwns and DB().Appearance.Name.Nickname then
             return nicknameIndicator .. DB().Appearance.Name.Nickname
