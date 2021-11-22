@@ -1,6 +1,36 @@
 Scorpio "AshToAsh.BlizzardSkin.Template.AuraContainer" ""
 
 -------------------------------------------------
+-- Buff filter
+-------------------------------------------------
+
+__Sealed__()
+class "BuffFilter"(function()
+    
+    function ShouldDisplayBuff(self, unitCaster, spellId, canApplyAura)
+        local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
+        
+        if ( hasCustom ) then
+            return showForMySpec or (alwaysShowMine and (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle"))
+        else
+            return (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle") and canApplyAura and not SpellIsSelfBuff(spellId)
+        end
+    end
+    
+    function Filter(self, unit, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
+        return ShouldDisplayBuff(self, caster, spellID, canApplyAura) and not isBossAura
+    end
+
+end)
+
+__Sealed__()
+class "BuffFilterClassic"(function()
+    
+    
+
+end)
+
+-------------------------------------------------
 -- Auras
 -------------------------------------------------
 

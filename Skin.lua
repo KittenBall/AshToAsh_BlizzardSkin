@@ -771,36 +771,7 @@ SKIN_STYLE =                                                                    
         PowerBar                                                                            = AshBlzSkinApi.PowerBarSkin(),
 
         -- 施法条
-        AshBlzSkinCastBar                                                                   = AshBlzSkinApi.CastBarSkin(),
-
-        -- Buff
-        AshBlzSkinBuffPanel                                                                 = AshBlzSkinApi.BuffPanelSkin(),
-
-        -- Debuff
-        AshBlzSkinDebuffPanel                                                               = AshBlzSkinApi.DebuffPanelSkin(),
-
-        -- 可驱散debuff (是可驱散类型即可驱散debuff)
-        AshBlzSkinDispellDebuffPanel                                                        = {
-            SHARE_DISPELLDEBUFFPANEL_SKIN,
-
-            visible                                                                         = AshBlzSkinApi.UnitIsPlayer(),
-        },
-
-        -- 重要Debuff
-        AshBlzSkinEnlargeDebuffIcon                                                         = SHARE_ENLARGEDEBUFFICON_SKIN,
-
-        -- 重要Buff
-        AshBlzSkinEnlargeBuffIcon                                                           = SHARE_ENLARGEBUFFICON_SKIN,
-
-        -- Boss debuff
-        AshBlzSkinBossDebuffIcon                                                            = SHARE_BOSSDEBUFFICON_SKIN,
-
-        -- 职业增益
-        AshBlzSkinClassBuffIcon                                                             = {
-            location                                                                        = AshBlzSkinApi.RelocationUnitFrameBottomIcon(),
-            width                                                                           = AshBlzSkinApi.ResizeOnUnitFrameChanged(),
-            height                                                                          = AshBlzSkinApi.ResizeOnUnitFrameChanged()
-        }
+        AshBlzSkinCastBar                                                                   = AshBlzSkinApi.CastBarSkin()
     },
 
     [AshPetUnitFrame]                                                                       = {
@@ -865,25 +836,7 @@ SKIN_STYLE =                                                                    
         PowerBar                                                                            = AshBlzSkinApi.PetPowerBarSkin(),
 
         -- 施法条
-        AshBlzSkinCastBar                                                                   = AshBlzSkinApi.CastBarSkin(),
-
-        -- Buff
-        AshBlzSkinBuffPanel                                                                 = AshBlzSkinApi.BuffPanelSkin(),
-        
-        -- Debuff
-        AshBlzSkinDebuffPanel                                                               = AshBlzSkinApi.DebuffPanelSkin(),
-
-        --  Boss debuff
-        AshBlzSkinBossDebuffIcon                                                            = SHARE_BOSSDEBUFFICON_SKIN,
-
-        -- 可驱散debuff (是可驱散类型即可驱散debuff)
-        AshBlzSkinDispellDebuffPanel                                                        = SHARE_DISPELLDEBUFFPANEL_SKIN,
-
-        -- 重要Debuff
-        AshBlzSkinEnlargeDebuffIcon                                                         = SHARE_ENLARGEDEBUFFICON_SKIN,
-
-        -- 重要Buff
-        AshBlzSkinEnlargeBuffIcon                                                           = SHARE_ENLARGEBUFFICON_SKIN
+        AshBlzSkinCastBar                                                                   = AshBlzSkinApi.CastBarSkin()
     },
 }
 
