@@ -7,6 +7,12 @@ Scorpio "AshToAsh.BlizzardSkin.Template.AuraContainer" ""
 __Sealed__()
 interface "IBuffFilter"(function()
 
+    property "MaxPriority" {
+        type                        = Number,
+        default                     = 1
+    }
+
+    -- @return priority
     __Abstract__()
     function Filter(...) end
 
@@ -27,7 +33,7 @@ class "BuffFilter"(function()
     end
     
     function Filter(self, unit, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
-        return ShouldDisplayBuff(self, caster, spellID, canApplyAura) and not isBossAura
+        return (ShouldDisplayBuff(self, caster, spellID, canApplyAura) and not isBossAura) and 1 or nil
     end
 
 end)
@@ -51,7 +57,6 @@ __Sealed__() struct "AuraData" {
     { name = "Icon"             },
     { name = "Count"            },
     { name = "DebuffType"       },
-    { name = "Cooldown"         },
     { name = "Stealeable"       },
     { name = "Caster"           },
     { name = "SpellID"          },
@@ -59,7 +64,8 @@ __Sealed__() struct "AuraData" {
     { name = "CasterByPlayer"   },
     { name = "Filter"           },
     { name = "Duration"         },
-    { name = "ExpirationTime"   }
+    { name = "ExpirationTime"   },
+    { name = "Priority"         }
 }
 
 -- Base aura icon
@@ -247,85 +253,96 @@ class "AuraContainer"(function()
     inherit "Frame"
 
     local auraDataPool              = Recycle()
-
-    -------------------------------------------------
-    -- Propertys
-    -------------------------------------------------
-
-    property "BuffCount"            {
-        type                        = NaturalNumber,
-        default                     = 3
-    }
-
-    property "DebuffCount"          {
-        type                        = NaturalNumber,
-        default                     = 3
-    }
-
-    property "BossDebuffCount"      {
-        type                        = NaturalNumber,
-        default                     = 1,
-        set                         = Toolset.fakefunc
-    }
-
-    property "EnlargeDebuffCount"   {
-        type                        = NaturalNumber,
-        default                     = 2
-    }
-
-    property "EnlargeBuffCount"     {
-        type                        = NaturalNumber,
-        default                     = 2
-    }
-
-    property "DispelDebuffCount"    {
-        type                        = NaturlNumber,
-        default                     = 4
-    }
-
-    property "ClassBuffCount"       {
-        type                        = NaturlNumber,
-        default                     = 1,
-        set                         = Toolset.fakefunc
-    }
-
-    property "BuffFilter"           {
-        default                     = Scorpio.IsRetal and BuffFilter(),
-        set                         = Toolset.fakefunc
-    }
-
-    property "Refresh"              {
-        set                         = "Refresh"
-    }
+    local buffCache                 = {}
 
     -------------------------------------------------
     -- Functions
     -------------------------------------------------
 
-    
+    local function wipeCache(cache)
+        for _, auraData in ipairs(cache) do
+            auraDataPool(auraData)
+        end
+        wipe(cache)
+    end
+
+    local function wipeCaches()
+        wipeCache(buffCache)
+    end
+
+    local function cacheAuraData(cache, priority, unit, index, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+        local auraData              = auraDataPool()
+        auraData.Priority           = priority
+        auraData.Unit               = unit
+        auraData.Index              = index
+        auraData.Name               = name
+        auraData.Icon               = icon
+        auraData.Count              = count
+        auraData.DebuffType         = dtype
+        auraData.Duration           = duration
+        auraData.ExpirationTime     = expires
+        auraData.Caster             = caster
+        auraData.SpellID            = spellID
+        auraData.IsBossAura         = isBossAura
+        auraData.CasterByPlayer     = castByPlayer
+        auraData.Stealeable         = isStealable and not UnitIsUnit(unit, "player")
+
+        tinsert(cache, auraData)
+    end
+
     function Refresh(self, unit)
         if not (unit and self:IsVisible()) then return self:HideAllAuras() end
 
-        local index = 1
-        local filter = "HELPFUL"
-        local count = 0
+        wipeCaches()
+
+        local index, maxPriorityAuraCount = 1, 0
+        local auraFilter, maxPriority, filter, maxAuraCount
 
         -- Buff filter
+        auraFilter, maxPriority, filter, maxAuraCount = "HELPFUL", self.BuffFilter.MaxPriority, self.BuffFilter, self.BuffCount
         while true do
-            local name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer = UnitAura(unit, index, filter)
+            local name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer = UnitAura(unit, index, auraFilter)
             if not name then break end
 
-            if self.BuffFilter:Filter(unit, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer) then
-                count = count + 1
+            local priority = filter(unit, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+            if priority then
+                cacheAuraData(buffCache, priority, unit, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+                
+                -- just check max priority aura count to reduce loop
+                if priority == maxPriority then
+                    maxPriorityAuraCount = maxPriorityAuraCount + 1
+                    if maxPriorityAuraCount >= maxAuraCount then
+                        break
+                    end
+                end
             end
 
-            if count >= self.BuffCount then break end
+            index = index + 1
         end
-
-        
+        self:ShowBuffs()
     end
 
-    function ShowBuff(self)
+    local function compareAuraData(a, b)
+        return a.Priority > b.Priority
+    end
+
+    function ShowBuffs(self)
+        sort(buffCache, compareAuraData)
+
+        for i = 1, self.BuffCount do
+            local icon = self.BuffIcons[i]
+            if not icon then
+                icon = BuffIcon("BuffIcon" .. i, self)
+                if i == 1 then
+                    icon:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -3, 0)
+                else
+                    icon:SetPoint("RIGHT", self:GetChild("BuffIcon" .. (i-1)), "LEFT", -1, 0)
+                end
+
+                self.BuffIcons[i] = icon
+            end
+            icon:SetAuraData(buffCache[i])
+        end
     end
 
     function HideAllAuras(self)
@@ -343,6 +360,79 @@ class "AuraContainer"(function()
             auras[i]:Hide()
         end
     end
+
+    function ResizeAuras(self, auras, width, height)
+        for i = 1, #auras do
+            auras[i]:SetSize(width, height)
+        end
+    end
+
+    -------------------------------------------------
+    -- Propertys
+    -------------------------------------------------
+
+    property "BuffCount"            {
+        type                        = NaturalNumber,
+        default                     = 3,
+        handler                     = function(self)
+            self:HideAuras(self.BuffIcons)
+        end
+    }
+
+    property "DebuffCount"          {
+        type                        = NaturalNumber,
+        default                     = 3,
+        handler                     = function(self)
+            self:HideAuras(self.DebuffIcons)
+        end
+    }
+
+    property "BossDebuffCount"      {
+        type                        = NaturalNumber,
+        default                     = 1,
+        set                         = Toolset.fakefunc
+    }
+
+    property "EnlargeDebuffCount"   {
+        type                        = NaturalNumber,
+        default                     = 2,
+        handler                     = function(self)
+            self:HideAuras(self.EnlargeDebuffIcons)
+        end
+    }
+
+    property "EnlargeBuffCount"     {
+        type                        = NaturalNumber,
+        default                     = 2,
+        handler                     = function(self)
+            self:HideAuras(self.EnlargeBuffIcons)
+        end
+    }
+
+    property "DispelDebuffCount"    {
+        type                        = NaturlNumber,
+        default                     = 4,
+        handler                     = function(self)
+            self:HideAuras(self.DispelDebuffIcons)
+        end
+    }
+
+    property "ClassBuffCount"       {
+        type                        = NaturlNumber,
+        default                     = 1,
+        handler                     = function(self)
+            self:HideAuras(self.ClassBuffIcons)
+        end
+    }
+
+    property "BuffFilter"           {
+        default                     = Scorpio.IsRetal and BuffFilter(),
+        set                         = Toolset.fakefunc
+    }
+
+    property "Refresh"              {
+        set                         = "Refresh"
+    }
 
     function __ctor(self)
         self.BuffIcons              = {}
