@@ -76,6 +76,7 @@ class "BaseAuraIcon"(function()
     local function OnEnter(self)
         if self.ShowTooltip and self.AuraIndex then
             GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
+            print(self.Unit, self.AuraIndex, self.AuraFilter)
             GameTooltip:SetUnitAura(self.Unit, self.AuraIndex, self.AuraFilter)
         end
     end
@@ -96,8 +97,11 @@ class "BaseAuraIcon"(function()
         GameTooltip:Hide()
     end
 
-    __Abstract__()
     function SetAuraData(self, data)
+        self.AuraIndex  = data.Index
+        self.AuraFilter = data.Filter
+        self.AuraCaster = data.Caster
+        self.Unit       = data.Unit
     end
 
     property "AuraData" {
@@ -120,6 +124,8 @@ class "BaseAuraIcon"(function()
 
     property "AuraCaster"       { type = String }
 
+    property "Unit"             { type = String }
+
     function __ctor(self)
         self.OnEnter            = self.OnEnter + OnEnter
         self.OnLeave            = self.OnLeave + OnLeave
@@ -134,9 +140,7 @@ class "AuraIcon"(function()
     inherit "BaseAuraIcon"
 
     function SetAuraData(self, data)
-        self.AuraIndex = data.Index
-        self.AuraFilter = data.Filter
-        self.AuraCaster = data.Caster
+        super.SetAuraData(self, data)
         self:SetLabel(data.Count)
         self:GetChild("Icon"):SetTexture(data.Icon)
         self:GetChild("Cooldown"):SetCooldown(data.ExpirationTime - data.Duration, data.Duration)
@@ -220,6 +224,7 @@ class "DispelDebuffIcon"(function()
     inherit "BaseAuraIcon"
 
     function SetAuraData(self, data)
+        self.Unit = data.Unit
         self.AuraIndex = data.Index
         self.AuraFilter = data.Filter
         self.AuraCaster = data.Caster
@@ -248,6 +253,7 @@ class "EnlargeBuffIcon" { AuraIcon }
 -- Enlarge Debuff icon
 class "EnlargeDebuffIcon" { DebuffIcon }
 
+__ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinAuraContainer")
 __Sealed__()
 class "AuraContainer"(function()
     inherit "Frame"
@@ -270,7 +276,7 @@ class "AuraContainer"(function()
         wipeCache(buffCache)
     end
 
-    local function cacheAuraData(cache, priority, unit, index, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+    local function cacheAuraData(cache, priority, unit, index, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
         local auraData              = auraDataPool()
         auraData.Priority           = priority
         auraData.Unit               = unit
@@ -285,6 +291,7 @@ class "AuraContainer"(function()
         auraData.SpellID            = spellID
         auraData.IsBossAura         = isBossAura
         auraData.CasterByPlayer     = castByPlayer
+        auraData.Filter             = filter
         auraData.Stealeable         = isStealable and not UnitIsUnit(unit, "player")
 
         tinsert(cache, auraData)
@@ -300,26 +307,28 @@ class "AuraContainer"(function()
 
         -- Buff filter
         auraFilter, maxPriority, filter, maxAuraCount = "HELPFUL", self.BuffFilter.MaxPriority, self.BuffFilter, self.BuffCount
-        while true do
+        while maxPriorityAuraCount < maxAuraCount do
             local name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer = UnitAura(unit, index, auraFilter)
             if not name then break end
 
-            local priority = filter(unit, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+            local priority = filter:Filter(unit, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
             if priority then
-                cacheAuraData(buffCache, priority, unit, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+                cacheAuraData(buffCache, priority, unit, index, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
                 
                 -- just check max priority aura count to reduce loop
                 if priority == maxPriority then
                     maxPriorityAuraCount = maxPriorityAuraCount + 1
-                    if maxPriorityAuraCount >= maxAuraCount then
-                        break
-                    end
                 end
             end
 
             index = index + 1
         end
         self:ShowBuffs()
+    end
+
+    local function getScaleSize(self, value)
+        local componentScale = min(self:GetWidth() / 72, self:GetHeight() / 36)
+        return (value or 10) * componentScale
     end
 
     local function compareAuraData(a, b)
@@ -333,6 +342,7 @@ class "AuraContainer"(function()
             local icon = self.BuffIcons[i]
             if not icon then
                 icon = BuffIcon("BuffIcon" .. i, self)
+                icon:SetSize(getScaleSize(self, self.BuffWidth), getScaleSize(self, self.BuffHeight))
                 if i == 1 then
                     icon:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -3, 0)
                 else
@@ -341,7 +351,7 @@ class "AuraContainer"(function()
 
                 self.BuffIcons[i] = icon
             end
-            icon:SetAuraData(buffCache[i])
+            icon.AuraData = buffCache[i]
         end
     end
 
@@ -361,10 +371,24 @@ class "AuraContainer"(function()
         end
     end
 
+    function ResizeAllAuras(self)
+        self:ResizeAuras(self.BuffIcons, self.BuffWidth, self.BuffHeight)
+        -- self:ResizeAuras(self.DebuffIcons)
+        -- self:ResizeAuras(self.EnlargeDebuffIcons)
+        -- self:ResizeAuras(self.EnlargeBuffIcons)
+        -- self:ResizeAuras(self.ClassBuffIcons)
+        -- self:ResizeAuras(self.DispelDebuffIcons)
+        -- self:ResizeAuras(self.BossDebuffIcons)
+    end
+
     function ResizeAuras(self, auras, width, height)
         for i = 1, #auras do
-            auras[i]:SetSize(width, height)
+            auras[i]:SetSize(getScaleSize(self, width), getScaleSize(self, height))
         end
+    end
+
+    local function OnSizeChanged(self, width, height)
+        self:ResizeAllAuras()
     end
 
     -------------------------------------------------
@@ -377,6 +401,27 @@ class "AuraContainer"(function()
         handler                     = function(self)
             self:HideAuras(self.BuffIcons)
         end
+    }
+
+    property "BuffWidth"            {
+        type                        = Number,
+        default                     = 1,
+        handler                     = function(self, width)
+            self:ResizeAuras(self.BuffIcons, width, self.BuffHeight)
+        end
+    }
+
+    property "BuffHeight"           {
+        type                        = Number,
+        default                     = 1,
+        handler                     = function(self, height)
+            self:ResizeAuras(self.BuffIcons, self.BuffWidth, height)
+        end
+    }
+
+    property "BuffFilter"           {
+        default                     = Scorpio.IsRetail and BuffFilter(),
+        set                         = Toolset.fakefunc
     }
 
     property "DebuffCount"          {
@@ -425,13 +470,18 @@ class "AuraContainer"(function()
         end
     }
 
-    property "BuffFilter"           {
-        default                     = Scorpio.IsRetal and BuffFilter(),
-        set                         = Toolset.fakefunc
-    }
-
     property "Refresh"              {
         set                         = "Refresh"
+    }
+
+    property "PowerBarHeight"       {
+        type                        = Number,
+        default                     = 1
+    }
+
+    property "PowerBarVisible"      {
+        type                        = Boolean,
+        default                     = false
     }
 
     function __ctor(self)
@@ -442,6 +492,8 @@ class "AuraContainer"(function()
         self.ClassBuffIcons         = {}
         self.DispelDebuffIcons      = {}
         self.BossDebuffIcons        = {}
+
+        self.OnSizeChanged = self.OnSizeChanged + OnSizeChanged
     end
 
 end)

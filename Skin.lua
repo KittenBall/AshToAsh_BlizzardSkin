@@ -771,7 +771,14 @@ SKIN_STYLE =                                                                    
         PowerBar                                                                            = AshBlzSkinApi.PowerBarSkin(),
 
         -- 施法条
-        AshBlzSkinCastBar                                                                   = AshBlzSkinApi.CastBarSkin()
+        AshBlzSkinCastBar                                                                   = AshBlzSkinApi.CastBarSkin(),
+
+        AshBlzSkinAuraContainer                                                             = {
+            setAllPoints                                                                    = true,
+            refresh                                                                         = AshBlzSkinApi.UnitAura(),
+            buffWidth                                                                       = AshBlzSkinApi.OnConfigChanged():Map(function() return DB().Appearance.Aura.AuraSize end),
+            buffHeight                                                                      = AshBlzSkinApi.OnConfigChanged():Map(function() return DB().Appearance.Aura.AuraSize end)
+        }
     },
 
     [AshPetUnitFrame]                                                                       = {
