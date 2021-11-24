@@ -325,7 +325,7 @@ class "AuraContainer"(function()
         
     end
 
-    function ShowBuff(self, )
+    function ShowBuff(self)
     end
 
     function HideAllAuras(self)
