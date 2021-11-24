@@ -5,7 +5,16 @@ Scorpio "AshToAsh.BlizzardSkin.Template.AuraContainer" ""
 -------------------------------------------------
 
 __Sealed__()
+interface "IBuffFilter"(function()
+
+    __Abstract__()
+    function Filter(...) end
+
+end)
+
+__Sealed__()
 class "BuffFilter"(function()
+    extend "IBuffFilter"
     
     function ShouldDisplayBuff(self, unitCaster, spellId, canApplyAura)
         local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
@@ -25,8 +34,8 @@ end)
 
 __Sealed__()
 class "BuffFilterClassic"(function()
-    
-    
+    extend "IBuffFilter"
+
 
 end)
 
@@ -237,6 +246,8 @@ __Sealed__()
 class "AuraContainer"(function()
     inherit "Frame"
 
+    local auraDataPool              = Recycle()
+
     -------------------------------------------------
     -- Propertys
     -------------------------------------------------
@@ -278,6 +289,11 @@ class "AuraContainer"(function()
         set                         = Toolset.fakefunc
     }
 
+    property "BuffFilter"           {
+        default                     = Scorpio.IsRetal and BuffFilter(),
+        set                         = Toolset.fakefunc
+    }
+
     property "Refresh"              {
         set                         = "Refresh"
     }
@@ -286,10 +302,30 @@ class "AuraContainer"(function()
     -- Functions
     -------------------------------------------------
 
+    
     function Refresh(self, unit)
         if not (unit and self:IsVisible()) then return self:HideAllAuras() end
 
+        local index = 1
+        local filter = "HELPFUL"
+        local count = 0
+
+        -- Buff filter
+        while true do
+            local name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer = UnitAura(unit, index, filter)
+            if not name then break end
+
+            if self.BuffFilter:Filter(unit, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer) then
+                count = count + 1
+            end
+
+            if count >= self.BuffCount then break end
+        end
+
         
+    end
+
+    function ShowBuff(self, )
     end
 
     function HideAllAuras(self)
