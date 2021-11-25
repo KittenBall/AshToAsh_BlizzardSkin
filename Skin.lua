@@ -773,11 +773,15 @@ SKIN_STYLE =                                                                    
         -- 施法条
         AshBlzSkinCastBar                                                                   = AshBlzSkinApi.CastBarSkin(),
 
+        -- 光环
         AshBlzSkinAuraContainer                                                             = {
             setAllPoints                                                                    = true,
+            paddingRight                                                                    = 3,
+            paddingBottom                                                                   = AshBlzSkinApi.PowerBarVisible():Map(function(visible)
+                return visible and POWERBAR_HEIGHT or 3
+            end);
             refresh                                                                         = AshBlzSkinApi.UnitAura(),
-            buffWidth                                                                       = AshBlzSkinApi.OnConfigChanged():Map(function() return DB().Appearance.Aura.AuraSize end),
-            buffHeight                                                                      = AshBlzSkinApi.OnConfigChanged():Map(function() return DB().Appearance.Aura.AuraSize end)
+            buffSize                                                                        = AshBlzSkinApi.OnConfigChanged():Map(function() return DB().Appearance.Aura.AuraSize end)
         }
     },
 

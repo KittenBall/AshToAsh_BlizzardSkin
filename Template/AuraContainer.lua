@@ -342,9 +342,9 @@ class "AuraContainer"(function()
             local icon = self.BuffIcons[i]
             if not icon then
                 icon = BuffIcon("BuffIcon" .. i, self)
-                icon:SetSize(getScaleSize(self, self.BuffWidth), getScaleSize(self, self.BuffHeight))
+                icon:SetSize(getScaleSize(self, self.BuffSize))
                 if i == 1 then
-                    icon:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -3, 0)
+                    icon:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -self.PaddingRight, self.PaddingBottom)
                 else
                     icon:SetPoint("RIGHT", self:GetChild("BuffIcon" .. (i-1)), "LEFT", -1, 0)
                 end
@@ -372,7 +372,7 @@ class "AuraContainer"(function()
     end
 
     function ResizeAllAuras(self)
-        self:ResizeAuras(self.BuffIcons, self.BuffWidth, self.BuffHeight)
+        self:ResizeAuras(self.BuffIcons, self.BuffSize)
         -- self:ResizeAuras(self.DebuffIcons)
         -- self:ResizeAuras(self.EnlargeDebuffIcons)
         -- self:ResizeAuras(self.EnlargeBuffIcons)
@@ -381,9 +381,26 @@ class "AuraContainer"(function()
         -- self:ResizeAuras(self.BossDebuffIcons)
     end
 
-    function ResizeAuras(self, auras, width, height)
+    function ResizeAuras(self, auras, size)
+        size = getScaleSize(self, size)
         for i = 1, #auras do
-            auras[i]:SetSize(getScaleSize(self, width), getScaleSize(self, height))
+            auras[i]:SetSize(size)
+        end
+    end
+
+    function OnPaddingChanged(self, paddingLeft, paddingTop, paddingRight, paddingBottom)
+        if paddingRight then
+            local icon = self.BuffIcons[1]
+            if icon then
+                icon:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -self.PaddingRight, self.PaddingBottom)
+            end
+        end
+
+        if paddingBottom then
+            local icon = self.BuffIcons[1]
+            if icon then
+                icon:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -self.PaddingRight, self.PaddingBottom)
+            end
         end
     end
 
@@ -403,19 +420,11 @@ class "AuraContainer"(function()
         end
     }
 
-    property "BuffWidth"            {
+    property "BuffSize"            {
         type                        = Number,
         default                     = 1,
-        handler                     = function(self, width)
-            self:ResizeAuras(self.BuffIcons, width, self.BuffHeight)
-        end
-    }
-
-    property "BuffHeight"           {
-        type                        = Number,
-        default                     = 1,
-        handler                     = function(self, height)
-            self:ResizeAuras(self.BuffIcons, self.BuffWidth, height)
+        handler                     = function(self, size)
+            self:ResizeAuras(self.BuffIcons, size)
         end
     }
 
@@ -474,14 +483,36 @@ class "AuraContainer"(function()
         set                         = "Refresh"
     }
 
-    property "PowerBarHeight"       {
-        type                        = Number,
-        default                     = 1
+    property "PaddingLeft"          {
+        type                        = NaturlNumber,
+        default                     = 0,
+        handler                     = function(self, paddingLeft)
+            OnPaddingChanged(paddingLeft)
+        end
     }
 
-    property "PowerBarVisible"      {
-        type                        = Boolean,
-        default                     = false
+    property "PaddingRight"         {
+        type                        = NaturlNumber,
+        default                     = 0,
+        handler                     = function(self, paddingRight)
+            OnPaddingChanged(nil, nil, paddingRight)
+        end
+    }
+
+    property "PaddingTop"           {
+        type                        = NaturlNumber,
+        default                     = 0,
+        handler                     = function(self, paddingTop)
+            OnPaddingChanged(nil, paddingTop)
+        end
+    }
+
+    property "PaddingBottom"        {
+        type                        = NaturlNumber,
+        default                     = 0,
+        handler                     = function(self, paddingBottom)
+            OnPaddingChanged(nil, nil, nil, paddingBottom)
+        end
     }
 
     function __ctor(self)
