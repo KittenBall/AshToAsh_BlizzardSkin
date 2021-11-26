@@ -342,7 +342,8 @@ class "AuraContainer"(function()
             local icon = self.BuffIcons[i]
             if not icon then
                 icon = BuffIcon("BuffIcon" .. i, self)
-                icon:SetSize(getScaleSize(self, self.BuffSize))
+                local size = getScaleSize(self, self.BuffSize)
+                icon:SetSize(size, size)
                 if i == 1 then
                     icon:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -self.PaddingRight, self.PaddingBottom)
                 else
@@ -384,7 +385,7 @@ class "AuraContainer"(function()
     function ResizeAuras(self, auras, size)
         size = getScaleSize(self, size)
         for i = 1, #auras do
-            auras[i]:SetSize(size)
+            auras[i]:SetSize(size, size)
         end
     end
 
@@ -487,7 +488,7 @@ class "AuraContainer"(function()
         type                        = NaturlNumber,
         default                     = 0,
         handler                     = function(self, paddingLeft)
-            OnPaddingChanged(paddingLeft)
+            self:OnPaddingChanged(paddingLeft)
         end
     }
 
@@ -495,7 +496,7 @@ class "AuraContainer"(function()
         type                        = NaturlNumber,
         default                     = 0,
         handler                     = function(self, paddingRight)
-            OnPaddingChanged(nil, nil, paddingRight)
+            self:OnPaddingChanged(nil, nil, paddingRight)
         end
     }
 
@@ -503,7 +504,7 @@ class "AuraContainer"(function()
         type                        = NaturlNumber,
         default                     = 0,
         handler                     = function(self, paddingTop)
-            OnPaddingChanged(nil, paddingTop)
+            self:OnPaddingChanged(nil, paddingTop)
         end
     }
 
@@ -511,7 +512,7 @@ class "AuraContainer"(function()
         type                        = NaturlNumber,
         default                     = 0,
         handler                     = function(self, paddingBottom)
-            OnPaddingChanged(nil, nil, nil, paddingBottom)
+            self:OnPaddingChanged(nil, nil, nil, paddingBottom)
         end
     }
 

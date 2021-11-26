@@ -778,7 +778,7 @@ SKIN_STYLE =                                                                    
             setAllPoints                                                                    = true,
             paddingRight                                                                    = 3,
             paddingBottom                                                                   = AshBlzSkinApi.PowerBarVisible():Map(function(visible)
-                return visible and POWERBAR_HEIGHT or 3
+                return visible and POWERBAR_HEIGHT or 3.5
             end);
             refresh                                                                         = AshBlzSkinApi.UnitAura(),
             buffSize                                                                        = AshBlzSkinApi.OnConfigChanged():Map(function() return DB().Appearance.Aura.AuraSize end)
