@@ -381,71 +381,6 @@ function AshBlzSkinApi.FocusSkin()
     end)
 end
 
-
--------------------------------------------------
--- Debuff
--------------------------------------------------
-local DebuffPanelNoBossAuraLocation = { Anchor("BOTTOMLEFT", 3, 1.5, "PredictionHealthBar", "BOTTOMLEFT") }
-local DebuffPanelBossAuraLocation   = { Anchor("BOTTOMLEFT", 1, 0, "AshBlzSkinBossDebuffIcon", "BOTTOMRIGHT") }
-SHARE_DEBUFFPANEL_SKIN                                                                      = {
-    elementType                                                                             = AshBlzSkinDebuffIcon,
-    orientation                                                                             = Orientation.HORIZONTAL,
-    leftToRight                                                                             = true,
-    topToBottom                                                                             = false,
-    rowCount                                                                                = 1,
-    columnCount                                                                             = AshBlzSkinApi.UnitBossAura():Map(function(val) return val and 1 or 3 end),
-    marginLeft                                                                              = 1,
-    hSpacing                                                                                = 0.5,
-    vSpacing                                                                                = 1,
-    location                                                                                = AshBlzSkinApi.UnitBossAura():Map(function(val)
-        return val and DebuffPanelBossAuraLocation or DebuffPanelNoBossAuraLocation
-    end),
-    displayOnlyDispellableDebuffs                                                           = AshBlzSkinApi.DisplayOnlyDispellableDebuffs(),
-
-    customFilter                                                                            = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID)
-        return not (_AuraBlackList[spellID] or _EnlargeDebuffList[spellID])
-    end,
-}
-
-__Static__() __AutoCache__()
-function AshBlzSkinApi.DebuffPanelSkin()
-    return AshBlzSkinApi.OnConfigChanged():Map(function()
-        SHARE_DEBUFFPANEL_SKIN.elementWidth = AshBlzSkinApi.ResizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
-        SHARE_DEBUFFPANEL_SKIN.elementHeight = AshBlzSkinApi.ResizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
-        return SHARE_DEBUFFPANEL_SKIN
-    end)
-end
-
--------------------------------------------------
--- Buff
--------------------------------------------------
-SHARE_BUFFPANEL_SKIN                                                                        = {
-    elementType                                                                             = AshBlzSkinBuffIcon,
-    orientation                                                                             = Orientation.HORIZONTAL,
-    marginRight                                                                             = 3,
-    rowCount                                                                                = 1,
-    columnCount                                                                             = 3,
-    hSpacing                                                                                = 0,
-    leftToRight                                                                             = false,
-    topToBottom                                                                             = false,
-    location                                                                                = {
-        Anchor("BOTTOMRIGHT", 0, 1.5, "PredictionHealthBar", "BOTTOMRIGHT") 
-    },
-        
-    customFilter                                                                            = function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID) 
-        return not _AuraBlackList[spellID] and not (_ClassBuffList[name] or _ClassBuffList[spellID]) and not EnlargeBuffList[spellID]
-    end,
-}
-
-__Static__() __AutoCache__()
-function AshBlzSkinApi.BuffPanelSkin()
-    return AshBlzSkinApi.OnConfigChanged():Map(function()
-        SHARE_BUFFPANEL_SKIN.elementWidth = AshBlzSkinApi.ResizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
-        SHARE_BUFFPANEL_SKIN.elementHeight = AshBlzSkinApi.ResizeOnUnitFrameChanged(DB().Appearance.Aura.AuraSize)
-        return SHARE_BUFFPANEL_SKIN
-    end)
-end
-
 -------------------------------------------------
 -- Master loot
 -------------------------------------------------
@@ -463,65 +398,6 @@ __Static__() __AutoCache__()
 function AshBlzSkinApi.MasterLooterSkin()
     return Observable.Just(not Scorpio.IsRetail):Map(function(display)
         if display then return MASTER_LOOTER_SKIN end
-    end)
-end
-
--------------------------------------------------
--- Dispellable debuff
--------------------------------------------------
-
-DISPELLABLE_DEBUFF_SKIN                                                                     = {
-    drawLayer                                                                               = "BORDER",
-    subLevel                                                                                = 2,
-    location                                                                                = {
-        Anchor("TOPLEFT", 0, 0, "$parent.statusBarTexture", "TOPLEFT"),
-        Anchor("BOTTOMRIGHT", 0, 0, "$parent.statusBarTexture", "BOTTOMRIGHT")
-    },
-    ignoreParentAlpha                                                                       = true,
-    file                                                                                    = AshBlzSkinApi.HealthBarTexture(),
-    vertexColor                                                                             = AshBlzSkinApi.UnitDebuffCanDispellColor(),
-    visible                                                                                 = AshBlzSkinApi.UnitDebuffCanDispell(),
-
-    AnimationGroup                                                                          = {
-        playing                                                                             = true,
-        looping                                                                             = "REPEAT",
-
-        Alpha1                                                                              = {
-            smoothing                                                                       = "OUT",
-            order                                                                           = 1,
-            duration                                                                        = 0.5,
-            fromAlpha                                                                       = 0,
-            toAlpha                                                                         = 1
-        },
-        Alpha2                                                                              = {
-            smoothing                                                                       = "IN",
-            order                                                                           = 2,
-            duration                                                                        = 0.5,
-            fromAlpha                                                                       = 1,
-            toAlpha                                                                         = 0
-        }
-    }
-}
-
-__Static__() __AutoCache__()
-function AshBlzSkinApi.DispellableDebuffSkin()
-    return AshBlzSkinApi.DisplayDispellableDebuffHighlight():Map(function(display)
-        return display and DISPELLABLE_DEBUFF_SKIN or nil
-    end)
-end
-
--------------------------------------------------
--- Dispellable debuff pixel glow
--------------------------------------------------
-
-PIXELGLOW_SKIN                                                                              = {
-    visible                                                                                 = AshBlzSkinApi.UnitDebuffCanDispell()
-}
-
-__Static__() __AutoCache__()
-function AshBlzSkinApi.DispellableDebuffPixelGlowSkin()
-    return AshBlzSkinApi.DisplayDispellableDebuffHighlight():Map(function(display)
-        return display and PIXELGLOW_SKIN or nil
     end)
 end
 
@@ -544,33 +420,6 @@ SHARE_ENLARGEDEBUFFICON_SKIN                                                    
     height                                                                                  = AshBlzSkinApi.ResizeOnUnitFrameChanged(15),
     location                                                                                = {
         Anchor("TOPLEFT", 3, -3, "PredictionHealthBar", "TOPLEFT")
-    }
-}
-
--- Dispell debuff
-SHARE_DISPELLDEBUFFPANEL_SKIN                                                               = {
-    elementType                                                                             = AshBlzSkinDispellIcon,
-    leftToRight                                                                             = false,
-    topToBottom                                                                             = false,
-    rowCount                                                                                = 1,
-    columnCount                                                                             = 4,
-    hSpacing                                                                                = 1.5,
-    vSpacing                                                                                = 1,
-    marginRight                                                                             = 3,
-    marginTop                                                                               = 4,
-    elementWidth                                                                            = AshBlzSkinApi.ResizeOnUnitFrameChanged(9),
-    elementHeight                                                                           = AshBlzSkinApi.ResizeOnUnitFrameChanged(9),
-    location                                                                                = {
-        Anchor("TOPRIGHT", 0, 0, "PredictionHealthBar", "TOPRIGHT")
-    }
-}
-
--- Boss debuff
-SHARE_BOSSDEBUFFICON_SKIN                                                                   = {
-    width                                                                                   = AshBlzSkinApi.ResizeOnUnitFrameChanged(15),
-    height                                                                                  = AshBlzSkinApi.ResizeOnUnitFrameChanged(15),
-    location                                                                                = {
-        Anchor("BOTTOMLEFT", 3, 1.5, "PredictionHealthBar", "BOTTOMLEFT")
     }
 }
 
@@ -597,10 +446,7 @@ SHARE_HEALTHBAR_SKIN                                                            
         else
             return { Anchor("TOPLEFT", 1, -1), Anchor("BOTTOMRIGHT", -1, 1) }
         end
-    end),
-
-    -- 拥有驱散debuff的能力
-    IconTexture                                                                             = AshBlzSkinApi.DispellableDebuffSkin()
+    end)
 }
 
 -------------------------------------------------
@@ -634,10 +480,6 @@ SKIN_STYLE =                                                                    
     [AshUnitFrame]                                                                          = {
         frameStrata                                                                         = "MEDIUM",
         alpha                                                                               = AshBlzSkinApi.UnitInRange():Map('v=>v and 1 or 0.55'),
-        auraEngine                                                                          = AshBlzSkinApi.AuraEngine(),
-
-        -- 可驱散debuff高亮
-        PixelGlow                                                                           = AshBlzSkinApi.DispellableDebuffPixelGlowSkin(),
 
         BackgroundTexture                                                                   = {
             file                                                                            = AshBlzSkinApi.UnitFrameBackground(),
@@ -776,12 +618,23 @@ SKIN_STYLE =                                                                    
         -- 光环
         AshBlzSkinAuraContainer                                                             = {
             setAllPoints                                                                    = true,
-            paddingRight                                                                    = 3,
+            useParentLevel                                                                  = true,
+            paddingLeft                                                                     = 4,
+            paddingRight                                                                    = 4,
+            paddingTop                                                                      = 4,
             paddingBottom                                                                   = AshBlzSkinApi.PowerBarVisible():Map(function(visible)
-                return visible and POWERBAR_HEIGHT or 3.5
+                return visible and POWERBAR_HEIGHT + 1 or 4
             end);
+            classBuffFilterData                                                             = _ClassBuffList,
             refresh                                                                         = AshBlzSkinApi.UnitAura(),
-            buffSize                                                                        = AshBlzSkinApi.OnConfigChanged():Map(function() return DB().Appearance.Aura.AuraSize end)
+            displayOnlyDispellableDebuffs                                                   = AshBlzSkinApi.DisplayOnlyDispellableDebuffs(),
+            buffSize                                                                        = AshBlzSkinApi.OnConfigChanged():Map(function() return DB().Appearance.Aura.AuraSize end),
+            debuffSize                                                                      = AshBlzSkinApi.OnConfigChanged():Map(function() return DB().Appearance.Aura.AuraSize end),
+            dispelDebuffSize                                                                = 8,
+            bossAuraSize                                                                    = 15,
+            classBuffSize                                                                   = 10,
+            CheckDispelAbilityEnable                                                        = AshBlzSkinApi.CheckDispelAbilityEnable(),
+            specID                                                                          = AshBlzSkinApi.PlayerSpecializationID()
         }
     },
 

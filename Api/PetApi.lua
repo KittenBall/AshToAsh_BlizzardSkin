@@ -58,13 +58,14 @@ function UpdateGroupPetMap(unit)
             end
         end
     end
+    FireSystemEvent("ASHTOASH_BLZ_SKIN_PET_OWNER_UPDATE", unit or "any")
 end
 
 PetColor = {}
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPetColor()
-    return Wow.FromUnitEvent(Wow.FromEvent("UNIT_CONNECTION", "UNIT_NAME_UPDATE", "GROUP_ROSTER_UPDATE"):Map("unit => unit or 'any'")):Next():Map(function(unit)
+    return Wow.FromUnitEvent(Wow.FromEvent("ASHTOASH_BLZ_SKIN_PET_OWNER_UPDATE")):Next():Map(function(unit)
         if not unit then return end
         
         local guid = UnitGUID(unit)
@@ -90,7 +91,7 @@ end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPetOwnerName()
-    return Wow.FromUnitEvent(Wow.FromEvent("UNIT_NAME_UPDATE", "GROUP_ROSTER_UPDATE"):Map("unit => unit or 'any'")):Next():Map(function(unit)
+    return Wow.FromUnitEvent(Wow.FromEvent("ASHTOASH_BLZ_SKIN_PET_OWNER_UPDATE")):Next():Map(function(unit)
         if not unit then return end
         local guid = UnitGUID(unit)
         if guid then

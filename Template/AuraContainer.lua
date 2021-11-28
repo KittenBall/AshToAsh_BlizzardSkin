@@ -1,18 +1,34 @@
 Scorpio "AshToAsh.BlizzardSkin.Template.AuraContainer" ""
 
 
-
 __Sealed__()
-interface "IAuraFilter"(function()
+interface "AuraFilter"(function()
 
-    property "MaxPriority" {
+    property "MaxPriority"          {
         type                        = Number,
         default                     = 1
     }
 
-    -- @return priority
+    property "Data"                 {
+        type                        = RawTable,
+        default                     = {}
+    }
+
+    property "SpecID"               {
+        type                        = Number,
+        default                     = 0
+    }
+
+    property "Class"                {
+        type                        = String,
+        default                     = UnitClassBase("player")
+    }
+
     __Abstract__()
     function Filter(...) end
+
+    __Abstract__()
+    function SortDisplayOrder(...) end
 
 end)
 
@@ -22,7 +38,7 @@ end)
 
 __Sealed__()
 class "BuffFilter"(function()
-    extend "IAuraFilter"
+    extend "AuraFilter"
     
     function ShouldDisplayBuff(self, unitCaster, spellId, canApplyAura)
         local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
@@ -35,16 +51,121 @@ class "BuffFilter"(function()
     end
     
     function Filter(self, unit, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
-        return (not isBossAura and self:ShouldDisplayBuff(caster, spellID, canApplyAura)) and 1 or nil
+        return (not isBossAura and self:ShouldDisplayBuff(caster, spellID, canApplyAura)) and self.MaxPriority or nil
     end
 
 end)
 
 __Sealed__()
 class "BuffFilterClassic"(function()
-    extend "IBuffFilter"
+    extend "AuraFilter"
 
-    -- todo
+    -- 同一个职业会互相顶的Buff
+    local classBuffList         = {
+        PALADIN                 = {
+            -- 强效王者祝福
+            [25898]             = true,
+            -- 王者祝福
+            [20217]             = true,
+            -- 强效庇护祝福
+            [27169]             = true,
+            -- 庇护祝福
+            [27168]             = true,
+            -- 强效力量祝福
+            [27141]             = true,
+            -- 力量祝福
+            [27140]             = true,
+            -- 强效智慧祝福
+            [27143]             = true,
+            -- 智慧祝福
+            [27142]             = true,
+            -- 强效光明祝福
+            [27145]             = true,
+            -- 光明祝福
+            [27144]             = true,
+            -- 强效拯救祝福
+            [25895]             = true,
+            -- 拯救祝福
+            [1038]              = true
+        },
+
+        MAGE                    = {
+            -- 奥术智慧
+            [27126]             = true,
+            -- 奥术光辉
+            [27127]             = true
+        },
+
+        DRUID                   = {
+            -- 野性赐福
+            [26991]             = true,
+            -- 野性印记
+            [26990]             = true
+        },
+
+        PRIEST                  = {
+            -- 坚韧祷言
+            [25392]             = true,
+            -- 真言术：韧
+            [25389]             = true,
+            -- 精神祷言
+            [32999]             = true,
+            -- 神圣之灵
+            [25312]             = true,
+            -- 暗影防护祷言
+            [39374]             = true,
+            -- 防护暗影
+            [25433]             = true
+        },
+
+        SHAMAN                  = {
+            -- 大地之盾
+            [32594]             = true
+        }
+    }
+
+    local classBuffPriority     = 0
+
+    local function shouldShowClassBuff(self, spellId)
+        local buffs = classBuffList[self.Class]
+        return buffs and buffs[spellId]
+    end
+
+    function ShouldDisplayBuff(self, unitCaster, spellId, canApplyAura)
+        local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
+        
+        if ( hasCustom ) then
+            return showForMySpec or (alwaysShowMine and (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle"))
+        else
+            return (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle") and canApplyAura and not SpellIsSelfBuff(spellId)
+        end
+    end
+    
+    function Filter(self, unit, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
+        if not isBossAura then
+            if self:ShouldDisplayBuff(caster, spellID, canApplyAura) then
+                if shouldShowClassBuff(self, spellID) then
+                    return classBuffPriority
+                else
+                    return self.MaxPriority
+                end
+            end
+        end
+    end
+
+    -- 如果职业buff会被显示的话，将职业buff添加到所有buff的最前面
+    function SortDisplayOrder(self, src, maxCount)
+        local count = #src
+        if count > 1 and count <= maxCount then
+            for i = 2, count do
+                local aura = src[i]
+                if aura.priority == classBuffPriority then
+                    tremove(src, i)
+                    tinsert(src, 1)
+                end
+            end
+        end
+    end
 
 end)
 
@@ -54,7 +175,7 @@ end)
 
 __Sealed__()
 class "DebuffFilter"(function()
-    extend "IAuraFilter"
+    extend "AuraFilter"
 
     property "MaxPriority" {
         type                        = Integer,
@@ -62,7 +183,7 @@ class "DebuffFilter"(function()
     }
 
     local isPriorityDebuff
-    local _, classFileName = UnitClass("player")
+    local classFileName = UnitClassBase("player")
     if classFileName == "PALADIN" then
 		isPriorityDebuff = function(spellID)
 			local isForbearance = (spellId == 25771)
@@ -74,7 +195,7 @@ class "DebuffFilter"(function()
 		end
 	end
 
-    function ShouldDisplayDebuff(unitCaster, spellID)
+    function ShouldDisplayDebuff(self, unitCaster, spellID)
         local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellID, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
         if ( hasCustom ) then
             return showForMySpec or (alwaysShowMine and (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle") )
@@ -90,7 +211,261 @@ class "DebuffFilter"(function()
         end
     end
 
+    function FilterPriorityAura(self, unit, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
+        return not isBossAura and isPriorityDebuff(spellID) and self.MaxPriority or nil
+    end
+
+    function FilterRaidAura(self, unit, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
+        return not isBossAura and not isPriorityDebuff(spellID) and self:ShouldDisplayDebuff(caster, spellID) and 1 or nil
+    end
+
 end)
+
+__Sealed__()
+class "DebuffFilterClassic"(function()
+
+    property "MaxPriority" {
+        type                        = Integer,
+        default                     = 255
+    }
+
+    local isPriorityDebuff
+    local classFileName = UnitClassBase("player")
+    if ( classFileName == "PALADIN" ) then
+		isPriorityDebuff = function(spellID)
+			return spellID == 25771
+		end
+	elseif (classFileName == "PRIEST") then
+		isPriorityDebuff = function(spellID)
+            return spellID == 6788
+		end
+    else
+        isPriorityDebuff = function()
+            return false
+        end
+	end
+
+    function ShouldDisplayDebuff(self, unitCaster, spellID)
+        local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellID, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
+        if ( hasCustom ) then
+            return showForMySpec or (alwaysShowMine and (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle") )
+        else
+            return true
+        end
+    end
+
+    function Filter(self, unit, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
+        if not isBossAura then
+            if isPriorityDebuff(spellID) then return self.MaxPriority end
+            if self:ShouldDisplayDebuff(caster, spellID) then return 1 end
+        end
+    end
+
+    function FilterPriorityAura(self, unit, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
+        return not isBossAura and isPriorityDebuff(spellID) and self.MaxPriority or nil
+    end
+
+    function FilterRaidAura(self, unit, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
+        return not isBossAura and not isPriorityDebuff(spellID) and self:ShouldDisplayDebuff(caster, spellID) and 1 or nil
+    end
+
+end)
+
+-------------------------------------------------
+-- Class buff filter
+-------------------------------------------------
+
+__Sealed__()
+class "ClassBuffFilter"(function()
+    extend "AuraFilter"
+
+    function Filter(self, unit, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
+        local aura = self.Data[spellID]
+        if aura then
+            return type(aura) == "table" and aura.Priority or self.MaxPriority
+        end
+    end
+
+end)
+
+-------------------------------------------------
+-- Dispel debuff filter
+-------------------------------------------------
+
+__Sealed__()
+class "DispelDebuffFilter"(function()
+    extend "AuraFilter"
+
+    local classDispelType           = {
+        -- 奶骑
+        [65]                        = {
+            Magic                   = true,
+            Disease                 = true,
+            Poison                  = true
+        },
+        -- 防骑
+        [66]                        = {
+            Disease                 = true,
+            Poison                  = true
+        },
+        -- 惩戒
+        [70]                        = {
+            Disease                 = true,
+            Poison                  = true
+        },
+        -- 奶萨
+        [264]                       = {
+            Magic                   = true,
+            Curse                   = true
+        },
+        --增强
+        [263]                       = {
+            Curse                   = true
+        },
+        -- 元素
+        [262]                       = {
+            Curse                   = true
+        },
+        -- 戒律
+        [256]                       = {
+            Magic                   = true,
+            Disease                 = true
+        },
+        -- 神牧
+        [257]                       = {
+            Magic                   = true,
+            Disease                 = true
+        },
+        -- 暗牧
+        [258]                       = {
+            Magic                   = true,
+            Disease                 = true
+        },
+        -- 奶僧
+        [270]                       = {
+            Magic                   = true,
+            Disease                 = true,
+            Poison                  = true
+        },
+        -- 踏风
+        [269]                       = {
+            Disease                 = true,
+            Poison                  = true
+        },
+        -- 酒仙
+        [268]                       = {
+            Disease                 = true,
+            Poison                  = true
+        },
+        -- 火法
+        [63]                        = {
+            Curse                   = true
+        },
+        -- 冰法
+        [64]                        = {
+            Curse                   = true
+        },
+        -- 奥法
+        [62]                        = {
+            Curse                   = true
+        },
+        -- 鸟德 
+        [102]                       = {
+            Curse                   = true,
+            Poison                  = true
+        },
+        -- 野德
+        [103]                       = {
+            Curse                   = true,
+            Poison                  = true
+        },
+        -- 熊
+        [104]                       = {
+            Curse                   = true,
+            Poison                  = true
+        },
+        -- 奶德
+        [105]                       = {
+            Magic                   = true,
+            Curse                   = true,
+            Poison                  = true
+        }
+    }
+
+    function Filter(self, unit, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
+        return classDispelType[self.SpecID] and classDispelType[self.SpecID][dtype]
+    end
+
+end)
+
+__Sealed__()
+class "DispelDebuffFilterClassic"(function()
+    extend "AuraFilter"
+
+    local classDispelType           = {
+        PALADIN                     = {
+            Magic                   = true,
+            Disease                 = true,
+            Poison                  = true
+        },
+        SHAMAN                      = {
+            Disease                 = true,
+            Poison                  = true
+        },
+        DRUID                       = {
+            Curse                   = true,
+            Poison                  = true
+        },
+        PRIEST                      = {
+            Magic                   = true,
+            Disease                 = true
+        },
+        MAGE                        = {
+            Curse                   = true
+        }
+    }
+
+    function Filter(self, unit, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
+        return classDispelType[self.Class] and classDispelType[self.Class][dtype]
+    end
+
+end)
+
+-------------------------------------------------
+-- Filter instance
+-------------------------------------------------
+
+__Static__()
+function AuraFilter.GetDebuffFilter()
+    if Scorpio.IsRetail then
+        return DebuffFilter()
+    else
+        return DebuffFilterClassic()
+    end
+end
+
+__Static__()
+function AuraFilter.GetBuffFilter()
+    if Scorpio.IsRetail then
+        return BuffFilter()
+    else
+        return BuffFilterClassic()
+    end
+end
+
+__Static__()
+function AuraFilter.GetClassBuffFilter()
+    return ClassBuffFilter()
+end
+
+__Static__()
+function AuraFilter.GetDispelDebuffFilter()
+    if Scorpio.IsRetail then
+        return DispelDebuffFilter()
+    else
+        return DispelDebuffFilterClassic()
+    end
+end
 
 -------------------------------------------------
 -- Auras
@@ -123,7 +498,6 @@ class "BaseAuraIcon"(function()
     local function OnEnter(self)
         if self.ShowTooltip and self.AuraIndex then
             GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
-            print(self.Unit, self.AuraIndex, self.AuraFilter)
             GameTooltip:SetUnitAura(self.Unit, self.AuraIndex, self.AuraFilter)
         end
     end
@@ -197,7 +571,7 @@ class "AuraIcon"(function()
         local label = auraCount
         if auraCount >= 100 then
             label = BUFF_STACKS_OVERFLOW
-        elseif auraCount <=0 then
+        elseif auraCount <= 1 then
             label = ""
         end
         self:GetChild("Label"):SetText(label)
@@ -217,40 +591,24 @@ end)
 class "BuffIcon"(function()
     inherit "AuraIcon"
 
-    local function OnMouseUp(self, button)
-        if IsAltKeyDown() and button == "RightButton" then
-            local name, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Unit, self.AuraIndex, self.AuraFilter)
-
-            if name then
-                _AuraBlackList[spellID] = true
-                FireSystemEvent("ASHTOASH_CONFIG_CHANGED")
-
-                -- Force the refreshing
-                Next(Scorpio.FireSystemEvent, "UNIT_AURA", "any")
-            end
-        elseif IsControlKeyDown() and button == "LeftButton" and self.AuraFilter:match("HARMFUL") then
-            local name, _, _, _, _, _, _, _, _, spellID = UnitAura(self.Unit, self.AuraIndex, self.AuraFilter)
-
-            if name then
-                _EnlargeDebuffList[spellID] = true
-                FireSystemEvent("ASHTOASH_CONFIG_CHANGED")
-
-                -- Force the refreshing
-                Next(Scorpio.FireSystemEvent, "UNIT_AURA", "any")
-            end
+    function SetAuraData(self, data)
+        super.SetAuraData(self, data)
+        if UnitExists(data.Caster) and UnitIsUnit("player", data.Caster) then
+            self:SetAlpha(1)
+        else
+            self:SetAlpha(0.5)
         end
     end
 
     function __ctor(self)
         super(self)
-        self.OnMouseUp = OnMouseUp
     end
 
 end)
 
 -- Debuff icon
 class "DebuffIcon"(function()
-    inherit "BuffIcon"
+    inherit "AuraIcon"
 
     function SetAuraData(self, data)
         super.SetAuraData(self, data)
@@ -289,7 +647,7 @@ class "DispelDebuffIcon"(function()
 end)
 
 -- Boss Debuff icon
-class "BossDebuffIcon" { DebuffIcon }
+class "BossAuraIcon" { DebuffIcon }
 
 -- Class buff icon
 class "ClassBuffIcon" { AuraIcon }
@@ -305,13 +663,42 @@ __Sealed__()
 class "AuraContainer"(function()
     inherit "Frame"
 
+    -- 可驱散Debuff类型
+    local dispelDebuffTypes         = { Magic = true, Curse = true, Disease = true, Poison = true }
+    local dispelDebuffColor         = {}
+    local buffFilter                = AuraFilter.GetBuffFilter()
+    local debuffFilter              = AuraFilter.GetDebuffFilter()
+    local classBuffFilter           = AuraFilter.GetClassBuffFilter()
+    local dispelDebuffFilter        = AuraFilter.GetDispelDebuffFilter()
+
     local auraDataPool              = Recycle()
     local buffCache                 = {}
     local debuffCache               = {}
+    local bossAuraCache             = {}
+    local dispelDebuffs             = {}
+    local dispelDebuffCache         = {}
+    local classBuffCache            = {}
+    local canDispelType             = nil
+
+    local bossBuffPriority          = 1
+    local bossDebuffPriority        = 2
 
     -------------------------------------------------
     -- Functions
     -------------------------------------------------
+
+    -- Increase debuff color's lightness
+    local function getDispellDebuffColor(dType)
+        local color = dispelDebuffColor[dType]
+        if not color then
+            local r, g, b = DebuffTypeColor[dType]
+            local h, s, l = Color(r, g, b):ToHSL()
+            color = Color.FromHSL(h, s, l * 1.3)
+            dispelDebuffColor[dType] = color
+        end
+    
+        return color
+    end
 
     local function wipeCache(cache)
         for _, auraData in ipairs(cache) do
@@ -322,6 +709,12 @@ class "AuraContainer"(function()
 
     local function wipeCaches()
         wipeCache(buffCache)
+        wipeCache(debuffCache)
+        wipeCache(bossAuraCache)
+        wipe(dispelDebuffs)
+        wipeCache(dispelDebuffCache)
+        wipeCache(classBuffCache)
+        canDispelType = nil
     end
 
     local function cacheAuraData(cache, priority, unit, index, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
@@ -345,47 +738,8 @@ class "AuraContainer"(function()
         tinsert(cache, auraData)
     end
 
-    -- Buff filter
-    local function RefreshBuff(self, unit)
-        local index, maxPriorityAuraCount, auraFilter, maxPriority, filter, maxAuraCount = 1, 0, "HELPFUL", self.BuffFilter.MaxPriority, self.BuffFilter, self.BuffCount
-        while maxPriorityAuraCount < maxAuraCount do
-            local name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer = UnitAura(unit, index, auraFilter)
-            if not name then break end
-
-            local priority = filter:Filter(unit, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
-            if priority then
-                cacheAuraData(buffCache, priority, unit, index, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
-                
-                -- just check max priority aura count to reduce loop
-                if priority == maxPriority then
-                    maxPriorityAuraCount = maxPriorityAuraCount + 1
-                end
-            end
-
-            index = index + 1
-        end
-        self:ShowBuffs()
-    end
-
-    -- Debuff filter
-    local function RefreshDebuff(self, unit)
-        local index, maxPriorityAuraCount, auraFilter, maxPriority, filter, maxAuraCount = 1, 0, "HARMFUL", self.DebuffFilter.MaxPriority, self.DebuffFilter, self.DebuffCount
-        while maxPriorityAuraCount < maxAuraCount do
-            local name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer = UnitAura(unit, index, auraFilter)
-            if not name then break end
-
-            local priority = filter:Filter(unit, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
-            if priority then
-                cacheAuraData(buffCache, priority, unit, index, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
-                
-                -- just check max priority aura count to reduce loop
-                if priority == maxPriority then
-                    maxPriorityAuraCount = maxPriorityAuraCount + 1
-                end
-            end
-
-            index = index + 1
-        end
+    local function compareAuraData(a, b)
+        return a.Priority > b.Priority
     end
 
     function Refresh(self, unit)
@@ -393,8 +747,151 @@ class "AuraContainer"(function()
 
         wipeCaches()
 
-        RefreshBuff(self, unit)
-        RefreshDebuff(self, unit)
+        local index = 1
+        local auraFilter
+        local displayOnlyDispellableDebuffs = self.DisplayOnlyDispellableDebuffs
+
+        --  Harmful
+        auraFilter = "HARMFUL"
+        local maxDebuffPriority, maxDebuffCount, debuffCount = debuffFilter.MaxPriority, self.DebuffCount, 0
+        local maxBossDebuffCount, bossDebuffCount = self.BossAuraCount, 0
+        while debuffCount < maxDebuffCount or bossDebuffCount < maxBossDebuffCount do
+            local name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer = UnitAura(unit, index, auraFilter)
+            if not name then break end
+
+            if not displayOnlyDispellableDebuffs and debuffCount < maxDebuffCount then
+                -- Debuff filter
+                local priority = debuffFilter:Filter(unit, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+                if priority then
+                    cacheAuraData(debuffCache, priority, unit, index, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+
+                    -- just check max priority aura count to reduce loop
+                    if priority == maxDebuffPriority then
+                        debuffCount = debuffCount + 1
+                    end
+                end
+            elseif debuffCount < maxDebuffCount then
+                -- Priority debuff
+                local priority = debuffFilter:FilterPriorityAura(unit, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+                if priority then
+                    cacheAuraData(debuffCache, priority, unit, index, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+
+                    -- just check max priority aura count to reduce loop
+                    if priority == maxDebuffPriority then
+                        debuffCount = debuffCount + 1
+                    end
+                end
+            end
+            
+            -- Boss debuff filter
+            if isBossAura and bossDebuffCount < maxBossDebuffCount then
+                cacheAuraData(bossAuraCache, bossDebuffPriority, unit, index, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+                bossDebuffCount = bossDebuffCount + 1
+            end
+
+            index = index + 1
+        end
+
+        -- Harmful|Raid
+        auraFilter, index = "HARMFUL|RAID", 1
+        local maxDispelCount, dispelCount = self.DispelDebuffCount, 0
+        local checkDispelAbility = self.CheckDispelAbilityEnable
+        while dispelCount < maxDispelCount or (displayOnlyDispellableDebuffs and debuffCount < maxDebuffCount) or (checkDispelAbility and canDispelType) do
+            local name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer = UnitAura(unit, index, auraFilter)
+            if not name then break end
+
+            if displayOnlyDispellableDebuffs and debuffCount < maxDebuffCount then
+                -- Debuff filter
+                local priority = debuffFilter:FilterRaidAura(unit, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+                if priority then
+                    cacheAuraData(debuffCache, priority, unit, index, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+
+                    -- just check max priority aura count to reduce loop
+                    if priority == maxDebuffPriority then
+                        debuffCount = debuffCount + 1
+                    end
+                end
+            end
+
+            -- Dispel debuff filter
+            if dispelDebuffTypes[dtype] and not dispelDebuffs[dtype] then
+                cacheAuraData(dispelDebuffCache, 0, unit, index, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+                dispelDebuffs[dtype] = true
+                dispelCount = dispelCount + 1
+            end
+
+            -- Dispel ability filter
+            if (checkDispelAbility and not canDispelType) then
+                local canDispel = dispelDebuffFilter:Filter(unit, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+                if canDispel then
+                    canDispelType = dtype
+                end
+            end
+
+            index = index + 1
+        end
+
+        -- Helpful
+        auraFilter, index = "HELPFUL", 1
+        local maxBuffPriority, maxBuffCount, buffCount = buffFilter.MaxPriority, self.BuffCount, 0
+        local maxBossBuffCount, bossBuffCount = self.BossAuraCount, 0
+        local maxClassBuffPriority, maxClassBuffCount, classBuffCount = classBuffFilter.MaxPriority, self.ClassBuffCount, 0
+        while buffCount < maxBuffCount or bossBuffCount < maxBossBuffCount do
+            local name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer = UnitAura(unit, index, auraFilter)
+            if not name then break end
+
+            local filtered = false
+            
+            if classBuffCount < maxClassBuffCount then
+                -- Class buff filter
+                local priority = classBuffFilter:Filter(unit, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+                if priority then
+                    filtered = true
+                    cacheAuraData(classBuffCache, priority, unit, index, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+                    -- just check max priority aura count to reduce loop
+                    if priority == maxClassBuffPriority then
+                        classBuffCount = classBuffCount + 1
+                    end
+                end
+            end
+
+            -- Boss buff filter
+            if not filtered and isBossAura and bossBuffCount < maxBossBuffCount then
+                filtered = true
+                cacheAuraData(bossAuraCache, bossBuffPriority, unit, index, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+                bossBuffCount = bossBuffCount + 1
+            end
+
+            if not filtered and buffCount < maxBuffCount then
+                -- Buff filter
+                local priority = buffFilter:Filter(unit, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+                if priority then
+                    filtered = true
+                    cacheAuraData(buffCache, priority, unit, index, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+                    -- just check max priority aura count to reduce loop
+                    if priority == maxBuffPriority then
+                        buffCount = buffCount + 1
+                    end
+                end
+            end
+
+            index = index + 1
+        end
+
+        -- sort auras
+        sort(buffCache, compareAuraData)
+        buffFilter:SortDisplayOrder(buffCache, maxBuffCount)
+        sort(bossAuraCache, compareAuraData)
+        sort(debuffCache, compareAuraData)
+        sort(classBuffCache, compareAuraData)
+        
+        -- Show auras
+        self:ShowBuffs()
+        self:ShowBossAuras()
+        self:ShowDebuffs()
+        self:ShowDispelDebuffs()
+        self:ShowClassBuffs()
+        self:ShowDispelAbiility()
     end
 
     local function getScaleSize(self, value)
@@ -402,19 +899,14 @@ class "AuraContainer"(function()
         return (value or 10) * componentScale
     end
 
-    local function compareAuraData(a, b)
-        return a.Priority > b.Priority
-    end
-
     function ShowBuffs(self)
-        sort(buffCache, compareAuraData)
-
+        local size = #buffCache
         for i = 1, self.BuffCount do
             local icon = self.BuffIcons[i]
-            if not icon then
+            if not icon and i <= size then
                 icon = BuffIcon("BuffIcon" .. i, self)
-                local size = getScaleSize(self, self.BuffSize)
-                icon:SetSize(size, size)
+                local auraSize = getScaleSize(self, self.BuffSize)
+                icon:SetSize(auraSize, auraSize)
                 if i == 1 then
                     icon:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -self.PaddingRight, self.PaddingBottom)
                 else
@@ -423,52 +915,178 @@ class "AuraContainer"(function()
 
                 self.BuffIcons[i] = icon
             end
-            icon.AuraData = buffCache[i]
+
+            if icon then
+                icon.AuraData = buffCache[i]
+            end
+        end
+    end
+
+    function ShowBossAuras(self)
+        local size = #bossAuraCache
+        for i = 1, self.BossAuraCount do
+            local icon = self.BossAuraIcons[i]
+            if not icon and i <= size then
+                icon = BossAuraIcon("BossAuraIcon" .. i, self)
+                local auraSize = getScaleSize(self, self.BossAuraSize)
+                icon:SetSize(auraSize, auraSize)
+                if i == 1 then
+                    icon:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", self.PaddingLeft, self.PaddingBottom)
+                else
+                    icon:SetPoint("LEFT", self:GetChild("BossAuraIcon" .. (i-1)), "RIGHT", 1.5, 0)
+                end
+
+                self.BossAuraIcons[i] = icon
+            end
+
+            if icon then
+                icon.AuraData = bossAuraCache[i]
+            end
+        end
+
+        self.__DisplayBossAuraCount = math.min(size, self.BossAuraCount)
+    end
+
+    function ShowDebuffs(self)
+        local size = #debuffCache
+        local debuffCount = (self.__DisplayBossAuraCount > 0) and self.DebuffCountWhenBossAura or self.DebuffCount
+        for i = 1, debuffCount do
+            local icon = self.DebuffIcons[i]
+            if not icon and i <= size then
+                icon = DebuffIcon("DebuffIcon" .. i, self)
+                local auraSize = getScaleSize(self, self.DebuffSize)
+                icon:SetSize(auraSize, auraSize)
+                if i ~= 1 then
+                    icon:SetPoint("LEFT", self:GetChild("DebuffIcon" .. (i-1)), "RIGHT", 1.5, 0)
+                end
+
+                self.DebuffIcons[i] = icon
+            end
+
+            if icon then
+                if i == 1 then
+                    icon:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", self.PaddingLeft + self.__DisplayBossAuraCount * (self.BossAuraSize + 1.5), self.PaddingBottom)
+                end
+
+                icon.AuraData = debuffCache[i]
+            end
+        end
+    end
+
+    function ShowDispelDebuffs(self)
+        local size = #dispelDebuffCache
+        for i = 1, self.DispelDebuffCount do
+            local icon = self.DispelDebuffIcons[i]
+            if not icon and i <= size then
+                icon = DispelDebuffIcon("DispelDebuffIcon" .. i, self)
+                local auraSize = getScaleSize(self, self.DispelDebuffSize)
+                icon:SetSize(auraSize, auraSize)
+                if i == 1 then
+                    icon:SetPoint("TOPRIGHT", self, "TOPRIGHT", -self.PaddingRight, -self.PaddingTop)
+                else
+                    icon:SetPoint("RIGHT", self:GetChild("DispelDebuffIcon" .. (i-1)), "LEFT", -1, 0)
+                end
+
+                self.DispelDebuffIcons[i] = icon
+            end
+
+            if icon then
+                icon.AuraData = dispelDebuffCache[i]
+            end
+        end
+    end
+
+    function ShowClassBuffs(self)
+        local size = #classBuffCache
+        local count = self.ClassBuffCount
+        local auraSize = getScaleSize(self, self.ClassBuffSize)
+        local margin = 1
+        for i = 1, count do
+            local icon = self.ClassBuffIcons[i]
+            if not icon and i <= size then
+                icon = ClassBuffIcon("ClassBuffIcon" .. i, self)
+                icon:SetSize(auraSize, auraSize)
+                if i ~= 1 then
+                    icon:SetPoint("LEFT", self:GetChild("ClassBuffIcon" .. (i-1)), "RIGHT", margin, 0)
+                end
+
+                self.ClassBuffIcons[i] = icon
+            end
+
+            if icon then
+                if i == 1 then
+                    icon:SetPoint("LEFT", self, "CENTER", -(((auraSize + margin) * size - margin)/2), 0)
+                end
+                icon.AuraData = classBuffCache[i]
+            end
+        end
+    end
+
+    function ShowDispelAbiility(self)
+        local glow = self:GetChild("PixelGlow")
+        if canDispelType then
+            glow.Color = getDispellDebuffColor(canDispelType)
+            glow:Show()
+        else
+            glow:Hide()
         end
     end
 
     function HideAllAuras(self)
         self:HideAuras(self.BuffIcons)
         self:HideAuras(self.DebuffIcons)
-        self:HideAuras(self.EnlargeDebuffIcons)
-        self:HideAuras(self.EnlargeBuffIcons)
         self:HideAuras(self.ClassBuffIcons)
         self:HideAuras(self.DispelDebuffIcons)
-        self:HideAuras(self.BossDebuffIcons)
+        self:HideAuras(self.BossAuraIcons)
     end
 
-    function HideAuras(self, auras)
-        for i = 1, #auras do
-            auras[i]:Hide()
+    function HideAuras(self, auras, newCount, oldCount)
+        if newCount and oldCount then
+            if newCount < oldCount then
+                for i = newCount + 1, oldCount do
+                    if auras[i] then auras[i]:Hide() end
+                end
+            end
+        else
+            for i = 1, #auras do
+                if auras[i] then auras[i]:Hide() end
+            end
         end
     end
 
     function ResizeAllAuras(self)
         self:ResizeAuras(self.BuffIcons, self.BuffSize)
-        -- self:ResizeAuras(self.DebuffIcons)
-        -- self:ResizeAuras(self.EnlargeDebuffIcons)
-        -- self:ResizeAuras(self.EnlargeBuffIcons)
-        -- self:ResizeAuras(self.ClassBuffIcons)
-        -- self:ResizeAuras(self.DispelDebuffIcons)
-        -- self:ResizeAuras(self.BossDebuffIcons)
+        self:ResizeAuras(self.DebuffIcons)
+        self:ResizeAuras(self.ClassBuffIcons)
+        self:ResizeAuras(self.DispelDebuffIcons)
+        self:ResizeAuras(self.BossAuraIcons)
     end
 
     function ResizeAuras(self, auras, size)
         size = getScaleSize(self, size)
         for i = 1, #auras do
-            auras[i]:SetSize(size, size)
+            if auras[i] then
+                auras[i]:SetSize(size, size)
+            end
         end
     end
 
     function OnPaddingChanged(self, paddingLeft, paddingTop, paddingRight, paddingBottom)
-        if paddingRight then
-            local icon = self.BuffIcons[1]
+        if paddingTop or paddingRight then
+            local icon = self.DispelDebuffIcons[1]
             if icon then
-                icon:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -self.PaddingRight, self.PaddingBottom)
+                icon:SetPoint("TOPRIGHT", self, "TOPRIGHT", -self.PaddingRight, -self.PaddingTop)
             end
         end
 
-        if paddingBottom then
+        if paddingLeft or paddingBottom then
+            local icon = self.BossAuraIcons[1]
+            if icon then
+                icon:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", self.PaddingLeft, self.PaddingBottom)
+            end
+        end
+
+        if paddingRight or paddingBottom then
             local icon = self.BuffIcons[1]
             if icon then
                 icon:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -self.PaddingRight, self.PaddingBottom)
@@ -491,22 +1109,17 @@ class "AuraContainer"(function()
     property "BuffCount"            {
         type                        = NaturalNumber,
         default                     = 3,
-        handler                     = function(self)
-            self:HideAuras(self.BuffIcons)
+        handler                     = function(self, new, old)
+            self:HideAuras(self.BuffIcons, new, old)
         end
     }
 
-    property "BuffSize"            {
+    property "BuffSize"             {
         type                        = Number,
         default                     = 1,
         handler                     = function(self, size)
             self:ResizeAuras(self.BuffIcons, size)
         end
-    }
-
-    property "BuffFilter"           {
-        default                     = Scorpio.IsRetail and BuffFilter(),
-        set                         = Toolset.fakefunc
     }
 
     -------------------------------------------------
@@ -516,43 +1129,24 @@ class "AuraContainer"(function()
     property "DebuffCount"          {
         type                        = NaturalNumber,
         default                     = 3,
-        handler                     = function(self)
-            self:HideAuras(self.DebuffIcons)
+        handler                     = function(self, new, old)
+            self:HideAuras(self.DebuffIcons, new, old)
         end
     }
 
-    property "DebuffFilter"         {
-        default                     = Scorpio.IsRetail and DebuffFilter(),
-        set                         = Toolset.fakefunc
-    }
-
-    property "BossDebuffCount"      {
+    property "DebuffCountWhenBossAura" {
         type                        = NaturalNumber,
         default                     = 1,
-        set                         = Toolset.fakefunc
-    }
-
-    property "EnlargeDebuffCount"   {
-        type                        = NaturalNumber,
-        default                     = 2,
-        handler                     = function(self)
-            self:HideAuras(self.EnlargeDebuffIcons)
+        handler                     = function(self, new, old)
+            self:HideAuras(self.DebuffIcons, new, old)
         end
     }
 
-    property "EnlargeBuffCount"     {
-        type                        = NaturalNumber,
-        default                     = 2,
-        handler                     = function(self)
-            self:HideAuras(self.EnlargeBuffIcons)
-        end
-    }
-
-    property "DispelDebuffCount"    {
-        type                        = NaturlNumber,
-        default                     = 4,
-        handler                     = function(self)
-            self:HideAuras(self.DispelDebuffIcons)
+    property "DebuffSize"           {
+        type                        = Number,
+        default                     = 1,
+        handler                     = function(self, size)
+            self:ResizeAuras(self.DebuffIcons, size)
         end
     }
 
@@ -561,11 +1155,66 @@ class "AuraContainer"(function()
         default                     = false
     }
 
+    -------------------------------------------------
+    --             Boss Aura                       --
+    -------------------------------------------------
+
+    property "BossAuraCount"        {
+        type                        = NaturalNumber,
+        default                     = 1,
+        set                         = Toolset.fakefunc
+    }
+
+    property "BossAuraSize"         {
+        type                        = Number,
+        default                     = 1,
+        handler                     = function(self, size)
+            self:ResizeAuras(self.BossAuraIcons, size)
+        end
+    }
+
+    -------------------------------------------------
+    --            Dispel debuff                    --
+    -------------------------------------------------
+
+    property "DispelDebuffCount"    {
+        type                        = NaturlNumber,
+        default                     = 4,
+        set                         = Toolset.fakefunc
+    }
+
+    property "DispelDebuffSize"     {
+        type                        = Number,
+        default                     = 1,
+        handler                     = function(self, size)
+            self:ResizeAuras(self.DispelDebuffIcons, size)
+        end
+    }
+
+    -------------------------------------------------
+    --            Class buff                       --
+    -------------------------------------------------
+
     property "ClassBuffCount"       {
         type                        = NaturlNumber,
+        default                     = 2,
+        handler                     = function(self, new, old)
+            self:HideAuras(self.ClassBuffIcons, new, old)
+        end
+    }
+
+    property "ClassBuffSize"        {
+        type                        = Number,
         default                     = 1,
-        handler                     = function(self)
-            self:HideAuras(self.ClassBuffIcons)
+        handler                     = function(self, size)
+            self:ResizeAuras(self.ClassBuffIcons, size)
+        end
+    }
+
+    property "ClassBuffFilterData"  {
+        type                        = RawTable,
+        handler                     = function(self, data)
+            classBuffFilter.Data = data
         end
     }
 
@@ -605,14 +1254,28 @@ class "AuraContainer"(function()
         end
     }
 
+    property "CheckDispelAbilityEnable"{
+        type                        = Boolean,
+        default                     = false
+    }
+
+    property "SpecID"               {
+        type                        = Number,
+        default                     = 0,
+        handler                     = function(self, specID)
+            dispelDebuffFilter.SpecID = specID
+        end
+    }
+
+    __Template__{
+        PixelGlow                   = SpaUI.Widget.PixelGlow
+    }
     function __ctor(self)
         self.BuffIcons              = {}
         self.DebuffIcons            = {}
-        self.EnlargeDebuffIcons     = {}
-        self.EnlargeBuffIcons       = {}
         self.ClassBuffIcons         = {}
         self.DispelDebuffIcons      = {}
-        self.BossDebuffIcons        = {}
+        self.BossAuraIcons          = {}
 
         self.OnSizeChanged = self.OnSizeChanged + OnSizeChanged
     end
@@ -658,20 +1321,20 @@ TEMPLATE_SKIN_STYLE                                                             
         },
     },
 
-    -- Enlarge debuff icon
-    [EnlargeDebuffIcon]                                                                 = {
-        topLevel                                                                        = true,
+    -- -- Enlarge debuff icon
+    -- [EnlargeDebuffIcon]                                                                 = {
+    --     topLevel                                                                        = true,
 
-        PixelGlow                                                                       = {
-            period                                                                      = 2,
-            visible                                                                     = true
-        }
-    },
+    --     PixelGlow                                                                       = {
+    --         period                                                                      = 2,
+    --         visible                                                                     = true
+    --     }
+    -- },
 
-    -- Enlarge buff icon
-    [EnlargeBuffIcon]                                                                   = {
-        topLevel                                                                        = true,
-    },
+    -- -- Enlarge buff icon
+    -- [EnlargeBuffIcon]                                                                   = {
+    --     topLevel                                                                        = true,
+    -- },
 
     -- Dispel debuff icon
     [DispelDebuffIcon]                                                                  = {

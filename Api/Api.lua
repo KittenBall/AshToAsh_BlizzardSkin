@@ -86,20 +86,14 @@ end
 -- Dispell
 -------------------------------------------------
 
-DispellDebuffTypes    = { Magic = true, Curse = true, Disease = true, Poison = true }
-DispellDebuffColor    = {}
+__Static__() __AutoCache__()
+function AshBlzSkinApi.CheckDispelAbilityEnable()
+    return Wow.FromUnitEvent(Wow.FromEvent("PLAYER_ENTERING_WORLD"):Map("=> 'any'")):Map(function()
+        local inInstance, instanceType = IsInInstance()
+        if not inInstance or instanceType == "none" or instanceType == "pvp" then return false end
 
--- Increase debuff color's lightness
-function GetDispellDebuffColor(dType)
-    local color = DispellDebuffColor[dType]
-    if not color then
-        local r, g, b = DebuffTypeColor[dType]
-        local h, s, l = Color(r, g, b):ToHSL()
-        color = Color.FromHSL(h, s, l * 1.3)
-        DispellDebuffColor[dType] = color
-    end
-
-    return color
+        return true
+    end)
 end
 
 -------------------------------------------------
@@ -148,7 +142,7 @@ end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitIsLeaderOrAssistant()
-    return Wow.FromUnitEvent(Wow.FromEvent("GROUP_ROSTER_UPDATER", "PARTY_LEADER_CHANGED"):Map("=>'any'")):Next():Map(function(unit)
+    return Wow.FromUnitEvent(Wow.FromEvent("GROUP_ROSTER_UPDATER", "PARTY_LEADER_CHANGED"):Map("=> 'any'")):Next():Map(function(unit)
         if UnitExists(unit) then
             local raidIndex = UnitInRaid(unit)
             if raidIndex then
@@ -167,6 +161,17 @@ function AshBlzSkinApi.UnitIsLeaderOrAssistantIcon()
             return "Interface\\GroupFrame\\UI-Group-LeaderIcon"
         elseif rank == 1 then
             return "Interface\\GroupFrame\\UI-Group-AssistantIcon"
+        end
+    end)
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.PlayerSpecializationID()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
+        if Scorpio.IsRetail then
+            return GetSpecializationInfo(GetSpecialization()) or 0
+        else
+            return 0
         end
     end)
 end

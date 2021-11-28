@@ -1,3 +1,10 @@
+## 1.8.0
+- Greatly optimized performance
+- Temporarily block enlarge buffs and enlarge debuffs
+- The pet owner’s name will now correspond correctly
+
+- All the above changes are for the upcoming configuration panel
+
 ## 1.7.6
 - Try to optimize some performance again
 
