@@ -36,6 +36,7 @@ end)
 -- Buff filter
 -------------------------------------------------
 
+--@retail@
 __Sealed__()
 class "BuffFilter"(function()
     extend "AuraFilter"
@@ -55,9 +56,11 @@ class "BuffFilter"(function()
     end
 
 end)
+--@end-retail@
 
+--[===[@non-version-retail@
 __Sealed__()
-class "BuffFilterClassic"(function()
+class "BuffFilter"(function()
     extend "AuraFilter"
 
     -- 同一个职业会互相顶的Buff
@@ -168,11 +171,13 @@ class "BuffFilterClassic"(function()
     end
 
 end)
+--@end-non-version-retail@]===]
 
 -------------------------------------------------
 -- Debuff filter
 -------------------------------------------------
 
+--@retail@
 __Sealed__()
 class "DebuffFilter"(function()
     extend "AuraFilter"
@@ -220,9 +225,11 @@ class "DebuffFilter"(function()
     end
 
 end)
+--@end-retail@
 
+--[===[@non-version-retail@
 __Sealed__()
-class "DebuffFilterClassic"(function()
+class "DebuffFilter"(function()
 
     property "MaxPriority" {
         type                        = Integer,
@@ -270,6 +277,7 @@ class "DebuffFilterClassic"(function()
     end
 
 end)
+--@end-non-version-retail@]===]
 
 -------------------------------------------------
 -- Class buff filter
@@ -292,6 +300,7 @@ end)
 -- Dispel debuff filter
 -------------------------------------------------
 
+--@retail@
 __Sealed__()
 class "DispelDebuffFilter"(function()
     extend "AuraFilter"
@@ -397,9 +406,11 @@ class "DispelDebuffFilter"(function()
     end
 
 end)
+--@end-retail@
 
+--[===[@non-version-retail@
 __Sealed__()
-class "DispelDebuffFilterClassic"(function()
+class "DispelDebuffFilter"(function()
     extend "AuraFilter"
 
     local classDispelType           = {
@@ -430,42 +441,7 @@ class "DispelDebuffFilterClassic"(function()
     end
 
 end)
-
--------------------------------------------------
--- Filter instance
--------------------------------------------------
-
-__Static__()
-function AuraFilter.GetDebuffFilter()
-    if Scorpio.IsRetail then
-        return DebuffFilter()
-    else
-        return DebuffFilterClassic()
-    end
-end
-
-__Static__()
-function AuraFilter.GetBuffFilter()
-    if Scorpio.IsRetail then
-        return BuffFilter()
-    else
-        return BuffFilterClassic()
-    end
-end
-
-__Static__()
-function AuraFilter.GetClassBuffFilter()
-    return ClassBuffFilter()
-end
-
-__Static__()
-function AuraFilter.GetDispelDebuffFilter()
-    if Scorpio.IsRetail then
-        return DispelDebuffFilter()
-    else
-        return DispelDebuffFilterClassic()
-    end
-end
+--@end-non-version-retail@]===]
 
 -------------------------------------------------
 -- Auras
@@ -666,10 +642,10 @@ class "AuraContainer"(function()
     -- 可驱散Debuff类型
     local dispelDebuffTypes         = { Magic = true, Curse = true, Disease = true, Poison = true }
     local dispelDebuffColor         = {}
-    local buffFilter                = AuraFilter.GetBuffFilter()
-    local debuffFilter              = AuraFilter.GetDebuffFilter()
-    local classBuffFilter           = AuraFilter.GetClassBuffFilter()
-    local dispelDebuffFilter        = AuraFilter.GetDispelDebuffFilter()
+    local buffFilter                = BuffFilter()
+    local debuffFilter              = DebuffFilter()
+    local classBuffFilter           = ClassBuffFilter()
+    local dispelDebuffFilter        = DispelDebuffFilter()
 
     local auraDataPool              = Recycle()
     local buffCache                 = {}
@@ -742,6 +718,23 @@ class "AuraContainer"(function()
         return a.Priority > b.Priority
     end
 
+    --@retail@
+    local foreachAura = AuraUtil.ForEachAura
+    --@end-retail@
+    
+    --[===[@non-version-retail@
+    local foreachAura = function(unit, filter, maxCount, func)
+        if maxCount and maxCount <= 0 then
+            return
+        end
+        local index = 1
+        while true do
+            if func(UnitAura(unit, index, filter)) then break end
+            index = index + 1
+        end
+    end
+    --@end-non-version-retail@]===]
+
     function Refresh(self, unit)
         if not (unit and self:IsVisible()) then return self:HideAllAuras() end
 
@@ -755,9 +748,9 @@ class "AuraContainer"(function()
         auraFilter = "HARMFUL"
         local maxDebuffPriority, maxDebuffCount, debuffCount = debuffFilter.MaxPriority, self.DebuffCount, 0
         local maxBossDebuffCount, bossDebuffCount = self.BossAuraCount, 0
-        while debuffCount < maxDebuffCount or bossDebuffCount < maxBossDebuffCount do
-            local name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer = UnitAura(unit, index, auraFilter)
-            if not name then break end
+        foreachAura(unit, auraFilter, math.max(maxDebuffCount, maxBossDebuffCount), function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+            -- compat classic
+            if not name then return true end
 
             if not displayOnlyDispellableDebuffs and debuffCount < maxDebuffCount then
                 -- Debuff filter
@@ -790,15 +783,17 @@ class "AuraContainer"(function()
             end
 
             index = index + 1
-        end
+            
+            return not (debuffCount < maxDebuffCount or bossDebuffCount < maxBossDebuffCount)
+        end)
 
         -- Harmful|Raid
         auraFilter, index = "HARMFUL|RAID", 1
         local maxDispelCount, dispelCount = self.DispelDebuffCount, 0
         local checkDispelAbility = self.CheckDispelAbilityEnable
-        while dispelCount < maxDispelCount or (displayOnlyDispellableDebuffs and debuffCount < maxDebuffCount) or (checkDispelAbility and canDispelType) do
-            local name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer = UnitAura(unit, index, auraFilter)
-            if not name then break end
+        foreachAura(unit, auraFilter, math.max(maxDispelCount, debuffCount), function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+            -- compat classic
+            if not name then return true end
 
             if displayOnlyDispellableDebuffs and debuffCount < maxDebuffCount then
                 -- Debuff filter
@@ -829,16 +824,18 @@ class "AuraContainer"(function()
             end
 
             index = index + 1
-        end
+
+            return not (dispelCount < maxDispelCount or (displayOnlyDispellableDebuffs and debuffCount < maxDebuffCount) or (checkDispelAbility and not canDispelType))
+        end)
 
         -- Helpful
         auraFilter, index = "HELPFUL", 1
         local maxBuffPriority, maxBuffCount, buffCount = buffFilter.MaxPriority, self.BuffCount, 0
         local maxBossBuffCount, bossBuffCount = self.BossAuraCount, 0
         local maxClassBuffPriority, maxClassBuffCount, classBuffCount = classBuffFilter.MaxPriority, self.ClassBuffCount, 0
-        while buffCount < maxBuffCount or bossBuffCount < maxBossBuffCount do
-            local name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer = UnitAura(unit, index, auraFilter)
-            if not name then break end
+        foreachAura(unit, auraFilter, math.max(maxClassBuffCount, maxBuffCount, maxBossBuffCount), function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+            -- compat classic
+            if not name then return true end
 
             local filtered = false
             
@@ -876,7 +873,9 @@ class "AuraContainer"(function()
             end
 
             index = index + 1
-        end
+
+            return not (buffCount < maxBuffCount or bossBuffCount < maxBossBuffCount)
+        end)
 
         -- sort auras
         sort(buffCache, compareAuraData)
