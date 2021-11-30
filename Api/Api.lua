@@ -149,7 +149,7 @@ function AshBlzSkinApi.UnitCenterStatusIconVisible()
         return false
     end)
 end
-@end-non-version-retail@]===]
+--@end-non-version-retail@]===]
 
 -------------------------------------------------
 -- Vehicle
@@ -171,7 +171,7 @@ function AshBlzSkinApi.UnitVehicleVisible()
         return false
     end)
 end
-@end-non-version-retail@]===]
+--@end-non-version-retail@]===]
 
 -------------------------------------------------
 -- Leader, Assistant, MasterLooter etc
@@ -232,7 +232,7 @@ function AshBlzSkinApi.PlayerSpecializationID()
         return 0
     end)
 end
-@end-non-version-retail@]===]
+--@end-non-version-retail@]===]
 
 
 -------------------------------------------------

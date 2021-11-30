@@ -743,6 +743,7 @@ class "AuraContainer"(function()
         local index = 1
         local auraFilter
         local displayOnlyDispellableDebuffs = self.DisplayOnlyDispellableDebuffs
+        local blackAuraList = self.BlackAuraList
 
         --  Harmful
         auraFilter = "HARMFUL"
@@ -751,6 +752,8 @@ class "AuraContainer"(function()
         foreachAura(unit, auraFilter, math.max(maxDebuffCount, maxBossDebuffCount), function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
             -- compat classic
             if not name then return true end
+
+            if blackAuraList[spellID] then return true end
 
             if not displayOnlyDispellableDebuffs and debuffCount < maxDebuffCount then
                 -- Debuff filter
@@ -795,6 +798,8 @@ class "AuraContainer"(function()
             -- compat classic
             if not name then return true end
 
+            if blackAuraList[spellID] then return true end
+
             if displayOnlyDispellableDebuffs and debuffCount < maxDebuffCount then
                 -- Debuff filter
                 local priority = debuffFilter:FilterRaidAura(unit, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
@@ -836,6 +841,8 @@ class "AuraContainer"(function()
         foreachAura(unit, auraFilter, math.max(maxClassBuffCount, maxBuffCount, maxBossBuffCount), function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
             -- compat classic
             if not name then return true end
+
+            if blackAuraList[spellID] then return true end
 
             local filtered = false
             
@@ -1264,6 +1271,10 @@ class "AuraContainer"(function()
         handler                     = function(self, specID)
             dispelDebuffFilter.SpecID = specID
         end
+    }
+
+    property "BlackAuraList"        {
+        type                        = RawTable
     }
 
     __Template__{

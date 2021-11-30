@@ -625,7 +625,8 @@ SKIN_STYLE =                                                                    
             paddingBottom                                                                   = AshBlzSkinApi.PowerBarVisible():Map(function(visible)
                 return visible and POWERBAR_HEIGHT + 1 or 4
             end);
-            classBuffFilterData                                                             = _ClassBuffList,
+            classBuffFilterData                                                             = AshToAsh.FromConfig():Map(function() return _ClassBuffList end),
+            blackAuraList                                                                   = AshToAsh.FromConfig():Map(function() return _AuraBlackList end),
             refresh                                                                         = AshBlzSkinApi.UnitAura(),
             displayOnlyDispellableDebuffs                                                   = AshBlzSkinApi.DisplayOnlyDispellableDebuffs(),
             buffSize                                                                        = AshBlzSkinApi.OnConfigChanged():Map(function() return DB().Appearance.Aura.AuraSize end),

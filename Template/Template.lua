@@ -542,7 +542,7 @@ Style.UpdateSkin(SKIN_NAME,                                                     
     }
 })
 
-@end-non-version-retail@]===]
+--@end-non-version-retail@]===]
 
 Style.UpdateSkin(SKIN_NAME,                                                               {
     [CenterStatusIcon]                                                                  = {

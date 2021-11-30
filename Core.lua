@@ -272,4 +272,4 @@ end
 --[===[@non-version-retail@
 GetThreatStatusColor = _G.GetThreatStatusColor or function (index) if index == 3 then return 1, 0, 0 elseif index == 2 then return 1, 0.6, 0 elseif index == 1 then return 1, 1, 0.47 else return 0.69, 0.69, 0.69 end end
 UnitTreatAsPlayerForDisplay = Toolset.fakefunc
-@end-non-version-retail@]===]
+--@end-non-version-retail@]===]
