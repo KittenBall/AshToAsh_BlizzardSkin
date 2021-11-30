@@ -3,6 +3,4 @@
     <Script file="PetApi.lua"/>
     <Script file="PanelApi.lua"/>
     <Script file="NameApi.lua"/>
-    <Script file="FriendApi.lua"/>
-    <Script file="Api_Retail.lua"/>
 </Ui>

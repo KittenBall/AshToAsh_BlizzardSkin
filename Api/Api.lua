@@ -122,6 +122,57 @@ function UnitIsInDistance(unit)
     return false
 end
 
+--@retail@
+SummonStatus = _G.Enum.SummonStatus
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.UnitCenterStatusIconVisible()
+    return Wow.FromUnitEvent(CenterStatusSubject):Next():Map(function(unit)
+        if UnitInOtherParty(unit) or UnitHasIncomingResurrection(unit) or (UnitIsInDistance(unit) and UnitPhaseReason(unit)) then
+            return true
+        elseif C_IncomingSummon.HasIncomingSummon(unit) then
+            local staus = C_IncomingSummon.IncomingSummonStatus(unit)
+            return status == SummonStatus.Pending or staus == SummonStatus.Accepted or staus == SummonStatus.Declined
+        end
+        return false
+    end)
+end
+--@end-retail@
+
+--[===[@non-version-retail@
+__Static__() __AutoCache__()
+function AshBlzSkinApi.UnitCenterStatusIconVisible()
+    return Wow.FromUnitEvent(CenterStatusSubject):Next():Map(function(unit)
+        if UnitInOtherParty(unit) or UnitHasIncomingResurrection(unit) or (UnitIsInDistance(unit) and not UnitInPhase(unit))then
+            return true
+        end
+        return false
+    end)
+end
+@end-non-version-retail@]===]
+
+-------------------------------------------------
+-- Vehicle
+-------------------------------------------------
+
+--@retail@
+__Static__() __AutoCache__()
+function AshBlzSkinApi.UnitVehicleVisible()
+    return Wow.FromUnitEvent(Wow.FromEvent("GROUP_ROSTER_UPDATE", "UNIT_ENTERED_VEHICLE", "UNIT_EXITED_VEHICLE"):Map("unit => unit or 'any'")):Map(function(unit)
+        return UnitInVehicle(unit) and UnitHasVehicleUI(unit)
+    end)
+end
+--@end-retail@
+
+--[===[@non-version-retail@
+__Static__() __AutoCache__()
+function AshBlzSkinApi.UnitVehicleVisible()
+    return Wow.FromUnitEvent(Observable:Just("any")):Map(function(unit)
+        return false
+    end)
+end
+@end-non-version-retail@]===]
+
 -------------------------------------------------
 -- Leader, Assistant, MasterLooter etc
 -------------------------------------------------
@@ -165,16 +216,24 @@ function AshBlzSkinApi.UnitIsLeaderOrAssistantIcon()
     end)
 end
 
+--@retail@
 __Static__() __AutoCache__()
 function AshBlzSkinApi.PlayerSpecializationID()
     return AshBlzSkinApi.OnConfigChanged():Map(function()
-        if Scorpio.IsRetail then
-            return GetSpecializationInfo(GetSpecialization()) or 0
-        else
-            return 0
-        end
+        return GetSpecializationInfo(GetSpecialization()) or 0
     end)
 end
+--@end-retail@
+
+--[===[@non-version-retail@
+__Static__() __AutoCache__()
+function AshBlzSkinApi.PlayerSpecializationID()
+    return Wow.FromUnitEvent(Observable:Just("any")):Map(function(unit)
+        return 0
+    end)
+end
+@end-non-version-retail@]===]
+
 
 -------------------------------------------------
 -- Option

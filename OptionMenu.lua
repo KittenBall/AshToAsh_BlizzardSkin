@@ -536,20 +536,6 @@ local function GetAppearanceMenu()
                         }
                     }
                 },
-                -- 好友名字染色
-                {
-                    text                                                                                                    = L["friends_name_coloring"],
-                    check                                                                                                   = {
-                        get                                                                                                 = function()
-                            return DB().Appearance.Name.FriendsNameColoring
-                        end,
-                        set                                                                                                 = function(value)
-                            DB().Appearance.Name.FriendsNameColoring = value
-                            SendConfigChanged()
-                            FireSystemEvent("UNIT_NAME_UPDATE", 'any')
-                        end
-                    }
-                },
                 -- 名字大小随框体缩放
                 {
                     text                                                                                                    = L["name_scales_with_frame"],
@@ -563,58 +549,6 @@ local function GetAppearanceMenu()
                         end
                     }
                 }
-                
-                    -- 不允许更改颜色
-                    -- submenu                                                                                                 = {
-                    --     {
-                    --         text                                                                                            = ENABLE,
-                    --         check                                                                                           = {
-                    --             get                                                                                         = function()
-                    --                 return DB().Appearance.Name.FriendsNameColoring
-                    --             end,
-                    --             set                                                                                         = function(value)
-                    --                 DB().Appearance.Name.FriendsNameColoring = value
-                    --                 FireSystemEvent("UNIT_NAME_UPDATE", 'any')
-                    --             end
-                    --         }
-                    --     },
-                    --     {
-                    --         text                                                                                            = L["battle_net_friend_color"],
-                    --         color                                                                                           = {
-                    --             get                                                                                         = function()
-                    --                 return DB().Appearance.Name.BNFriendColor
-                    --             end,
-                    --             set                                                                                         = function(value)
-                    --                 DB().Appearance.Name.BNFriendColor = value
-                    --                 FireSystemEvent("UNIT_NAME_UPDATE", 'any')
-                    --             end
-                    --         }
-                    --     },
-                    --     {
-                    --         text                                                                                            = L["guild_friend_color"],
-                    --         color                                                                                           = {
-                    --             get                                                                                         = function()
-                    --                 return DB().Appearance.Name.GuildColor
-                    --             end,
-                    --             set                                                                                         = function(value)
-                    --                 DB().Appearance.Name.GuildColor = value
-                    --                 FireSystemEvent("UNIT_NAME_UPDATE", 'any')
-                    --             end
-                    --         }
-                    --     },
-                    --     {
-                    --         text                                                                                            = L["friend_color"],
-                    --         color                                                                                           = {
-                    --             get                                                                                         = function()
-                    --                 return DB().Appearance.Name.FriendColor
-                    --             end,
-                    --             set                                                                                         = function(value)
-                    --                 DB().Appearance.Name.FriendColor = value
-                    --                 FireSystemEvent("UNIT_NAME_UPDATE", 'any')
-                    --             end
-                    --         }
-                    --     }
-                    -- }
             } 
         },
         -- 单位框体背景

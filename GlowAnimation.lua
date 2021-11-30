@@ -85,7 +85,7 @@ class "AutoCastGlow"(function(_ENV)
     end
 
     local function UpdateSizes(self)
-        local groupNumber = self._GroupNumber or 4
+        local groupNumber = self.GroupNumber
         local scale = self.Scale
         for k, size in pairs(AutoCastGlow.GlowSizes) do
             for i = 1, groupNumber do
@@ -135,7 +135,7 @@ class "AutoCastGlow"(function(_ENV)
     property "GroupNumber"          {
         type        = NaturalNumber,
         default     = 4,
-        get         = function(self) return self._GroupNumber or 4 end,
+        get         = function(self) return self._GroupNumber end,
         set         = function(self, groupNumber)
             groupNumber = groupNumber >= 0 and groupNumber or 4
             self._GroupNumber = groupNumber
@@ -149,7 +149,7 @@ class "AutoCastGlow"(function(_ENV)
     property "PaddingHorizontal"    {
         type        = Number,
         default     = 0,
-        get         = function(self) return self._PaddingHorizontal or 0 end,
+        get         = function(self) return self._PaddingHorizontal end,
         set         = function(self, paddingHorizontal)
             self._PaddingHorizontal = paddingHorizontal
             UpdatePoints(self)
@@ -161,7 +161,7 @@ class "AutoCastGlow"(function(_ENV)
     property "PaddingVertical"      {
         type        = Number,
         default     = 0,
-        get         = function(self) return self._PaddingVertical or 0 end,
+        get         = function(self) return self._PaddingVertical end,
         set         = function(self, paddingVertical)
             self._PaddingVertical = paddingVertical
             UpdatePoints(self)
@@ -172,7 +172,7 @@ class "AutoCastGlow"(function(_ENV)
     property "Scale"                {
         type        = Number,
         default     = 1,
-        get         = function(self) return self._Scale or 1 end,
+        get         = function(self) return self._Scale end,
         set         = function(self, scale)
             scale = (scale >= 0) and scale or 1
             self._Scale = scale
@@ -185,7 +185,7 @@ class "AutoCastGlow"(function(_ENV)
     property "Period"               {
         type        = Number,
         default     = 8,
-        get         = function(self) return self._Period or 8 end,
+        get         = function(self) return self._Period end,
         set         = function(self, period)
             period = (period == 0) and 8 or period
             self._Period = period
@@ -209,7 +209,7 @@ class "AutoCastGlow"(function(_ENV)
     property "Color"                {
         type        = ColorType,
         default     = Color(0.95, 0.95, 0.32),
-        get         = function(self) return self._Color or Color(0.95, 0.95, 0.32) end,
+        get         = function(self) return self._Color end,
         set         = function(self, color)
             self._Color = color
             for _, texture in ipairs(self.textures) do
@@ -222,7 +222,7 @@ class "AutoCastGlow"(function(_ENV)
     property "FrameLevel"           {
         type        = NaturalNumber,
         default     = 8,
-        get         = function(self) return self._FrameLevel or 8 end,
+        get         = function(self) return self._FrameLevel end,
         set         = function(self, frameLevel)
             self._FrameLevel = frameLevel
             UpdateFrameLevel(self)
@@ -233,7 +233,7 @@ class "AutoCastGlow"(function(_ENV)
     property "File"                 {
         type        = String + Number,
         default     = Scorpio.IsRetail and [[Interface\Artifacts\Artifacts]] or [[Interface\ItemSocketingFrame\UI-ItemSockets]],
-        get         = function(self) return self._File or (Scorpio.IsRetail and [[Interface\Artifacts\Artifacts]] or [[Interface\ItemSocketingFrame\UI-ItemSockets]]) end,
+        get         = function(self) return self._File end,
         set         = function(self, file)
             self._File = file
             for _, texture in ipairs(self.textures) do
@@ -246,7 +246,7 @@ class "AutoCastGlow"(function(_ENV)
     property "TexCoords"            {
         type        = RectType,
         default     = Scorpio.IsRetail and RectType(0.8115234375, 0.9169921875, 0.8798828125, 0.9853515625) or RectType(0.3984375, 0.4453125, 0.40234375, 0.44921875),
-        get         = function(self) return self._TexCoords or (Scorpio.IsRetail and RectType(0.8115234375, 0.9169921875, 0.8798828125, 0.9853515625) or RectType(0.3984375, 0.4453125, 0.40234375, 0.44921875)) end,
+        get         = function(self) return self._TexCoords end,
         set         = function(self, texCoords)
             self._TexCoords = texCoords
             for _, texture in ipairs(self.textures) do
@@ -259,7 +259,7 @@ class "AutoCastGlow"(function(_ENV)
     property "AlphaMode"            {
         type        = AlphaMode,
         default     = Scorpio.IsRetail and "BLEND" or "ADD",
-        get         = function(self) return self._AlphaMode or (Scorpio.IsRetail and "BLEND" or "ADD") end,
+        get         = function(self) return self._AlphaMode end,
         set         = function(self, alphaMode)
             self._AlphaMode = alphaMode or "BLEND"
             for _, texture in ipairs(self.textures) do
@@ -284,8 +284,8 @@ class "AutoCastGlow"(function(_ENV)
 
     local function OnUpdate(self, elapsed)
         local width, height = self:GetSize()
-        local groupNumber = self._GroupNumber or 4
-        local period = self._Period or 8
+        local groupNumber = self.GroupNumber
+        local period = self.Period
         if width ~= self.info.width or height ~= self.info.height then
             self.info.width = width
             self.info.height = height
@@ -463,7 +463,7 @@ class "PixelGlow"(function(_ENV)
     property "LineNumber"           {
         type        = NaturalNumber,
         default     = 8,
-        get         = function(self) return self._LineNumber or 8 end,
+        get         = function(self) return self._LineNumber end,
         set         = function(self, lineNumber)
             lineNumber = lineNumber > 0 and lineNumber or 8
             self._LineNumber = lineNumber
@@ -478,7 +478,7 @@ class "PixelGlow"(function(_ENV)
     property "PaddingHorizontal"    {
         type        = Number,
         default     = 0,
-        get         = function(self) return self._PaddingHorizontal or 0 end,
+        get         = function(self) return self._PaddingHorizontal end,
         set         = function(self, paddingHorizontal)
             self._PaddingHorizontal = paddingHorizontal
             UpdatePoints(self)
@@ -490,7 +490,7 @@ class "PixelGlow"(function(_ENV)
     property "PaddingVertical"      {
         type        = Number,
         default     = 0,
-        get         = function(self) return self._PaddingVertical or 0 end,
+        get         = function(self) return self._PaddingVertical end,
         set         = function(self, paddingVertical)
             self._PaddingVertical = paddingVertical
             UpdatePoints(self)
@@ -516,7 +516,7 @@ class "PixelGlow"(function(_ENV)
     property "Thickness"            {
         type        = Number,
         default     = 2,
-        get         = function(self) return self._Thickness or 2 end,
+        get         = function(self) return self._Thickness end,
         set         = function(self, thickness)
             thickness = thickness > 0 and thickness or 2
             self._Thickness = thickness
@@ -530,7 +530,7 @@ class "PixelGlow"(function(_ENV)
     property "Period"               {
         type        = Number,
         default     = 4,
-        get         = function(self) return self._Period or 4 end,
+        get         = function(self) return self._Period end,
         set         = function(self, period)
             period = (period == 0) and 4 or period
             self._Period = period
@@ -554,7 +554,7 @@ class "PixelGlow"(function(_ENV)
     property "Color"                {
         type        = ColorType,
         default     = Color(0.95, 0.95, 0.32),
-        get         = function(self) return self._Color or Color(0.95, 0.95, 0.32) end,
+        get         = function(self) return self._Color end,
         set         = function(self, color)
             self._Color = color
             for _, texture in ipairs(self.textures) do
@@ -567,7 +567,7 @@ class "PixelGlow"(function(_ENV)
     property "FrameLevel"           {
         type        = NaturalNumber,
         default     = 8,
-        get         = function(self) return self._FrameLevel or 8 end,
+        get         = function(self) return self._FrameLevel end,
         set         = function(self, frameLevel)
             self._FrameLevel = frameLevel
             UpdateFrameLevel(self)
@@ -578,7 +578,7 @@ class "PixelGlow"(function(_ENV)
     property "File"                 {
         type        = String + Number,
         default     = [[Interface\BUTTONS\WHITE8X8]],
-        get         = function(self) return self._File or [[Interface\BUTTONS\WHITE8X8]] end,
+        get         = function(self) return self._File end,
         set         = function(self, file)
             self._File = file
             for _, texture in ipairs(self.textures) do
@@ -591,7 +591,7 @@ class "PixelGlow"(function(_ENV)
     property "TexCoords"            {
         type        = RectType,
         default     = { 0, 1, 0, 1 },
-        get         = function(self) return self._TexCoords or { 0, 1, 0, 1 } end,
+        get         = function(self) return self._TexCoords end,
         set         = function(self, texCoords)
             self._TexCoords = texCoords
             for _, texture in ipairs(self.textures) do
@@ -604,7 +604,7 @@ class "PixelGlow"(function(_ENV)
     property "AlphaMode"            {
         type        = AlphaMode,
         default     = "BLEND",
-        get         = function(self) return self._AlphaMode or "BLEND" end,
+        get         = function(self) return self._AlphaMode end,
         set         = function(self, alphaMode)
             self._AlphaMode = alphaMode or "BLEND"
             for _, texture in ipairs(self.textures) do
@@ -685,7 +685,7 @@ class "PixelGlow"(function(_ENV)
     end
 
     local function OnUpdate(self, elapsed)
-        self.timer = self.timer + elapsed / (self._Period or 4)
+        self.timer = self.timer + elapsed / (self.Period)
         if self.timer > 1 or self.timer < -1 then
             self.timer = self.timer % 1
         end
@@ -724,7 +724,7 @@ class "PixelGlow"(function(_ENV)
                 [3] = (height * 2 + width - length /2) / perimeter
             }
         end
-        local thickness = self._Thickness or 2
+        local thickness = self.Thickness
         self.step = self.step or 1/8
         if self:IsShown() then
             if not self.masks[1]:IsShown() then

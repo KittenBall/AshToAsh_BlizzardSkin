@@ -324,7 +324,7 @@ SHARE_NAMELABEL_SKIN                                                            
     drawLayer                                                                               = "ARTWORK",
     wordWrap                                                                                = false,
     justifyH                                                                                = "LEFT",
-    textColor                                                                               = AshBlzSkinApi.UnitNameColor()
+    textColor                                                                               = Color.WHITE
 }
 
 -- 名字指示器
