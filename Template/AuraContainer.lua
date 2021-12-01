@@ -971,7 +971,7 @@ class "AuraContainer"(function()
 
             if icon then
                 if i == 1 then
-                    icon:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", self.PaddingLeft + self.__DisplayBossAuraCount * (self.BossAuraSize + 1.5), self.PaddingBottom)
+                    icon:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", self.PaddingLeft + self.__DisplayBossAuraCount * (getScaleSize(self, self.BossAuraSize) + 1.5), self.PaddingBottom)
                 end
 
                 icon.AuraData = debuffCache[i]
