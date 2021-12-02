@@ -734,7 +734,7 @@ class "AuraContainer"(function()
     --@end-non-version-retail@]===]
 
     function Refresh(self, unit)
-        if not (unit and self:IsVisible()) then return self:HideAllAuras() end
+        if not UnitExists(unit) then return self:HideAllAuras() end
 
         wipeCaches()
 

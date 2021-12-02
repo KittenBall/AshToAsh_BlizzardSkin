@@ -73,13 +73,11 @@ function AshBlzSkinApi.UnitCastBarColor()
 end
 
 -------------------------------------------------
--- Dead
+-- Status
 -------------------------------------------------
 __Static__() __AutoCache__()
-function AshBlzSkinApi.UnitIsDead()
-    return Wow.FromUnitEvent(Wow.FromEvent("UNIT_CONNECTION", "PLAYER_FLAGS_CHANGED", "UNIT_HEALTH")):Map(function(unit)
-        return UnitIsDeadOrGhost(unit) and UnitIsConnected(unit)
-    end)
+function AshBlzSkinApi.UnitStatus()
+    return Wow.FromUnitEvent(Wow.FromEvent("UNIT_CONNECTION", "PLAYER_FLAGS_CHANGED", "UNIT_HEALTH"))
 end
 
 -------------------------------------------------

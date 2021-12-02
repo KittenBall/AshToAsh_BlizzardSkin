@@ -32,10 +32,6 @@ class "AggroHighlight" { Texture }
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinVehicleIcon")
 class "VehicleIcon" { Texture }
 
--- 死亡
-__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinDeadIcon")
-class "DeadIcon" { Texture }
-
 -- 团队拾取者
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinMasterLooterIcon")
 class "MasterLooterIcon" { Texture }
@@ -119,22 +115,35 @@ end)
 -- EnlargeBuff icon
 __Sealed__() class "AshBlzSkinEnlargeBuffIcon" { AshBlzSkinAuraIcon }
 
--- AuraPanel
-class "BlzSkinAuraPanel"(function()
-    inherit "AuraPanel"
+__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinStatusText")
+class "StatusText" (function()
+    inherit "FontString"
 
-    __Indexer__() __Observable__()
-    property "AuraFilter" { set = Toolset.fakefunc }
+    property "Refresh"          {
+        set                     = function(self, unit)
+            self:Refresh(unit)
+        end
+    }
 
-    __Indexer__() __Observable__()
-    property "AuraCaster" { set = Toolset.fakefunc }
+    function Refresh(self, unit)
+        if UnitExists(unit) then
+            if not UnitIsConnected(unit) then
+                self:SetText(PLAYER_OFFLINE)
+                self:Show()
+            elseif UnitIsDeadOrGhost(unit) then
+                self:SetText(DEAD)
+                self:Show()
+            else
+                self:Hide()
+            end
+        else
+            self:Hide()
+        end
+    end
 
 end)
 
 TEMPLATE_SKIN_STYLE                                                                     = {
-    [BlzSkinAuraPanel]                                                                  = {
-        refresh                                                                         = AshBlzSkinApi.UnitAura()
-    },
 
     -- 目标选中边框
     [SelectionHighlightTexture]                                                         = {
@@ -145,13 +154,6 @@ TEMPLATE_SKIN_STYLE                                                             
         setAllPoints                                                                    = true,
         ignoreParentAlpha                                                               = true,
         visible                                                                         = Wow.UnitIsTarget()
-    },
-
-    -- 死亡图标
-    [DeadIcon]                                                                          = {
-        file                                                                            = "Interface\\EncounterJournal\\UI-EJ-Icons",
-        texCoords                                                                       = RectType(0.375, 0.5, 0, 0.5),
-        visible                                                                         = AshBlzSkinApi.UnitIsDead()
     },
 
     -- 解锁按钮

@@ -62,7 +62,8 @@ end
 -------------------------------------------------
 SHARE_HEALTHLABEL_SKIN                                                                       = {
     location                                                                                 = {
-        Anchor("CENTER"),
+        Anchor("LEFT"),
+        Anchor("RIGHT"),
         Anchor("TOP", 0, -2, "NameLabel", "BOTTOM")
     }
 }
@@ -473,6 +474,13 @@ SHARE_AURA_CONTAINER                                                            
 
 }
 
+-- 状态文字
+SHARE_STATUS                                                                                = {
+    refresh                                                                                 = AshBlzSkinApi.UnitStatus(),
+    location                                                                                = AshBlzSkinApi.RelocationUnitFrameBottomIcon(),
+    fontObject                                                                              = GameFontDisable
+}
+
 -------------------------------------------------
 -- Skin
 -------------------------------------------------
@@ -528,11 +536,8 @@ SKIN_STYLE =                                                                    
         -- 血量文本
         HealthLabel                                                                         = AshBlzSkinApi.HealthLabelSkin(),
 
-        -- 死亡图标
-        AshBlzSkinDeadIcon                                                                  = {
-            size                                                                            = AshBlzSkinApi.ResizeUnitFrameIcon(),
-            location                                                                        = AshBlzSkinApi.RelocationUnitFrameBottomIcon(),
-        },
+        -- 状态文本
+        AshBlzSkinStatusText                                                                = SHARE_STATUS,
 
         -- 角色职责图标
         RoleIcon                                                                            = {
@@ -602,12 +607,6 @@ SKIN_STYLE =                                                                    
 
         -- 标记图标
         RaidTargetIcon                                                                      = SHARE_RAIDTARGET_SKIN,
-
-        -- 离线图标
-        DisconnectIcon                                                                      = {
-            location                                                                        = AshBlzSkinApi.RelocationUnitFrameBottomIcon(),
-            size                                                                            = AshBlzSkinApi.ResizeUnitFrameIcon()
-        },
 
         -- 准备就绪
         ReadyCheckIcon                                                                      = {
@@ -680,11 +679,8 @@ SKIN_STYLE =                                                                    
             }
         },
 
-        --死亡图标
-        AshBlzSkinDeadIcon                                                                  = {
-            size                                                                            = AshBlzSkinApi.ResizeUnitFrameIcon(),
-            location                                                                        = AshBlzSkinApi.RelocationUnitFrameBottomIcon(),
-        },
+        -- 状态文本
+        AshBlzSkinStatusText                                                                = SHARE_STATUS,
 
         -- 仇恨指示器
         AshBlzSkinAggroHighlight                                                            = AshBlzSkinApi.PetAggroSkin(),

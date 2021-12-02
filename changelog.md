@@ -1,3 +1,6 @@
+## 1.8.4
+- Fix issues
+
 ## 1.8.0
 - Greatly optimized performance
 - Temporarily block enlarge buffs and enlarge debuffs
