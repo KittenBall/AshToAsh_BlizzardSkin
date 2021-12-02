@@ -160,7 +160,7 @@ class "BuffFilter"(function()
         if count > 1 and count <= maxCount then
             for i = 2, count do
                 local aura = src[i]
-                if aura.priority == classBuffPriority then
+                if aura.Priority == classBuffPriority then
                     tremove(src, i)
                     tinsert(src, 1)
                 end
