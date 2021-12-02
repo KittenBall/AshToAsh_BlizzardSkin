@@ -146,12 +146,10 @@ class "BuffFilter"(function()
     
     function Filter(self, unit, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
         if not isBossAura then
-            if self:ShouldDisplayBuff(caster, spellID, canApplyAura) then
-                if shouldShowClassBuff(self, spellID) then
-                    return classBuffPriority
-                else
-                    return self.MaxPriority
-                end
+            if shouldShowClassBuff(self, spellID) then
+                return classBuffPriority
+            elseif self:ShouldDisplayBuff(caster, spellID, canApplyAura) then
+                return self.MaxPriority
             end
         end
     end

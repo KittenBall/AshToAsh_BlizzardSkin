@@ -449,6 +449,30 @@ SHARE_HEALTHBAR_SKIN                                                            
     end)
 }
 
+-- 光环
+SHARE_AURA_CONTAINER                                                                        = {
+    setAllPoints                                                                            = true,
+    useParentLevel                                                                          = true,
+    paddingLeft                                                                             = 4,
+    paddingRight                                                                            = 4,
+    paddingTop                                                                              = 4,
+    paddingBottom                                                                           = AshBlzSkinApi.PowerBarVisible():Map(function(visible)
+        return visible and POWERBAR_HEIGHT + 1 or 4
+    end);
+    classBuffFilterData                                                                     = AshToAsh.FromConfig():Map(function() return _ClassBuffList end),
+    blackAuraList                                                                           = AshToAsh.FromConfig():Map(function() return _AuraBlackList end),
+    refresh                                                                                 = AshBlzSkinApi.UnitAura(),
+    displayOnlyDispellableDebuffs                                                           = AshBlzSkinApi.DisplayOnlyDispellableDebuffs(),
+    buffSize                                                                                = AshBlzSkinApi.OnConfigChanged():Map(function() return DB().Appearance.Aura.AuraSize end),
+    debuffSize                                                                              = AshBlzSkinApi.OnConfigChanged():Map(function() return DB().Appearance.Aura.AuraSize end),
+    dispelDebuffSize                                                                        = 8,
+    bossAuraSize                                                                            = 15,
+    classBuffSize                                                                           = 10,
+    CheckDispelAbilityEnable                                                                = AshBlzSkinApi.CheckDispelAbilityEnable(),
+    specID                                                                                  = AshBlzSkinApi.PlayerSpecializationID()
+
+}
+
 -------------------------------------------------
 -- Skin
 -------------------------------------------------
@@ -616,27 +640,7 @@ SKIN_STYLE =                                                                    
         AshBlzSkinCastBar                                                                   = AshBlzSkinApi.CastBarSkin(),
 
         -- 光环
-        AshBlzSkinAuraContainer                                                             = {
-            setAllPoints                                                                    = true,
-            useParentLevel                                                                  = true,
-            paddingLeft                                                                     = 4,
-            paddingRight                                                                    = 4,
-            paddingTop                                                                      = 4,
-            paddingBottom                                                                   = AshBlzSkinApi.PowerBarVisible():Map(function(visible)
-                return visible and POWERBAR_HEIGHT + 1 or 4
-            end);
-            classBuffFilterData                                                             = AshToAsh.FromConfig():Map(function() return _ClassBuffList end),
-            blackAuraList                                                                   = AshToAsh.FromConfig():Map(function() return _AuraBlackList end),
-            refresh                                                                         = AshBlzSkinApi.UnitAura(),
-            displayOnlyDispellableDebuffs                                                   = AshBlzSkinApi.DisplayOnlyDispellableDebuffs(),
-            buffSize                                                                        = AshBlzSkinApi.OnConfigChanged():Map(function() return DB().Appearance.Aura.AuraSize end),
-            debuffSize                                                                      = AshBlzSkinApi.OnConfigChanged():Map(function() return DB().Appearance.Aura.AuraSize end),
-            dispelDebuffSize                                                                = 8,
-            bossAuraSize                                                                    = 15,
-            classBuffSize                                                                   = 10,
-            CheckDispelAbilityEnable                                                        = AshBlzSkinApi.CheckDispelAbilityEnable(),
-            specID                                                                          = AshBlzSkinApi.PlayerSpecializationID()
-        }
+        AshBlzSkinAuraContainer                                                             = SHARE_AURA_CONTAINER
     },
 
     [AshPetUnitFrame]                                                                       = {
@@ -701,7 +705,10 @@ SKIN_STYLE =                                                                    
         PowerBar                                                                            = AshBlzSkinApi.PetPowerBarSkin(),
 
         -- 施法条
-        AshBlzSkinCastBar                                                                   = AshBlzSkinApi.CastBarSkin()
+        AshBlzSkinCastBar                                                                   = AshBlzSkinApi.CastBarSkin(),
+        
+        -- 光环
+        AshBlzSkinAuraContainer                                                             = SHARE_AURA_CONTAINER
     },
 }
 
