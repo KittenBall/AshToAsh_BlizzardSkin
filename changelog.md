@@ -1,3 +1,6 @@
+## 1.8.5
+- Fix aura display when class buff show in bcc
+
 ## 1.8.4
 - Fix issues
 

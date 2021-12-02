@@ -103,7 +103,11 @@ class "BuffFilter"(function()
             -- 野性赐福
             [26991]             = true,
             -- 野性印记
-            [26990]             = true
+            [26990]             = true,
+            -- 荆棘术
+            [26992]             = true,
+            -- 自然之握
+            [27009]             = true
         },
 
         PRIEST                  = {
@@ -137,18 +141,19 @@ class "BuffFilter"(function()
     function ShouldDisplayBuff(self, unitCaster, spellId, canApplyAura)
         local hasCustom, alwaysShowMine, showForMySpec = SpellGetVisibilityInfo(spellId, UnitAffectingCombat("player") and "RAID_INCOMBAT" or "RAID_OUTOFCOMBAT")
         
+        local isClassBuff = shouldShowClassBuff(self, spellId)
         if ( hasCustom ) then
-            return showForMySpec or (alwaysShowMine and (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle"))
+            return showForMySpec or (alwaysShowMine and (classBuff or unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle")), classBuff
         else
-            return (unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle") and canApplyAura and not SpellIsSelfBuff(spellId)
+            return (classBuff or unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle") and canApplyAura and not SpellIsSelfBuff(spellId), classBuff
         end
     end
     
     function Filter(self, unit, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
         if not isBossAura then
-            if shouldShowClassBuff(self, spellID) then
-                return classBuffPriority
-            elseif self:ShouldDisplayBuff(caster, spellID, canApplyAura) then
+            local display, isClassBuff = self:ShouldDisplayBuff(caster, spellID, canApplyAura)
+            if display then
+                if isClassBuff then return classBuffPriority end
                 return self.MaxPriority
             end
         end
@@ -157,12 +162,13 @@ class "BuffFilter"(function()
     -- 如果职业buff会被显示的话，将职业buff添加到所有buff的最前面
     function SortDisplayOrder(self, src, maxCount)
         local count = #src
-        if count > 1 and count <= maxCount then
-            for i = 2, count do
+        if count > 1 then
+            -- 在显示范围内的职业buff全部挪到最前面
+            for i = 2, math.min(count, maxCount) do
                 local aura = src[i]
                 if aura.Priority == classBuffPriority then
                     tremove(src, i)
-                    tinsert(src, 1)
+                    tinsert(src, 1, aura)
                 end
             end
         end
@@ -834,7 +840,7 @@ class "AuraContainer"(function()
         -- Helpful
         auraFilter, index = "HELPFUL", 1
         local maxBuffPriority, maxBuffCount, buffCount = buffFilter.MaxPriority, self.BuffCount, 0
-        local maxBossBuffCount, bossBuffCount = self.BossAuraCount, 0
+        local maxBossBuffCount, bossBuffCount = self.BossAuraCount - bossDebuffCount, 0
         local maxClassBuffPriority, maxClassBuffCount, classBuffCount = classBuffFilter.MaxPriority, self.ClassBuffCount, 0
         foreachAura(unit, auraFilter, math.max(maxClassBuffCount, maxBuffCount, maxBossBuffCount), function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
             -- compat classic
@@ -878,8 +884,7 @@ class "AuraContainer"(function()
             end
 
             index = index + 1
-
-            return not (buffCount < maxBuffCount or bossBuffCount < maxBossBuffCount)
+            return not (buffCount < maxBuffCount or bossBuffCount < maxBossBuffCount or classBuffCount < maxClassBuffCount)
         end)
 
         -- sort auras
