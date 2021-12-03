@@ -143,9 +143,9 @@ class "BuffFilter"(function()
         
         local isClassBuff = shouldShowClassBuff(self, spellId)
         if ( hasCustom ) then
-            return showForMySpec or (alwaysShowMine and (classBuff or unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle")), classBuff
+            return showForMySpec or (alwaysShowMine and (isClassBuff or unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle")), isClassBuff
         else
-            return (classBuff or unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle") and canApplyAura and not SpellIsSelfBuff(spellId), classBuff
+            return (isClassBuff or unitCaster == "player" or unitCaster == "pet" or unitCaster == "vehicle") and canApplyAura and not SpellIsSelfBuff(spellId), isClassBuff
         end
     end
     
@@ -292,7 +292,7 @@ class "ClassBuffFilter"(function()
     extend "AuraFilter"
 
     function Filter(self, unit, filter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer, ...)
-        local aura = self.Data[spellID]
+        local aura = self.Data[spellID] or self.Data[name]
         if aura then
             return type(aura) == "table" and aura.Priority or self.MaxPriority
         end
@@ -757,7 +757,7 @@ class "AuraContainer"(function()
             -- compat classic
             if not name then return true end
 
-            if blackAuraList[spellID] then return true end
+            if blackAuraList[spellID] then return false end
 
             if not displayOnlyDispellableDebuffs and debuffCount < maxDebuffCount then
                 -- Debuff filter
@@ -802,7 +802,7 @@ class "AuraContainer"(function()
             -- compat classic
             if not name then return true end
 
-            if blackAuraList[spellID] then return true end
+            if blackAuraList[spellID] then return false end
 
             if displayOnlyDispellableDebuffs and debuffCount < maxDebuffCount then
                 -- Debuff filter
@@ -846,7 +846,7 @@ class "AuraContainer"(function()
             -- compat classic
             if not name then return true end
 
-            if blackAuraList[spellID] then return true end
+            if blackAuraList[spellID] then return false end
 
             local filtered = false
             
