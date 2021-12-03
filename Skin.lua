@@ -58,69 +58,6 @@ end
 -------------------------------------------------
 
 -------------------------------------------------
--- Health Label
--------------------------------------------------
-SHARE_HEALTHLABEL_SKIN                                                                       = {
-    location                                                                                 = {
-        Anchor("LEFT"),
-        Anchor("RIGHT"),
-        Anchor("TOP", 0, -2, "NameLabel", "BOTTOM")
-    }
-}
-
-local function formatHealth(health)
-    if health and health > 0 then
-        if DB().Appearance.HealthBar.HealthText.TextFormat == HealthTextFormat.TEN_THOUSAND then
-            return health >= 10000 and ("%.1fW"):format(health/10000) or health
-        elseif DB().Appearance.HealthBar.HealthText.TextFormat == HealthTextFormat.KILO then
-            return health >= 1000 and ("%.1fK"):format(health/1000) or health
-        else
-            return BreakUpLargeNumbers(health)
-        end
-    end
-end
-
-__Static__() __AutoCache__()
-function AshBlzSkinApi.HealthLabelSkin()
-    return AshBlzSkinApi.OnConfigChanged():Map(function()
-        local healthTextStyle = DB().Appearance.HealthBar.HealthText.Style
-        if healthTextStyle == HealthTextStyle.HEALTH then
-            SHARE_HEALTHLABEL_SKIN.text  = Wow.UnitHealthFrequent():Map(formatHealth)
-        elseif healthTextStyle == HealthTextStyle.LOSTHEALTH then
-            SHARE_HEALTHLABEL_SKIN.text  = Wow.UnitHealthLostFrequent():Map(formatHealth):Map(function(health) return health and ("-" .. health) end)
-        elseif healthTextStyle == HealthTextStyle.PERCENT then
-            SHARE_HEALTHLABEL_SKIN.text  = Wow.UnitHealthPercentFrequent():Map(function(percent)
-                return percent > 0 and percent.."%" or nil
-            end)
-        else
-            return nil
-        end
-        
-        SHARE_HEALTHLABEL_SKIN.textColor = (healthTextStyle == HealthTextStyle.LOSTHEALTH and Color.RED or Color.WHITE)
-        
-        if DB().Appearance.HealthBar.HealthText.ScaleWithFrame then
-            SHARE_HEALTHLABEL_SKIN.Font = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
-                local fontType = {}
-                fontType.font = GetLibSharedMediaFont(DB().Appearance.HealthBar.HealthText.Font) or HealthLabelFont
-                fontType.outline = DB().Appearance.HealthBar.HealthText.FontOutline
-                fontType.monochrome = DB().Appearance.HealthBar.HealthText.FontMonochrome
-                fontType.height = getDynamicFontHeight(h, DB().Appearance.HealthBar.HealthText.FontSize, 0.6)
-                return fontType
-            end)
-        else
-            local fontType = {}
-            fontType.font = GetLibSharedMediaFont(DB().Appearance.HealthBar.HealthText.Font) or HealthLabelFont
-            fontType.outline = DB().Appearance.HealthBar.HealthText.FontOutline
-            fontType.monochrome = DB().Appearance.HealthBar.HealthText.FontMonochrome
-            fontType.height = DB().Appearance.HealthBar.HealthText.FontSize
-            SHARE_HEALTHLABEL_SKIN.Font = fontType
-        end
-
-        return SHARE_HEALTHLABEL_SKIN
-    end)
-end
-
--------------------------------------------------
 -- Panel Label
 -------------------------------------------------
 GROUP_PANEL_LABEL_SKIN                                                                       = {
@@ -403,6 +340,47 @@ function AshBlzSkinApi.MasterLooterSkin()
 end
 
 -------------------------------------------------
+-- Status text 状态文字
+-------------------------------------------------
+
+SHARE_STATUS_SKIN                                                                           = {
+    refresh                                                                                 = AshBlzSkinApi.UnitStatus(),
+    location                                                                                = AshBlzSkinApi.RelocationUnitFrameBottomIcon(),
+    healhTextStyle                                                                          = AshBlzSkinApi.OnConfigChanged():Map(function()
+        return DB().Appearance.HealthBar.HealthText.Style
+    end),
+    healthTextFormat                                                                        = AshBlzSkinApi.OnConfigChanged():Map(function()
+        return DB().Appearance.HealthBar.HealthText.TextFormat
+    end),
+    text                                                                                    = Color.DISABLE
+}
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.StatusSkin()
+    return AshBlzSkinApi.OnConfigChanged():Map(function()
+        if DB().Appearance.HealthBar.HealthText.ScaleWithFrame then
+            SHARE_STATUS_SKIN.Font = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
+                local fontType = {}
+                fontType.font = GetLibSharedMediaFont(DB().Appearance.HealthBar.HealthText.Font) or HealthLabelFont
+                fontType.outline = DB().Appearance.HealthBar.HealthText.FontOutline
+                fontType.monochrome = DB().Appearance.HealthBar.HealthText.FontMonochrome
+                fontType.height = getDynamicFontHeight(h, DB().Appearance.HealthBar.HealthText.FontSize, 0.6)
+                return fontType
+            end)
+        else
+            local fontType = {}
+            fontType.font = GetLibSharedMediaFont(DB().Appearance.HealthBar.HealthText.Font) or HealthLabelFont
+            fontType.outline = DB().Appearance.HealthBar.HealthText.FontOutline
+            fontType.monochrome = DB().Appearance.HealthBar.HealthText.FontMonochrome
+            fontType.height = DB().Appearance.HealthBar.HealthText.FontSize
+            SHARE_STATUS_SKIN.Font = fontType
+        end
+
+        return SHARE_STATUS_SKIN
+    end)
+end
+
+-------------------------------------------------
 -- Share Skin
 -------------------------------------------------
 
@@ -474,12 +452,6 @@ SHARE_AURA_CONTAINER                                                            
 
 }
 
--- 状态文字
-SHARE_STATUS                                                                                = {
-    refresh                                                                                 = AshBlzSkinApi.UnitStatus(),
-    location                                                                                = AshBlzSkinApi.RelocationUnitFrameBottomIcon(),
-    fontObject                                                                              = GameFontDisable
-}
 
 -------------------------------------------------
 -- Skin
@@ -533,11 +505,8 @@ SKIN_STYLE =                                                                    
         -- 名字
         NameLabel                                                                           = AshBlzSkinApi.NameSkin(),
 
-        -- 血量文本
-        HealthLabel                                                                         = AshBlzSkinApi.HealthLabelSkin(),
-
         -- 状态文本
-        AshBlzSkinStatusText                                                                = SHARE_STATUS,
+        AshBlzSkinStatusText                                                                = AshBlzSkinApi.StatusSkin(),
 
         -- 角色职责图标
         RoleIcon                                                                            = {
@@ -680,7 +649,7 @@ SKIN_STYLE =                                                                    
         },
 
         -- 状态文本
-        AshBlzSkinStatusText                                                                = SHARE_STATUS,
+        AshBlzSkinStatusText                                                                = AshBlzSkinApi.StatusSkin(),
 
         -- 仇恨指示器
         AshBlzSkinAggroHighlight                                                            = AshBlzSkinApi.PetAggroSkin(),

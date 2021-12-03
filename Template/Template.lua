@@ -119,11 +119,33 @@ __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinStatusText")
 class "StatusText" (function()
     inherit "FontString"
 
+    property "HealthTextFormat" {
+        type                    = HealthTextFormat,
+        default                 = HealthTextFormat.NORMAL
+    }
+
+    property "HealthTextStyle"  {
+        type                    = HealthTextStyle,
+        default                 = HealthTextStyle.NONE
+    }
+
     property "Refresh"          {
         set                     = function(self, unit)
             self:Refresh(unit)
         end
     }
+
+    local function formatHealth(health)
+        if health and health > 0 then
+            if self.HealthTextFormat == HealthTextFormat.TEN_THOUSAND then
+                return health >= 10000 and ("%.1fW"):format(health/10000) or health
+            elseif self.HealthTextFormat == HealthTextFormat.KILO then
+                return health >= 1000 and ("%.1fK"):format(health/1000) or health
+            else
+                return BreakUpLargeNumbers(health)
+            end
+        end
+    end
 
     function Refresh(self, unit)
         if UnitExists(unit) then
@@ -133,6 +155,26 @@ class "StatusText" (function()
             elseif UnitIsDeadOrGhost(unit) then
                 self:SetText(DEAD)
                 self:Show()
+            elseif self.HealthTextStyle == HealthTextStyle.HEALTH then
+                self:SetText(formatHealth(UnitHealth(unit)))
+                self:Show()
+            elseif self.HealthTextStyle == HealthTextStyle.LOSTHEALTH then
+                local health = UnitHealth(unit)
+                local healthLost = UnitHealthMax(unit) - health
+                if healthLost > 0 then
+                    health = formatHealth(health)
+                    frame.statusText:SetText(health and "-" .. health)
+                    frame.statusText:Show()
+                else
+                    self:Hide()
+                end
+            elseif self.HealthTextStyle == HealthTextStyle.PERCENT then
+                local maxHealth = UnitHealthMax(unit)
+                if maxHealth > 0 then
+                    self:SetFormattedText("%d%%", math.ceil(100 * UnitHealth(unit)/maxHealth))
+                else
+                    self:Hide()
+                end
             else
                 self:Hide()
             end
