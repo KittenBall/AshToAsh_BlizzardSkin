@@ -346,7 +346,7 @@ end
 SHARE_STATUS_SKIN                                                                           = {
     refresh                                                                                 = AshBlzSkinApi.UnitStatus(),
     location                                                                                = AshBlzSkinApi.RelocationUnitFrameBottomIcon(),
-    healhTextStyle                                                                          = AshBlzSkinApi.OnConfigChanged():Map(function()
+    healthTextStyle                                                                         = AshBlzSkinApi.OnConfigChanged():Map(function()
         return DB().Appearance.HealthBar.HealthText.Style
     end),
     healthTextFormat                                                                        = AshBlzSkinApi.OnConfigChanged():Map(function()

@@ -135,7 +135,7 @@ class "StatusText" (function()
         end
     }
 
-    local function formatHealth(health)
+    local function formatHealth(self, health)
         if health and health > 0 then
             if self.HealthTextFormat == HealthTextFormat.TEN_THOUSAND then
                 return health >= 10000 and ("%.1fW"):format(health/10000) or health
@@ -148,38 +148,35 @@ class "StatusText" (function()
     end
 
     function Refresh(self, unit)
+        local text
+        local color = Color.WHITE
         if UnitExists(unit) then
             if not UnitIsConnected(unit) then
-                self:SetText(PLAYER_OFFLINE)
-                self:Show()
+                text = PLAYER_OFFLINE
+                color = Color.DISABLED
             elseif UnitIsDeadOrGhost(unit) then
-                self:SetText(DEAD)
-                self:Show()
+                text = DEAD
+                color = Color.DISABLED
             elseif self.HealthTextStyle == HealthTextStyle.HEALTH then
-                self:SetText(formatHealth(UnitHealth(unit)))
-                self:Show()
+                text = formatHealth(self, UnitHealth(unit))
             elseif self.HealthTextStyle == HealthTextStyle.LOSTHEALTH then
                 local health = UnitHealth(unit)
                 local healthLost = UnitHealthMax(unit) - health
                 if healthLost > 0 then
-                    health = formatHealth(health)
-                    frame.statusText:SetText(health and "-" .. health)
-                    frame.statusText:Show()
-                else
-                    self:Hide()
+                    text = "-" .. formatHealth(self, health)
+                    color = Color.RED
                 end
             elseif self.HealthTextStyle == HealthTextStyle.PERCENT then
                 local maxHealth = UnitHealthMax(unit)
                 if maxHealth > 0 then
-                    self:SetFormattedText("%d%%", math.ceil(100 * UnitHealth(unit)/maxHealth))
-                else
-                    self:Hide()
+                    text = math.ceil(100 * UnitHealth(unit)/maxHealth) .. "%"
                 end
-            else
-                self:Hide()
             end
-        else
-            self:Hide()
+        end
+
+        if text then
+            self:SetText(text)
+            self:SetTextColor(color.r, color.g, color.b)
         end
     end
 
