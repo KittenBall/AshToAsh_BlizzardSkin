@@ -531,10 +531,12 @@ SKIN_STYLE =                                                                    
         RaidTargetIcon                                                                      = SHARE_RAIDTARGET_SKIN,
 
         -- 准备就绪
-        ReadyCheckIcon                                                                      = {
-            drawLayer                                                                       = "OVERLAY",
+        AshBlzSkinReadyCheckIcon                                                            = {
+            topLevel                                                                        = true,
             location                                                                        = AshBlzSkinApi.RelocationUnitFrameBottomIcon(),
-            size                                                                            = AshBlzSkinApi.ResizeUnitFrameIcon()
+            size                                                                            = AshBlzSkinApi.ResizeUnitFrameIcon(),
+            update                                                                          = AshBlzSkinApi.ReadyCheck(),
+            finish                                                                          = AshBlzSkinApi.ReadyCheckFinish()
         },
 
         -- 中间状态图标

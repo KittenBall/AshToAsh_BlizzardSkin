@@ -233,6 +233,19 @@ function AshBlzSkinApi.PlayerSpecializationID()
 end
 --@end-non-version-retail@]===]
 
+-------------------------------------------------
+-- Ready check
+-------------------------------------------------
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.ReadyCheck()
+    return Wow.FromUnitEvent(Wow.FromEvent("READY_CHECK_CONFIRM", "READY_CHECK"):Map("=> 'any'"))
+end
+
+__Static__() __AutoCache__()
+function AshBlzSkinApi.ReadyCheckFinish()
+    return Wow.FromUnitEvent(Wow.FromEvent("READY_CHECK_FINISHED"):Map("=> 'any'"))
+end
 
 -------------------------------------------------
 -- Option

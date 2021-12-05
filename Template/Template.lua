@@ -177,6 +177,7 @@ class "StatusText" (function()
         if text then
             self:SetText(text)
             self:SetTextColor(color.r, color.g, color.b)
+            self:Show()
         else
             self:Hide()
         end
@@ -270,6 +271,79 @@ class "RoleIcon"(function()
 end)
 --@end-non-version-retail@]===]
 
+
+__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinReadyCheckIcon")
+class "ReadyCheckIcon"(function()
+    inherit "Button"
+
+    property "Update"           {
+        set                     = function(self, unit)
+            self:UpdateReadyCheck(unit)
+        end
+    }
+
+    property "Finish"           {
+        set                     = function(self)
+            self:FinishReadyCheck()
+        end
+    }
+
+    function FinishReadyCheck(self)
+        if self:IsVisible() then
+            self.readyCheckDecay = CUF_READY_CHECK_DECAY_TIME
+            if self.readyCheckStatus == "waiting" then
+                self:SetNormalTexture(READY_CHECK_NOT_READY_TEXTURE)
+                self:Show()
+            end
+        else
+            self:UpdateReadyCheck(self.unit)
+        end
+    end
+
+    function UpdateReadyCheck(self, unit)
+        if self.readyCheckDecay and GetReadyCheckTimeLeft() <= 0 then
+            return
+        end
+
+        if not unit then
+            return self:Hide()
+        end
+        
+        self.unit = unit
+
+        local readyCheckStatus = GetReadyCheckStatus(unit)
+        self.readyCheckStatus = readyCheckStatus
+        if readyCheckStatus == "ready" then
+            self:SetNormalTexture(READY_CHECK_READY_TEXTURE)
+            self:Show()
+        elseif readyCheckStatus == "notready" then
+            self:SetNormalTexture(READY_CHECK_NOT_READY_TEXTURE)
+            self:Show()
+        elseif readyCheckStatus == "waiting" then
+            self:SetNormalTexture(READY_CHECK_WAITING_TEXTURE)
+            self:Show()
+        else
+            self:Hide()
+        end
+    end
+
+    local function OnUpdate(self, elapsed)
+        if self.readyCheckDecay then
+            if self.readyCheckDecay > 0 then
+                self.readyCheckDecay = self.readyCheckDecay - elapsed
+            else
+                self.readyCheckDecay = nil
+                self:UpdateReadyCheck(self.unit)
+            end
+        end
+    end
+
+    function __ctor(self)
+        self:EnableMouse(false)
+        self.OnUpdate = self.OnUpdate + OnUpdate
+    end
+
+end)
 
 TEMPLATE_SKIN_STYLE                                                                     = {
 
