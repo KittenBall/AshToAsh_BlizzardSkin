@@ -232,9 +232,9 @@ class "RoleIcon"(function()
     end
 
 end)
---@retail@
+--@end-retail@
 
---[===[@end-non-version-retail@
+--[===[@non-version-retail@
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinRoleIcon")
 class "RoleIcon"(function()
     inherit "Texture"
