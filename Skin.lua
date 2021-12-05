@@ -271,7 +271,7 @@ NAMELABEL_SKIN                                                                  
 
     text                                                                                    = AshBlzSkinApi.UnitName(),
     location                                                                                = {
-        Anchor("TOPLEFT", 0, -1, "RoleIcon", "TOPRIGHT"), 
+        Anchor("TOPLEFT", 0, -1, "AshBlzSkinRoleIcon", "TOPRIGHT"), 
         Anchor("TOPRIGHT", -3, -3) 
     }
 }
@@ -316,26 +316,6 @@ __Static__() __AutoCache__()
 function AshBlzSkinApi.FocusSkin()
     return AshBlzSkinApi.OnConfigChanged():Map(function()
         return DB().Appearance.DisplayFocusHighlight and FOCUS_SKIN or nil
-    end)
-end
-
--------------------------------------------------
--- Master loot
--------------------------------------------------
-
-MASTER_LOOTER_SKIN                                                                          = {
-    location                                                                                = {
-        Anchor("RIGHT", -1, 0, "RaidRosterIcon", "LEFT")
-    },
-    size                                                                                    = Size(11, 11),
-    file                                                                                    = "Interface\\GroupFrame\\UI-Group-MasterLooter",
-    visible                                                                                 = AshBlzSkinApi.UnitIsMasterLooter()
-}
-
-__Static__() __AutoCache__()
-function AshBlzSkinApi.MasterLooterSkin()
-    return Observable.Just(not Scorpio.IsRetail):Map(function(display)
-        if display then return MASTER_LOOTER_SKIN end
     end)
 end
 
@@ -509,30 +489,11 @@ SKIN_STYLE =                                                                    
         AshBlzSkinStatusText                                                                = AshBlzSkinApi.StatusSkin(),
 
         -- 角色职责图标
-        RoleIcon                                                                            = {
+        AshBlzSkinRoleIcon                                                                  = {
             location                                                                        = {
                 Anchor("TOPLEFT", 3, -2)
             },
-            size                                                                            = Wow.UnitRoleVisible():Map(function(val)
-                if val then
-                    shareSize.width, shareSize.height = 12, 12
-                else
-                    shareSize.width, shareSize.height = 1, 1
-                end
-                return shareSize
-            end),
-            visible                                                                         = true
-        },
-
-        -- 载具图标
-        AshBlzSkinVehicleIcon                                                               = {
-            location                                                                        = {
-                Anchor("TOPLEFT", 0, -1, "RoleIcon", "BOTTOMLEFT")
-            },
-            size                                                                            = Size(12, 12),
-            file                                                                            = "Interface\\Vehicles\\UI-Vehicles-Raid-Icon",
-            texCoords                                                                       = RectType(0, 1, 0, 1),
-            visible                                                                         = AshBlzSkinApi.UnitVehicleVisible()
+            refresh                                                                         = AshBlzSkinApi.UnitRole()
         },
 
         -- 队长图标
@@ -553,26 +514,18 @@ SKIN_STYLE =                                                                    
                 return shareSize
             end)
         },
-
-        -- 主坦克、主助理
-        RaidRosterIcon                                                                      = {
+        
+        --[===[@non-version-retail@
+        -- 团队拾取者
+        AshBlzSkinMasterLooterIcon                                                          = {
             location                                                                        = {
                 Anchor("RIGHT", -1, 0, "LeaderIcon", "LEFT")
             },
-            drawLayer                                                                       = "ARTWORK",
-            subLevel                                                                        = 2,
-            size                                                                            = Wow.UnitGroupRoster():Map(function(assign)
-                if not assign or assign == "NONE" then
-                    shareSize.width, shareSize.height = 1, 11
-                else
-                    shareSize.width, shareSize.height = 11, 11
-                end
-                return shareSize
-            end),
+            size                                                                            = Size(11, 11),
+            file                                                                            = "Interface\\GroupFrame\\UI-Group-MasterLooter",
+            visible                                                                         = AshBlzSkinApi.UnitIsMasterLooter()
         },
-        
-        -- 团队拾取者
-        AshBlzSkinMasterLooterIcon                                                          = AshBlzSkinApi.MasterLooterSkin(),
+        --@end-non-version-retail@]===]
 
         -- 标记图标
         RaidTargetIcon                                                                      = SHARE_RAIDTARGET_SKIN,

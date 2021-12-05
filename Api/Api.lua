@@ -101,7 +101,7 @@ end
 CenterStatusSubject = BehaviorSubject()
 Observable.Interval(1):Subscribe(function() CenterStatusSubject:OnNext("any") end)
 
-__SystemEvent__ "INCOMING_RESURRECT_CHANGED" "UNIT_OTHER_PARTY_CHANGED" "UNIT_PHASE" "UNIT_FLAGS" "UNIT_CTR_OPTIONS" "INCOMING_SUMMON_CHANGED" "GROUP_ROSTER_UPDATE" "PLAYER_ENTERING_WORLD" "UNIT_PET"
+__SystemEvent__ "INCOMING_RESURRECT_CHANGED" "UNIT_OTHER_PARTY_CHANGED" "UNIT_PHASE" "UNIT_FLAGS" "UNIT_CTR_OPTIONS" "INCOMING_SUMMON_CHANGED" "PLAYER_ENTERING_WORLD" "UNIT_PET"
 function UpdateCenterStatusIcon(unit)
     CenterStatusSubject:OnNext(unit or "any")
 end
@@ -150,34 +150,28 @@ end
 --@end-non-version-retail@]===]
 
 -------------------------------------------------
--- Vehicle
+-- Role
 -------------------------------------------------
 
---@retail@
 __Static__() __AutoCache__()
-function AshBlzSkinApi.UnitVehicleVisible()
-    return Wow.FromUnitEvent(Wow.FromEvent("GROUP_ROSTER_UPDATE", "UNIT_ENTERED_VEHICLE", "UNIT_EXITED_VEHICLE"):Map("unit => unit or 'any'")):Map(function(unit)
-        return UnitInVehicle(unit) and UnitHasVehicleUI(unit)
-    end)
+function AshBlzSkinApi.UnitRole()
+    return Wow.FromUnitEvent(Wow.FromEvent("PLAYER_ROLES_ASSIGNED"):Map("=> any"))
 end
---@end-retail@
 
 --[===[@non-version-retail@
 __Static__() __AutoCache__()
-function AshBlzSkinApi.UnitVehicleVisible()
-    return Wow.FromUnitEvent(Observable:Just("any")):Map(function(unit)
-        return false
-    end)
+function AshBlzSkinApi.UnitRole()
+    return Wow.Unit()
 end
 --@end-non-version-retail@]===]
 
 -------------------------------------------------
 -- Leader, Assistant, MasterLooter etc
 -------------------------------------------------
-
+--[===[@non-version-retail@
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitIsMasterLooter()
-    return Wow.FromUnitEvent(Wow.FromEvent("GROUP_ROSTER_UPDATER"):Map("=>'any'")):Next():Map(function(unit)
+    return Wow.Unit():Next():Map(function(unit)
         if UnitExists(unit) then
             local raidIndex = UnitInRaid(unit)
             if raidIndex then
@@ -188,10 +182,11 @@ function AshBlzSkinApi.UnitIsMasterLooter()
         return false
     end)
 end
+--@end-non-version-retail@]===]
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitIsLeaderOrAssistant()
-    return Wow.FromUnitEvent(Wow.FromEvent("GROUP_ROSTER_UPDATER", "PARTY_LEADER_CHANGED"):Map("=> 'any'")):Next():Map(function(unit)
+    return Wow.FromUnitEvent(Wow.FromEvent("PARTY_LEADER_CHANGED"):Map("=> 'any'")):Next():Map(function(unit)
         if UnitExists(unit) then
             local raidIndex = UnitInRaid(unit)
             if raidIndex then
@@ -213,6 +208,10 @@ function AshBlzSkinApi.UnitIsLeaderOrAssistantIcon()
         end
     end)
 end
+
+-------------------------------------------------
+-- Specialization
+-------------------------------------------------
 
 --@retail@
 __Static__() __AutoCache__()

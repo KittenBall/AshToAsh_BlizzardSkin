@@ -163,7 +163,7 @@ class "StatusText" (function()
                 local health = UnitHealth(unit)
                 local healthLost = UnitHealthMax(unit) - health
                 if healthLost > 0 then
-                    text = "-" .. formatHealth(self, health)
+                    text = "-" .. formatHealth(self, healthLost)
                     color = Color.RED
                 end
             elseif self.HealthTextStyle == HealthTextStyle.PERCENT then
@@ -177,10 +177,99 @@ class "StatusText" (function()
         if text then
             self:SetText(text)
             self:SetTextColor(color.r, color.g, color.b)
+        else
+            self:Hide()
         end
     end
 
 end)
+
+--@retail@
+__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinRoleIcon")
+class "RoleIcon"(function()
+    inherit "Texture"
+
+    property "Refresh"          {
+        set                     = function(self, unit)
+            self:Refresh(unit)
+        end
+    }
+
+    function Refresh(self, unit)
+        local size = self:GetHeight()
+	    if UnitInVehicle(unit) and UnitHasVehicleUI(unit) then
+	    	self:SetTexture("Interface\\Vehicles\\UI-Vehicles-Raid-Icon")
+	    	self:SetTexCoord(0, 1, 0, 1)
+	    	self:Show()
+	    	self:SetSize(size, size)
+	    else
+            local raidId = UnitInRaid(unit)
+            if raidID then
+                local role = select(10, GetRaidRosterInfo(raidID))
+	    	    self:SetTexture("Interface\\GroupFrame\\UI-Group-"..role.."Icon")
+	    	    self:SetTexCoord(0, 1, 0, 1)
+	    	    self:Show()
+	    	    self:SetSize(size, size)
+                return
+            end
+
+	    	local role = UnitGroupRolesAssigned(unit)
+	    	if role == "TANK" or role == "HEALER" or role == "DAMAGER" then
+	    		self:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES")
+	    		self:SetTexCoord(GetTexCoordsForRoleSmallCircle(role))
+	    		self:Show()
+	    		self:SetSize(size, size)
+                return
+            end
+
+	    	self:Hide()
+	    	self:SetSize(1, size)
+	    end
+    end
+
+    function __ctor(self)
+        self:SetSize(12, 12)
+    end
+
+end)
+--@retail@
+
+--[===[@end-non-version-retail@
+__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinRoleIcon")
+class "RoleIcon"(function()
+    inherit "Texture"
+
+    property "Refresh"          {
+        set                     = function(self, unit)
+            self:Refresh(unit)
+        end
+    }
+
+    function Refresh(self, unit)
+        local size = self:GetHeight()
+	    local raidID = UnitInRaid(unit)
+        if raidID then
+	    	local role = select(10, GetRaidRosterInfo(raidID))
+            if role then
+	    	    self:SetTexture("Interface\\GroupFrame\\UI-Group-"..role.."Icon")
+	    	    self:SetTexCoord(0, 1, 0, 1)
+	    	    self:Show()
+	    	    self:SetSize(size, size)
+                return
+            end
+	    end
+        
+        self:Hide()
+        self:SetSize(1, size)
+    end
+
+    function __ctor(self)
+        self:SetSize(12, 12)
+    end
+
+end)
+--@end-non-version-retail@]===]
+
 
 TEMPLATE_SKIN_STYLE                                                                     = {
 
