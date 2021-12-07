@@ -365,7 +365,7 @@ end
 -------------------------------------------------
 
 -- Enlarge buff
-SHARE_ENLARGEBUFFICON_SKIN                                                                 = {
+SHARE_ENLARGEBUFFICON_SKIN                                                                  = {
     width                                                                                   = AshBlzSkinApi.ResizeOnUnitFrameChanged(15),
     height                                                                                  = AshBlzSkinApi.ResizeOnUnitFrameChanged(15),
     location                                                                                = {
