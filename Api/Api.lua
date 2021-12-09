@@ -75,10 +75,20 @@ end
 -------------------------------------------------
 -- Status
 -------------------------------------------------
+
+--@retail@
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitStatus()
     return Wow.FromUnitEvent(Wow.FromEvent("UNIT_CONNECTION", "PLAYER_FLAGS_CHANGED", "UNIT_HEALTH"))
 end
+--@end-retail@
+
+--[===[@non-version-retail@
+__Static__() __AutoCache__()
+function AshBlzSkinApi.UnitStatus()
+    return Wow.FromUnitEvent(Wow.FromEvent("UNIT_CONNECTION", "PLAYER_FLAGS_CHANGED", "UNIT_HEALTH", "UNIT_HEALTH_FREQUENT"))
+end
+--@end-non-version-retail@]===]
 
 -------------------------------------------------
 -- Dispell
@@ -86,7 +96,7 @@ end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.CheckDispelAbilityEnable()
-    return Wow.FromUnitEvent(Wow.FromEvent("PLAYER_ENTERING_WORLD"):Map("=> 'any'")):Map(function()
+    return Wow.FromEvent("PLAYER_ENTERING_WORLD"):Map(function()
         local inInstance, instanceType = IsInInstance()
         if not inInstance or instanceType == "none" or instanceType == "pvp" then return false end
 

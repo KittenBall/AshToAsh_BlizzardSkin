@@ -206,7 +206,7 @@ end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.OnConfigChanged()
-    return Wow.FromUnitEvent(Wow.FromEvent("ASHTOASH_BLIZZARD_SKIN_CONFIG_CHANGED"):Map("=> 'any'"))
+    return Wow.FromEvent("ASHTOASH_BLIZZARD_SKIN_CONFIG_CHANGED")
 end
 
 EnlargeBuffList        = {}
