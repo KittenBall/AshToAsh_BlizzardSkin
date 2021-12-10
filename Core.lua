@@ -192,7 +192,6 @@ end
 
 function OnSpecChanged()
     SendConfigChanged()
-
     -- 触发一些配置更改
     FireSystemEvent("UNIT_HEALTH", 'any')
     FireSystemEvent("ASHTOASH_BLZ_SKIN_NICK_NAME_UPDATE", 'any')
@@ -206,7 +205,7 @@ end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.OnConfigChanged()
-    return Wow.FromEvent("ASHTOASH_BLIZZARD_SKIN_CONFIG_CHANGED")
+    return Wow.FromUnitEvent(Wow.FromEvent("ASHTOASH_BLIZZARD_SKIN_CONFIG_CHANGED"):Map("=> 'any'"))
 end
 
 EnlargeBuffList        = {}

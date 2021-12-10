@@ -427,9 +427,8 @@ SHARE_AURA_CONTAINER                                                            
     dispelDebuffSize                                                                        = 8,
     bossAuraSize                                                                            = 15,
     classBuffSize                                                                           = 10,
-    CheckDispelAbilityEnable                                                                = AshBlzSkinApi.CheckDispelAbilityEnable(),
+    checkDispelAbilityEnable                                                                = AshBlzSkinApi.CheckDispelAbilityEnable(),
     specID                                                                                  = AshBlzSkinApi.PlayerSpecializationID()
-
 }
 
 
@@ -545,8 +544,7 @@ SKIN_STYLE =                                                                    
                 return { Anchor("CENTER", 0, h / 3 + 2, nil, "BOTTOM") }
             end),
             size                                                                            = AshBlzSkinApi.ResizeUnitFrameIcon(22),
-            visible                                                                         = AshBlzSkinApi.UnitCenterStatusIconVisible(),
-            unit                                                                            = Wow.Unit()
+            refresh                                                                         = AshBlzSkinApi.UnitCenterStatus()
         },
 
         -- 血条

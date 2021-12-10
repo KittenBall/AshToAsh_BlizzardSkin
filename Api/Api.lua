@@ -96,7 +96,7 @@ end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.CheckDispelAbilityEnable()
-    return Wow.FromEvent("PLAYER_ENTERING_WORLD"):Map(function()
+    return Wow.FromUnitEvent(Wow.FromEvent("PLAYER_ENTERING_WORLD"):Map("=> 'any'")):Map(function()
         local inInstance, instanceType = IsInInstance()
         if not inInstance or instanceType == "none" or instanceType == "pvp" then return false end
 
@@ -131,31 +131,17 @@ function UnitIsInDistance(unit)
 end
 
 --@retail@
-SummonStatus = _G.Enum.SummonStatus
 
 __Static__() __AutoCache__()
-function AshBlzSkinApi.UnitCenterStatusIconVisible()
-    return Wow.FromUnitEvent(CenterStatusSubject):Next():Map(function(unit)
-        if UnitInOtherParty(unit) or UnitHasIncomingResurrection(unit) or (UnitIsInDistance(unit) and UnitPhaseReason(unit)) then
-            return true
-        elseif C_IncomingSummon.HasIncomingSummon(unit) then
-            local staus = C_IncomingSummon.IncomingSummonStatus(unit)
-            return status == SummonStatus.Pending or staus == SummonStatus.Accepted or staus == SummonStatus.Declined
-        end
-        return false
-    end)
+function AshBlzSkinApi.UnitCenterStatus()
+    return Wow.FromUnitEvent(CenterStatusSubject):Next()
 end
 --@end-retail@
 
 --[===[@non-version-retail@
 __Static__() __AutoCache__()
-function AshBlzSkinApi.UnitCenterStatusIconVisible()
-    return Wow.FromUnitEvent(CenterStatusSubject):Next():Map(function(unit)
-        if UnitInOtherParty(unit) or UnitHasIncomingResurrection(unit) or (UnitIsInDistance(unit) and not UnitInPhase(unit))then
-            return true
-        end
-        return false
-    end)
+function AshBlzSkinApi.UnitCenterStatus()
+    return Wow.FromUnitEvent(CenterStatusSubject):Next()
 end
 --@end-non-version-retail@]===]
 

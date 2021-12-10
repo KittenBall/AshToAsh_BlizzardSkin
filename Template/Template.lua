@@ -115,6 +115,7 @@ end)
 -- EnlargeBuff icon
 __Sealed__() class "AshBlzSkinEnlargeBuffIcon" { AshBlzSkinAuraIcon }
 
+-- StatusText
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinStatusText")
 class "StatusText" (function()
     inherit "FontString"
@@ -185,7 +186,7 @@ class "StatusText" (function()
 
 end)
 
---@retail@
+-- Role icon
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinRoleIcon")
 class "RoleIcon"(function()
     inherit "Texture"
@@ -196,6 +197,7 @@ class "RoleIcon"(function()
         end
     }
 
+    --@retail@
     function Refresh(self, unit)
         local size = self:GetHeight()
 	    if UnitInVehicle(unit) and UnitHasVehicleUI(unit) then
@@ -227,25 +229,9 @@ class "RoleIcon"(function()
 	    	self:SetSize(1, size)
 	    end
     end
+    --@end-retail@
 
-    function __ctor(self)
-        self:SetSize(12, 12)
-    end
-
-end)
---@end-retail@
-
---[===[@non-version-retail@
-__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinRoleIcon")
-class "RoleIcon"(function()
-    inherit "Texture"
-
-    property "Refresh"          {
-        set                     = function(self, unit)
-            self:Refresh(unit)
-        end
-    }
-
+    --[===[@non-version-retail@
     function Refresh(self, unit)
         local size = self:GetHeight()
 	    local raidID = UnitInRaid(unit)
@@ -263,15 +249,16 @@ class "RoleIcon"(function()
         self:Hide()
         self:SetSize(1, size)
     end
+    --@end-non-version-retail@]===]
 
     function __ctor(self)
         self:SetSize(12, 12)
     end
 
 end)
---@end-non-version-retail@]===]
 
 
+-- Ready check icon
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinReadyCheckIcon")
 class "ReadyCheckIcon"(function()
     inherit "Button"
@@ -387,96 +374,6 @@ TEMPLATE_SKIN_STYLE                                                             
 Style.UpdateSkin(SKIN_NAME, TEMPLATE_SKIN_STYLE)
 
 --@retail@
-
--- 中间状态图标
-__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinCenterStatusIcon")
-class "CenterStatusIcon"(function()
-    inherit "Button"
-
-    property "Unit" { 
-        type        = String,
-        handler     = function(self, unit)
-            self:Update()
-        end
-    }
-
-    local function OnEnter(self, motion)
-        if self.tooltip then
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:SetText(self.tooltip, nil, nil, nil, nil, true)
-            GameTooltip:Show()
-        else
-            self:GetParent():OnEnter(motion)
-        end
-    end
-    
-    local function OnLeave(self, motion)
-        if self.tooltip then
-            GameTooltip:Hide()
-        else
-            self:GetParent():OnLeave(motion)
-        end
-    end
-
-    function Update(self)
-        local unit = self.Unit
-        if not unit then return end
-        local texture = self:GetChild("Texture")
-        local border = self:GetChild("Border")
-        if UnitInOtherParty(unit) then
-            texture:SetTexture("Interface\\LFGFrame\\LFG-Eye")
-            texture:SetTexCoord(0.125, 0.25, 0.25, 0.5)
-            border:SetTexture("Interface\\Common\\RingBorder")
-            border:Show()
-            self.tooltip = PARTY_IN_PUBLIC_GROUP_MESSAGE
-        elseif UnitHasIncomingResurrection(unit) then
-            texture:SetTexture("Interface\\RaidFrame\\Raid-Icon-Rez")
-            texture:SetTexCoord(0, 1, 0, 1)
-            border:Hide()
-            self.tooltip = nil
-        elseif C_IncomingSummon.HasIncomingSummon(unit) then
-            if status == _G.Enum.SummonStatus.Pending then
-                texture:SetAltas("Raid-Icon-SummonPending")
-                texture:SetTexCoord(0, 1, 0, 1)
-                border:Hide()
-                self.tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_PENDING
-    		elseif( status == _G.Enum.SummonStatus.Accepted ) then
-                texture:SetAltas("Raid-Icon-SummonAccepted")
-                texture:SetTexCoord(0, 1, 0, 1)
-                border:Hide()
-                self.tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_ACCEPTED
-    		elseif( status == _G.Enum.SummonStatus.Declined ) then
-                texture:SetAltas("Raid-Icon-SummonDeclined")
-                texture:SetTexCoord(0, 1, 0, 1)
-                border:Hide()
-                self.tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_DECLINED
-    		end
-        else
-            local phaseReason = UnitPhaseReason(unit)
-            if phaseReason then
-                texture:SetTexture("Interface\\TargetingFrame\\UI-PhasingIcon")
-                texture:SetTexCoord(0.15625, 0.84375, 0.15625, 0.84375)
-                border:Hide()
-                self.tooltip = PartyUtil.GetPhasedReasonString(phaseReason, unit)
-            end
-        end
-    end
-
-    local function OnShow(self)
-        self:Update()
-    end
-
-    __Template__{
-        Border      = Texture,
-        Texture     = Texture
-    }
-    function __ctor(self)
-        self.OnEnter = self.OnEnter + OnEnter
-        self.OnLeave = self.OnLeave + OnLeave
-        self.OnShow  = self.OnShow + OnShow
-    end
-end)
-
 -- CastBar 修改自Scorpio.UI.CooldownStatusBar
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinCastBar")
 class "CastBar" (function(_ENV)
@@ -589,83 +486,6 @@ Style.UpdateSkin(SKIN_NAME,                                                     
 --@end-retail@
 
 --[===[@non-version-retail@
-
--- 中间状态图标
-__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinCenterStatusIcon") 
-class "CenterStatusIcon"(function()
-    inherit "Button"
-
-    property "Unit" { 
-        type        = String,
-        handler     = function(self, unit)
-            self:Update()
-        end
-    }
-
-    local function OnEnter(self, motion)
-        if self.tooltip then
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:SetText(self.tooltip, nil, nil, nil, nil, true)
-            GameTooltip:Show()
-        else
-            self:GetParent():OnEnter(motion)
-        end
-    end
-    
-    local function OnLeave(self, motion)
-        if self.tooltip then
-            GameTooltip:Hide()
-        else
-            self:GetParent():OnLeave(motion)
-        end
-    end
-
-    function Update(self)
-        local unit = self.Unit
-        if not unit then return end
-        local texture = self:GetChild("Texture")
-        local border = self:GetChild("Border")
-        if UnitInOtherParty(unit) then
-            texture:SetTexture("Interface\\LFGFrame\\LFG-Eye")
-            texture:SetTexCoord(0.125, 0.25, 0.25, 0.5)
-            texture:Show()
-            border:SetTexture("Interface\\Common\\RingBorder")
-            border:Show()
-            self.tooltip = PARTY_IN_PUBLIC_GROUP_MESSAGE
-        elseif UnitHasIncomingResurrection(unit) then
-            texture:SetTexture("Interface\\RaidFrame\\Raid-Icon-Rez")
-            texture:SetTexCoord(0, 1, 0, 1)
-            texture:Show()
-            border:Hide()
-            self.tooltip = nil
-        elseif not UnitInPhase(unit) then
-            texture:SetTexture("Interface\\TargetingFrame\\UI-PhasingIcon")
-            texture:SetTexCoord(0.15625, 0.84375, 0.15625, 0.84375)
-            texture:Show()
-            border:Hide()
-            self.tooltip = PARTY_PHASED_MESSAGE
-        else
-            texture:Hide()
-            border:Hide()
-            self.tooltip = nil
-        end
-    end
-
-    local function OnShow(self)
-        self:Update()
-    end
-
-    __Template__{
-        Border      = Texture,
-        Texture     = Texture
-    }
-    function __ctor(self)
-        self.OnEnter = self.OnEnter + OnEnter
-        self.OnLeave = self.OnLeave + OnLeave
-        self.OnShow  = self.OnShow + OnShow
-    end
-end)
-
 -- CastBar 修改自Scorpio.UI.CooldownStatusBar
 __Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinCastBar")
 class "CastBar" (function(_ENV)
@@ -745,8 +565,133 @@ Style.UpdateSkin(SKIN_NAME,                                                     
         }
     }
 })
-
 --@end-non-version-retail@]===]
+
+
+-- 中间状态图标
+__Sealed__() __ChildProperty__(Scorpio.Secure.UnitFrame, "AshBlzSkinCenterStatusIcon")
+class "CenterStatusIcon"(function()
+    inherit "Button"
+
+    property "Refresh"      {
+        set                 = function(self, unit)
+            self:Refresh(unit)
+        end
+    }
+
+    local function OnEnter(self, motion)
+        if self.tooltip then
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetText(self.tooltip, nil, nil, nil, nil, true)
+            GameTooltip:Show()
+        else
+            self:GetParent():OnEnter(motion)
+        end
+    end
+    
+    local function OnLeave(self, motion)
+        if self.tooltip then
+            GameTooltip:Hide()
+        else
+            self:GetParent():OnLeave(motion)
+        end
+    end
+
+    --@retail@
+    local SummonStatus = _G.Enum.SummonStatus
+    function Refresh(self, unit)
+        local texture = self:GetChild("Texture")
+        local border = self:GetChild("Border")
+        if UnitInOtherParty(unit) then
+            texture:SetTexture("Interface\\LFGFrame\\LFG-Eye")
+            texture:SetTexCoord(0.125, 0.25, 0.25, 0.5)
+            border:SetTexture("Interface\\Common\\RingBorder")
+            border:Show()
+            self.tooltip = PARTY_IN_PUBLIC_GROUP_MESSAGE
+            self:Show()
+        elseif UnitHasIncomingResurrection(unit) then
+            texture:SetTexture("Interface\\RaidFrame\\Raid-Icon-Rez")
+            texture:SetTexCoord(0, 1, 0, 1)
+            border:Hide()
+            self.tooltip = nil
+            self:Show()
+        elseif C_IncomingSummon.HasIncomingSummon(unit) then
+            if status == SummonStatus.Pending then
+                texture:SetAltas("Raid-Icon-SummonPending")
+                texture:SetTexCoord(0, 1, 0, 1)
+                border:Hide()
+                self.tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_PENDING
+                self:Show()
+    		elseif( status == SummonStatus.Accepted ) then
+                texture:SetAltas("Raid-Icon-SummonAccepted")
+                texture:SetTexCoord(0, 1, 0, 1)
+                border:Hide()
+                self.tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_ACCEPTED
+                self:Show()
+    		elseif( status == SummonStatus.Declined ) then
+                texture:SetAltas("Raid-Icon-SummonDeclined")
+                texture:SetTexCoord(0, 1, 0, 1)
+                border:Hide()
+                self.tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_DECLINED
+                self:Show()
+    		end
+        else
+            local phaseReason = UnitPhaseReason(unit)
+            if phaseReason then
+                texture:SetTexture("Interface\\TargetingFrame\\UI-PhasingIcon")
+                texture:SetTexCoord(0.15625, 0.84375, 0.15625, 0.84375)
+                border:Hide()
+                self.tooltip = PartyUtil.GetPhasedReasonString(phaseReason, unit)
+                self:Show()
+                return
+            end
+
+            self:Hide()
+        end
+    end
+    --@end-retail@
+
+    --[===[@non-version-retail@
+    function Refresh(self, unit)
+        local texture = self:GetChild("Texture")
+        local border = self:GetChild("Border")
+        if UnitInOtherParty(unit) then
+            texture:SetTexture("Interface\\LFGFrame\\LFG-Eye")
+            texture:SetTexCoord(0.125, 0.25, 0.25, 0.5)
+            texture:Show()
+            border:SetTexture("Interface\\Common\\RingBorder")
+            border:Show()
+            self.tooltip = PARTY_IN_PUBLIC_GROUP_MESSAGE
+            self:Show()
+        elseif UnitHasIncomingResurrection(unit) then
+            texture:SetTexture("Interface\\RaidFrame\\Raid-Icon-Rez")
+            texture:SetTexCoord(0, 1, 0, 1)
+            texture:Show()
+            border:Hide()
+            self.tooltip = nil
+            self:Show()
+        elseif not UnitInPhase(unit) then
+            texture:SetTexture("Interface\\TargetingFrame\\UI-PhasingIcon")
+            texture:SetTexCoord(0.15625, 0.84375, 0.15625, 0.84375)
+            texture:Show()
+            border:Hide()
+            self.tooltip = PARTY_PHASED_MESSAGE
+            self:Show()
+        else
+            self:Hide()
+        end
+    end
+    --@end-non-version-retail@]===]
+
+    __Template__{
+        Border      = Texture,
+        Texture     = Texture
+    }
+    function __ctor(self)
+        self.OnEnter = self.OnEnter + OnEnter
+        self.OnLeave = self.OnLeave + OnLeave
+    end
+end)
 
 Style.UpdateSkin(SKIN_NAME,                                                               {
     [CenterStatusIcon]                                                                  = {
