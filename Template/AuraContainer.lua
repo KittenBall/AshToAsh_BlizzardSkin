@@ -195,7 +195,7 @@ class "DebuffFilter"(function()
     local classFileName = UnitClassBase("player")
     if classFileName == "PALADIN" then
 		isPriorityDebuff = function(spellID)
-			local isForbearance = (spellId == 25771)
+			local isForbearance = (spellID == 25771)
 			return isForbearance or SpellIsPriorityAura(spellID)
 		end
 	else

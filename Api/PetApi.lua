@@ -18,12 +18,6 @@ local function mapPetGuidToUnit(unit, petGuid, raidIndex)
         end
         petOwnerInfo.class = UnitClassBase(unit)
         petOwnerInfo.name = UnitName(unit)
-        if raidIndex then
-            local _, _, subGroup = GetRaidRosterInfo(raidIndex)
-            petOwnerInfo.subGroup = subGroup
-        else
-            petOwnerInfo.subGroup = nil
-        end
         PetOwnerClassMap[petGuid] = petOwnerInfo
     end
 end
@@ -100,9 +94,6 @@ function AshBlzSkinApi.UnitPetOwnerName()
                 local name
                 if petOwnerInfo.name then
                     name = petOwnerInfo.name
-                end
-                if name and petOwnerInfo.subGroup then
-                    name = name .. ("("..GROUP_NUMBER..")"):format(petOwnerInfo.subGroup)
                 end
                 if name then return name end
             end

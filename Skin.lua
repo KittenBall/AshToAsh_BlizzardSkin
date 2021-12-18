@@ -566,7 +566,7 @@ SKIN_STYLE =                                                                    
 
     [AshPetUnitFrame]                                                                       = {
         frameStrata                                                                         = "MEDIUM",
-        alpha                                                                               = AshBlzSkinApi.UnitPetInRange():Map('v=> v and 1 or 0.55'), 
+        alpha                                                                               = AshBlzSkinApi.UnitPetInRange():Map('v=> v and 1 or 0.55'),
 
         BackgroundTexture                                                                   = {
             file                                                                            = AshBlzSkinApi.UnitFrameBackground(),
