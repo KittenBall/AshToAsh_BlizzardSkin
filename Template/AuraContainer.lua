@@ -475,10 +475,25 @@ __Sealed__()
 class "BaseAuraIcon"(function()
     inherit "Frame"
 
+    local function ShowTooltip(self)
+        GameTooltip:SetUnitAura(self.Unit, self.AuraIndex, self.AuraFilter)
+        
+        if self.QuickBlockEnable then
+            GameTooltip:AddLine(" ")
+            GameTooltip:AddLine(L["aura_quick_block_tips"])
+
+            if self.AuraFilter:match("HARMFUL") then
+                GameTooltip:AddLine(L["aura_quick_enlarge_debuff_tips"])
+            end
+
+            GameTooltip:Show()
+        end
+    end
+
     local function OnEnter(self)
         if self.ShowTooltip and self.AuraIndex then
             GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMRIGHT')
-            GameTooltip:SetUnitAura(self.Unit, self.AuraIndex, self.AuraFilter)
+            ShowTooltip(self)
         end
     end
 
@@ -490,7 +505,7 @@ class "BaseAuraIcon"(function()
         self.timer = 0
 
         if self.ShowTooltip and GameTooltip:IsOwned(self) then
-            GameTooltip:SetUnitAura(self.Unit, self.AuraIndex, self.AuraFilter)
+            ShowTooltip(self)
         end
     end
 
@@ -498,10 +513,31 @@ class "BaseAuraIcon"(function()
         GameTooltip:Hide()
     end
 
+    local function OnMouseUp(self, button)
+        if not self.QuickBlockEnable then return end
+
+        if IsAltKeyDown() and button == "RightButton" then
+            if self.AuraName then
+                _AuraBlackList[self.AuraSpellID] = true
+                OnConfigChanged()
+                Next(Scorpio.FireSystemEvent, "UNIT_AURA", "any")
+            end
+        elseif IsControlKeyDown() and button == "LeftButton" and self.AuraFilter:match("HARMFUL") then
+            if self.AuraName then
+                _EnlargeDebuffList[self.AuraSpellID] = true
+                OnConfigChanged()
+                Next(Scorpio.FireSystemEvent, "UNIT_AURA", "any")
+            end
+        end
+
+    end
+
     function SetAuraData(self, data)
         self.AuraIndex  = data.Index
         self.AuraFilter = data.Filter
         self.AuraCaster = data.Caster
+        self.AuraName   = data.Name
+        self.AuraSpellID= data.SpellID
         self.Unit       = data.Unit
     end
 
@@ -525,12 +561,19 @@ class "BaseAuraIcon"(function()
 
     property "AuraCaster"       { type = String }
 
+    property "AuraName"         { type = String }
+
+    property "AuraSpellID"      { type = Integer }
+
     property "Unit"             { type = String }
+
+    property "QuickBlockEnable" { type = Boolean }
 
     function __ctor(self)
         self.OnEnter            = self.OnEnter + OnEnter
         self.OnLeave            = self.OnLeave + OnLeave
         self.OnUpdate           = self.OnUpdate + OnUpdate
+        self.OnMouseUp          = self.OnMouseUp + OnMouseUp
     end
 
 end)
@@ -658,6 +701,7 @@ class "AuraContainer"(function()
     local dispelDebuffs             = {}
     local dispelDebuffCache         = {}
     local classBuffCache            = {}
+    local enlargeDebuffCache        = {}
     local canDispelType             = nil
 
     local bossBuffPriority          = 1
@@ -694,6 +738,7 @@ class "AuraContainer"(function()
         wipe(dispelDebuffs)
         wipeCache(dispelDebuffCache)
         wipeCache(classBuffCache)
+        wipeCache(enlargeDebuffCache)
         canDispelType = nil
     end
 
@@ -748,18 +793,29 @@ class "AuraContainer"(function()
         local auraFilter
         local displayOnlyDispellableDebuffs = self.DisplayOnlyDispellableDebuffs
         local blackAuraList = self.BlackAuraList
+        local enlargeDebuffList = self.EnlargeDebuffList
 
         --  Harmful
         auraFilter = "HARMFUL"
         local maxDebuffPriority, maxDebuffCount, debuffCount = debuffFilter.MaxPriority, self.DebuffCount, 0
         local maxBossDebuffCount, bossDebuffCount = self.BossAuraCount, 0
+        local maxEnlargeDebuffCount, enlargeDebuffCount = enlargeDebuffList and self.EnlargeDebuffCount or 0, 0
         foreachAura(unit, auraFilter, math.max(maxDebuffCount, maxBossDebuffCount), function(name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
             -- compat classic
             if not name then return true end
 
-            if blackAuraList[spellID] then return false end
+            if blackAuraList and blackAuraList[spellID] then return false end
 
-            if not displayOnlyDispellableDebuffs and debuffCount < maxDebuffCount then
+            local filtered = false
+
+            -- Enlarge debuff filter
+            if enlargeDebuffCount < maxEnlargeDebuffCount and enlargeDebuffList and enlargeDebuffList[spellID] then
+                cacheAuraData(enlargeDebuffCache, 0, unit, index, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
+                enlargeDebuffCount = enlargeDebuffCount + 1
+                filtered = true
+            end
+
+            if not filtered and not displayOnlyDispellableDebuffs and debuffCount < maxDebuffCount then
                 -- Debuff filter
                 local priority = debuffFilter:Filter(unit, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
                 if priority then
@@ -770,7 +826,7 @@ class "AuraContainer"(function()
                         debuffCount = debuffCount + 1
                     end
                 end
-            elseif debuffCount < maxDebuffCount then
+            elseif not filtered and debuffCount < maxDebuffCount then
                 -- Priority debuff
                 local priority = debuffFilter:FilterPriorityAura(unit, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
                 if priority then
@@ -784,14 +840,14 @@ class "AuraContainer"(function()
             end
             
             -- Boss debuff filter
-            if isBossAura and bossDebuffCount < maxBossDebuffCount then
+            if not filtered and isBossAura and bossDebuffCount < maxBossDebuffCount then
                 cacheAuraData(bossAuraCache, bossDebuffPriority, unit, index, auraFilter, name, icon, count, dtype, duration, expires, caster, isStealable, nameplateShowPersonal, spellID, canApplyAura, isBossAura, castByPlayer)
                 bossDebuffCount = bossDebuffCount + 1
             end
 
             index = index + 1
             
-            return not (debuffCount < maxDebuffCount or bossDebuffCount < maxBossDebuffCount)
+            return not (debuffCount < maxDebuffCount or bossDebuffCount < maxBossDebuffCount or enlargeDebuffCount < maxEnlargeDebuffCount)
         end)
 
         -- Harmful|Raid
@@ -802,7 +858,9 @@ class "AuraContainer"(function()
             -- compat classic
             if not name then return true end
 
-            if blackAuraList[spellID] then return false end
+            if blackAuraList and blackAuraList[spellID] then return false end
+
+            if enlargeDebuffList and enlargeDebuffList[spellID] then return false end
 
             if displayOnlyDispellableDebuffs and debuffCount < maxDebuffCount then
                 -- Debuff filter
@@ -846,7 +904,7 @@ class "AuraContainer"(function()
             -- compat classic
             if not name then return true end
 
-            if blackAuraList[spellID] then return false end
+            if blackAuraList and blackAuraList[spellID] then return false end
 
             local filtered = false
             
@@ -901,6 +959,7 @@ class "AuraContainer"(function()
         self:ShowDispelDebuffs()
         self:ShowClassBuffs()
         self:ShowDispelAbiility()
+        self:ShowEnlargeDebuffs()
     end
 
     local function getScaleSize(self, value)
@@ -982,6 +1041,30 @@ class "AuraContainer"(function()
         end
     end
 
+    
+    function ShowEnlargeDebuffs(self)
+        local size = #enlargeDebuffCache
+        for i = 1, self.EnlargeDebuffCount do
+            local icon = self.EnlargeDebuffIcons[i]
+            if not icon and i <= size then
+                icon = EnlargeDebuffIcon("EnlargeDebuffIcon" .. i, self)
+                local auraSize = getScaleSize(self, self.EnlargeDebuffSize)
+                icon:SetSize(auraSize, auraSize)
+                if i == 1 then
+                    icon:SetPoint("TOPLEFT", self.PaddingLeft, -self.PaddingTop)
+                else
+                    icon:SetPoint("LEFT", self:GetChild("EnlargeDebuffIcon" .. (i-1)), "RIGHT", 1.5, 0)
+                end
+
+                self.EnlargeDebuffIcons[i] = icon
+            end
+
+            if icon then
+                icon.AuraData = enlargeDebuffCache[i]
+            end
+        end
+    end
+
     function ShowDispelDebuffs(self)
         local size = #dispelDebuffCache
         for i = 1, self.DispelDebuffCount do
@@ -1047,6 +1130,7 @@ class "AuraContainer"(function()
         self:HideAuras(self.ClassBuffIcons)
         self:HideAuras(self.DispelDebuffIcons)
         self:HideAuras(self.BossAuraIcons)
+        self:HideAuras(self.EnlargeDebuffIcons)
     end
 
     function HideAuras(self, auras, newCount, oldCount)
@@ -1069,6 +1153,7 @@ class "AuraContainer"(function()
         self:ResizeAuras(self.ClassBuffIcons)
         self:ResizeAuras(self.DispelDebuffIcons)
         self:ResizeAuras(self.BossAuraIcons)
+        self:ResizeAuras(self.EnlargeDebuffIcons)
     end
 
     function ResizeAuras(self, auras, size)
@@ -1099,6 +1184,13 @@ class "AuraContainer"(function()
             local icon = self.BuffIcons[1]
             if icon then
                 icon:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -self.PaddingRight, self.PaddingBottom)
+            end
+        end
+
+        if paddingLeft or paddingTop then
+            local icon = self.EnlargeDebuffIcons[1]
+            if icon then
+                icon:SetPoint("TOPLEFT", self, "TOPLEFT", self.PaddingLeft, -self.PaddingTop)
             end
         end
     end
@@ -1180,6 +1272,30 @@ class "AuraContainer"(function()
         handler                     = function(self, size)
             self:ResizeAuras(self.BossAuraIcons, size)
         end
+    }
+
+    -------------------------------------------------
+    --            Enlarge debuff                   --
+    -------------------------------------------------
+
+    property "EnlargeDebuffCount"   {
+        type                        = NaturalNumber,
+        default                     = 2,
+        handler                     = function(self, new, old)
+            self:HideAuras(self.EnlargeDebuffIcons, new, old)
+        end
+    }
+
+    property "EnlargeDebuffSize"    {
+        type                        = Number,
+        default                     = 1,
+        handler                     = function(self, size)
+            self:ResizeAuras(self.EnlargeDebuffIcons, size)
+        end
+    }
+
+    property "EnlargeDebuffList"    {
+        type                        = RawTable
     }
 
     -------------------------------------------------
@@ -1289,6 +1405,7 @@ class "AuraContainer"(function()
         self.ClassBuffIcons         = {}
         self.DispelDebuffIcons      = {}
         self.BossAuraIcons          = {}
+        self.EnlargeDebuffIcons     = {}
 
         self.OnSizeChanged = self.OnSizeChanged + OnSizeChanged
     end
@@ -1301,6 +1418,7 @@ TEMPLATE_SKIN_STYLE                                                             
     },
 
     [AuraIcon]                                                                          = {
+
         Icon                                                                            = {
             drawLayer                                                                   = "ARTWORK",
             setAllPoints                                                                = true,
@@ -1315,6 +1433,10 @@ TEMPLATE_SKIN_STYLE                                                             
         }
     },
 
+    [BuffIcon]                                                                          = {
+        quickBlockEnable                                                                = true
+    },
+
     -- Class buff icon
     [ClassBuffIcon]                                                                     = {
         topLevel                                                                        = true,
@@ -1323,6 +1445,8 @@ TEMPLATE_SKIN_STYLE                                                             
 
     -- Debuff icon
     [DebuffIcon]                                                                        = {
+        quickBlockEnable                                                                = true,
+
         Background                                                                      = {
             drawLayer                                                                   = "OVERLAY",
             file                                                                        = "Interface\\Buttons\\UI-Debuff-Overlays",
@@ -1334,15 +1458,20 @@ TEMPLATE_SKIN_STYLE                                                             
         },
     },
 
-    -- -- Enlarge debuff icon
-    -- [EnlargeDebuffIcon]                                                                 = {
-    --     topLevel                                                                        = true,
+    [BossAuraIcon]                                                                      = {
+        quickBlockEnable                                                                = false
+    },
 
-    --     PixelGlow                                                                       = {
-    --         period                                                                      = 2,
-    --         visible                                                                     = true
-    --     }
-    -- },
+    -- Enlarge debuff icon
+    [EnlargeDebuffIcon]                                                                 = {
+        quickBlockEnable                                                                = false,
+        topLevel                                                                        = true,
+
+        PixelGlow                                                                       = {
+            period                                                                      = 2,
+            visible                                                                     = true
+        }
+    },
 
     -- -- Enlarge buff icon
     -- [EnlargeBuffIcon]                                                                   = {

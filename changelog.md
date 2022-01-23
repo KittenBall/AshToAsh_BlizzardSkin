@@ -1,3 +1,7 @@
+## 1.8.9
+- Re-introduced the quick add aura blacklist feature
+- Enlarge debuff icon will show now
+
 ## 1.8.5
 - Fix aura display when class buff show in bcc
 

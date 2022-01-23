@@ -420,12 +420,14 @@ SHARE_AURA_CONTAINER                                                            
     end);
     classBuffFilterData                                                                     = AshToAsh.FromConfig():Map(function() return _ClassBuffList end),
     blackAuraList                                                                           = AshToAsh.FromConfig():Map(function() return _AuraBlackList end),
+    enlargeDebuffList                                                                       = AshToAsh.FromConfig():Map(function() return _EnlargeDebuffList end),
     refresh                                                                                 = AshBlzSkinApi.UnitAura(),
     displayOnlyDispellableDebuffs                                                           = AshBlzSkinApi.DisplayOnlyDispellableDebuffs(),
     buffSize                                                                                = AshBlzSkinApi.OnConfigChanged():Map(function() return DB().Appearance.Aura.AuraSize end),
     debuffSize                                                                              = AshBlzSkinApi.OnConfigChanged():Map(function() return DB().Appearance.Aura.AuraSize end),
     dispelDebuffSize                                                                        = 8,
     bossAuraSize                                                                            = 15,
+    enlargeDebuffSize                                                                       = 15,
     classBuffSize                                                                           = 10,
     checkDispelAbilityEnable                                                                = AshBlzSkinApi.CheckDispelAbilityEnable(),
     specID                                                                                  = AshBlzSkinApi.PlayerSpecializationID()
