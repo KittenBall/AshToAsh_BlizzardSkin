@@ -1,3 +1,6 @@
+## 1.8.10
+- Fix aura tooltip bug
+
 ## 1.8.9
 - Re-introduced the quick add aura blacklist feature
 - Enlarge debuff icon will show now

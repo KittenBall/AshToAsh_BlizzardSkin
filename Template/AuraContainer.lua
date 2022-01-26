@@ -652,10 +652,7 @@ class "DispelDebuffIcon"(function()
     inherit "BaseAuraIcon"
 
     function SetAuraData(self, data)
-        self.Unit = data.Unit
-        self.AuraIndex = data.Index
-        self.AuraFilter = data.Filter
-        self.AuraCaster = data.Caster
+        super.SetAuraData(self, data)
         if data.DebuffType then
             self:GetChild("Icon"):SetTexture("Interface\\RaidFrame\\Raid-Icon-Debuff" .. data.DebuffType)
         end
@@ -784,6 +781,7 @@ class "AuraContainer"(function()
     end
     --@end-non-version-retail@]===]
 
+    -- @todo will remake
     function Refresh(self, unit)
         if not UnitExists(unit) then return self:HideAllAuras() end
 
@@ -804,7 +802,10 @@ class "AuraContainer"(function()
             -- compat classic
             if not name then return true end
 
-            if blackAuraList and blackAuraList[spellID] then return false end
+            if blackAuraList and blackAuraList[spellID] then
+                index = index + 1
+                return false
+            end
 
             local filtered = false
 
@@ -858,9 +859,15 @@ class "AuraContainer"(function()
             -- compat classic
             if not name then return true end
 
-            if blackAuraList and blackAuraList[spellID] then return false end
+            if blackAuraList and blackAuraList[spellID] then
+                index = index + 1
+                return false
+            end
 
-            if enlargeDebuffList and enlargeDebuffList[spellID] then return false end
+            if enlargeDebuffList and enlargeDebuffList[spellID] then
+                index = index + 1
+                return false
+            end
 
             if displayOnlyDispellableDebuffs and debuffCount < maxDebuffCount then
                 -- Debuff filter
@@ -904,7 +911,10 @@ class "AuraContainer"(function()
             -- compat classic
             if not name then return true end
 
-            if blackAuraList and blackAuraList[spellID] then return false end
+            if blackAuraList and blackAuraList[spellID] then
+                index = index + 1
+                return false
+            end
 
             local filtered = false
             
