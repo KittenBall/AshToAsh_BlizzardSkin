@@ -193,12 +193,16 @@ SHARE_CASTBAR_SKIN                                                              
     height                                                                                  = POWERBAR_HEIGHT - 1,
     location                                                                                = {
         Anchor("TOPLEFT", 0, 0, "PowerBar", "TOPLEFT"),
-        Anchor("BOTTOMRIGHT", 0, 0, "PowerBar", "BOTTOMRIGHT") 
+        Anchor("BOTTOMRIGHT", 0, 0, "PowerBar", "BOTTOMRIGHT")
     },
     visibility                                                                              = AshBlzSkinApi.CastBarVisibilityChanged(),
 
     Spark                                                                                   = {
         size                                                                                = Size(24, 24),
+    },
+
+    TargetMark                                                                              = {
+        size                                                                                = Size(POWERBAR_HEIGHT, POWERBAR_HEIGHT)
     },
 
     Label                                                                                   = {

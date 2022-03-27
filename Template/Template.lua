@@ -406,6 +406,10 @@ class "CastBar" (function(_ENV)
         default             = Visibility.SHOW_ONLY_PARTY
     }
 
+    property "Unit"                 {
+        type                = String
+    }
+
     function UpdateStatusBarColor(self)
         local color = self.Interruptible and self.NormalColor or self.NonInterruptColor
         self:SetStatusBarColor(color.r, color.g, color.b)
@@ -419,6 +423,29 @@ class "CastBar" (function(_ENV)
             local value = self.Reverse and (self.maxValue - self.value) or self.value
             self:SetValue(value)
         end
+    end
+
+    local function OnShow(self)
+        local unit = self.Unit
+        if UnitExists(unit) then
+            local target = unit .. "target"
+            if UnitExists(target) and UnitCanAttack("player", target) then
+                local index = GetRaidTargetIndex(target)
+                if index then
+                    index           = index - 1
+                    local left, right, top, bottom
+                    local cIncr     = RAID_TARGET_ICON_DIMENSION / RAID_TARGET_TEXTURE_DIMENSION
+                    left            = mod(index , RAID_TARGET_TEXTURE_COLUMNS) * cIncr
+                    right           = left + cIncr
+                    top             = floor(index / RAID_TARGET_TEXTURE_ROWS) * cIncr
+                    bottom          = top + cIncr
+                    self.targetMark:SetTexCoord(left, right, top, bottom)
+                    return self.targetMark:Show()
+                end
+            end
+        end
+
+        self.targetMark:Hide()
     end
 
     function SetStatusBarTexture(self, texture)
@@ -445,14 +472,17 @@ class "CastBar" (function(_ENV)
     end
 
     __Template__{
-        Spark           = Texture
+        Spark           = Texture,
+        TargetMark      = Texture
     }
     function __ctor(self)
         self.value = 0
         self.maxValue = 0
         self.spark = self:GetChild("Spark")
+        self.targetMark = self:GetChild("TargetMark")
         self:SetStatusBarColor(self.NormalColor)
         self.OnUpdate = self.OnUpdate + OnUpdate
+        self.OnShow = self.OnShow + OnShow
     end
 end)
 
@@ -466,11 +496,17 @@ Style.UpdateSkin(SKIN_NAME,                                                     
         interruptible                                                                   = Wow.UnitCastInterruptible(),
         cooldown                                                                        = Wow.UnitCastCooldown(),
         reverse                                                                         = Wow.UnitCastChannel(),
+        unit                                                                            = Wow.Unit(),
 
         Spark                                                                           = {
             drawLayer                                                                   = "OVERLAY",
             file                                                                        = "Interface\\CastingBar\\UI-CastingBar-Spark",
             alphaMode                                                                   = "ADD"
+        },
+
+        TargetMark                                                                      = {
+            file                                                                        = [[Interface\TargetingFrame\UI-RaidTargetingIcons]],
+            location                                                                    = { Anchor("RIGHT", -2, 0) }
         },
 
         Label                                                                           = {
@@ -496,6 +532,10 @@ class "CastBar" (function(_ENV)
         default             = Visibility.SHOW_ONLY_PARTY
     }
 
+    property "Unit"                 {
+        type                = String
+    }
+
     local function OnUpdate(self, elapsed)
         self.value = self.value + elapsed
         if self.value >= self.maxValue then
@@ -509,6 +549,29 @@ class "CastBar" (function(_ENV)
     function SetStatusBarTexture(self, texture)
         super.SetStatusBarTexture(self, texture)
         self.spark:SetPoint("CENTER", texture, "RIGHT", 0, 0)
+    end
+
+    local function OnShow(self)
+        local unit = self.Unit
+        if UnitExists(unit) then
+            local target = unit .. "target"
+            if UnitExists(target) and UnitCanAttack("player", target) then
+                local index = GetRaidTargetIndex(target)
+                if index then
+                    index           = index - 1
+                    local left, right, top, bottom
+                    local cIncr     = RAID_TARGET_ICON_DIMENSION / RAID_TARGET_TEXTURE_DIMENSION
+                    left            = mod(index , RAID_TARGET_TEXTURE_COLUMNS) * cIncr
+                    right           = left + cIncr
+                    top             = floor(index / RAID_TARGET_TEXTURE_ROWS) * cIncr
+                    bottom          = top + cIncr
+                    self.targetMark:SetTexCoord(left, right, top, bottom)
+                    return self.targetMark:Show()
+                end
+            end
+        end
+
+        self.targetMark:Hide()
     end
 
     function SetCooldown(self, start, duration)
@@ -530,13 +593,16 @@ class "CastBar" (function(_ENV)
     end
 
     __Template__{
-        Spark           = Texture
+        Spark           = Texture,
+        TargetMark      = Texture
     }
     function __ctor(self)
         self.value = 0
         self.maxValue = 0
         self.spark = self:GetChild("Spark")
+        self.targetMark = self:GetChild("TargetMark")
         self.OnUpdate = self.OnUpdate + OnUpdate
+        self.OnShow = self.OnShow + OnShow
     end
 end)
 
@@ -549,11 +615,17 @@ Style.UpdateSkin(SKIN_NAME,                                                     
         statusBarColor                                                                  = AshBlzSkinApi.UnitCastBarColor(),
         cooldown                                                                        = Wow.UnitCastCooldown(),
         reverse                                                                         = Wow.UnitCastChannel(),
+        unit                                                                            = Wow.Unit(),
 
         Spark                                                                           = {
             drawLayer                                                                   = "OVERLAY",
             file                                                                        = "Interface\\CastingBar\\UI-CastingBar-Spark",
             alphaMode                                                                   = "ADD"
+        },
+
+        TargetMark                                                                      = {
+            file                                                                        = [[Interface\TargetingFrame\UI-RaidTargetingIcons]],
+            location                                                                    = { Anchor("RIGHT", -2, 0) }
         },
 
         Label                                                                           = {
@@ -616,20 +688,21 @@ class "CenterStatusIcon"(function()
             self.tooltip = nil
             self:Show()
         elseif C_IncomingSummon.HasIncomingSummon(unit) then
+			local status = C_IncomingSummon.IncomingSummonStatus(unit)
             if status == SummonStatus.Pending then
-                texture:SetAltas("Raid-Icon-SummonPending")
+                texture:SetAtlas("Raid-Icon-SummonPending")
                 texture:SetTexCoord(0, 1, 0, 1)
                 border:Hide()
                 self.tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_PENDING
                 self:Show()
     		elseif( status == SummonStatus.Accepted ) then
-                texture:SetAltas("Raid-Icon-SummonAccepted")
+                texture:SetAtlas("Raid-Icon-SummonAccepted")
                 texture:SetTexCoord(0, 1, 0, 1)
                 border:Hide()
                 self.tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_ACCEPTED
                 self:Show()
     		elseif( status == SummonStatus.Declined ) then
-                texture:SetAltas("Raid-Icon-SummonDeclined")
+                texture:SetAtlas("Raid-Icon-SummonDeclined")
                 texture:SetTexCoord(0, 1, 0, 1)
                 border:Hide()
                 self.tooltip = INCOMING_SUMMON_TOOLTIP_SUMMON_DECLINED

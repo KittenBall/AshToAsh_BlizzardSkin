@@ -1,3 +1,7 @@
+## 1.8.11
+- Add a indicator on castbar when unit target has a raid target.
+- Fix a bug which summon indicator not working on retail
+
 ## 1.8.10
 - Fix aura tooltip bug
 
