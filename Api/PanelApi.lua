@@ -2,12 +2,12 @@ Scorpio "AshToAsh.BlizzardSkin.Api.Panel" ""
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPanelConfigChanged()
-    return Wow.GetFrame(AshGroupPanel, Wow.FromEvent("ASHTOASH_CONFIG_CHANGED"))
+    return Wow.GetFrameByType(AshGroupPanel, Wow.FromEvent("ASHTOASH_CONFIG_CHANGED"))
 end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPetPanelConfigChanged()
-    return Wow.GetFrame(AshGroupPetPanel, Wow.FromEvent("ASHTOASH_CONFIG_CHANGED"))
+    return Wow.GetFrameByType(AshGroupPetPanel, Wow.FromEvent("ASHTOASH_CONFIG_CHANGED"))
 end
 
 local function getFilterDesc(filter)
@@ -106,7 +106,7 @@ end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPanelLabelVisible()
-    return Wow.GetFrame(AshGroupPanel, "OnSizeChanged"):Map(function(panel)
+    return Wow.GetFrameByType(AshGroupPanel, "OnSizeChanged"):Map(function(panel)
         local w, h = panel:GetSize()
         if panel.Orientation == Orientation.HORIZONTAL then
             return h >= 40 and w > 20
@@ -118,7 +118,7 @@ end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPetPanelLabelVisible()
-    return Wow.GetFrame(AshGroupPetPanel, "OnSizeChanged"):Map(function(panel)
+    return Wow.GetFrameByType(AshGroupPetPanel, "OnSizeChanged"):Map(function(panel)
         local w, h = panel:GetSize()
         if panel.Orientation == Orientation.HORIZONTAL then
             return h >= 40 and w > 20

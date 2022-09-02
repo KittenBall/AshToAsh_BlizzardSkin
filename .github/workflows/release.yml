@@ -30,3 +30,8 @@ jobs:
         uses: BigWigsMods/packager@master
         with:
           args: -g bcc
+    
+      - name: Create Wrath Package
+        uses: BigWigsMods/packager@master
+        with:
+          args: -g wrath
