@@ -1,103 +1,38 @@
 Scorpio "AshToAsh.BlizzardSkin.Api.Pet" ""
 
-PetOwnerClassMap = LruCache(100)
-
-local function getUnitPetGUID(playerUnit, petUnit)
-    if playerUnit and UnitIsPlayer(playerUnit) then
-        if UnitExists(petUnit) then
-            return UnitGUID(petUnit)
-        end
-    end
-end
-
-local function mapPetGuidToUnit(unit, petGuid, raidIndex)
-    if petGuid then
-        local petOwnerInfo = PetOwnerClassMap[petGuid]
-        if not petOwnerInfo or petOwnerInfo == -1 then
-            petOwnerInfo = {}
-        end
-        petOwnerInfo.class = UnitClassBase(unit)
-        petOwnerInfo.name = UnitName(unit)
-        PetOwnerClassMap[petGuid] = petOwnerInfo
-    end
-end
-
-__SystemEvent__ "GROUP_ROSTER_UPDATE" "UNIT_NAME_UPDATE" "UNIT_PET" "UNIT_CONNECTION"
-function UpdateGroupPetMap(unit)
-    if unit and UnitExists(unit) then
-        mapPetGuidToUnit(unit, getUnitPetGUID(unit, unit .. "pet"))
-    elseif unit == nil then
-        unit = "player"
-        mapPetGuidToUnit(unit, getUnitPetGUID(unit, "pet"))
-
-        if IsInGroup() then
-            if IsInRaid() then
-                for i = 1, 40 do
-                    local playerUnit = "raid" .. i
-                    if UnitExists(playerUnit) then
-                        mapPetGuidToUnit(playerUnit, getUnitPetGUID(playerUnit, "raidpet"..i), UnitInRaid(playerUnit))
-                    else
-                        break
-                    end
-                end
-            else
-                for i = 1, 4 do
-                    local playerUnit = "party"..i
-                    if UnitExists(playerUnit) then
-                        mapPetGuidToUnit(playerUnit, getUnitPetGUID(unplayerUnit, "partypet"..i))
-                    else
-                        break
-                    end
-                end
-            end
-        end
-    end
-    FireSystemEvent("ASHTOASH_BLZ_SKIN_PET_OWNER_UPDATE", unit or "any")
-end
-
 PetColor = {}
 
 __Static__() __AutoCache__()
+function AshBlzSkinApi.UnitPetOwner()
+    return Wow.Unit():Map(function(unit)
+        unit            = unit:gsub("pet", "")
+        if unit == "" then unit = "player" end
+        return unit
+    end)
+end
+
+__Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPetColor()
-    return Wow.FromUnitEvent("ASHTOASH_BLZ_SKIN_PET_OWNER_UPDATE"):Next():Map(function(unit)
-        if not unit then return end
+    return AshBlzSkinApi.UnitPetOwner():Map(function(unit)
+        local key = UnitClassBase(unit) or "GREEN"
+        local color = PetColor[key]
         
-        local guid = UnitGUID(unit)
-        if guid then
-            local petOwnerInfo = PetOwnerClassMap[guid]
-            if petOwnerInfo and petOwnerInfo ~= -1 then
-                local key = petOwnerInfo.class or "GREEN"
-                local color = PetColor[key]
-
-                if not color then
-                    color = Color[key]
-                    local h, s, v = color:ToHSV()
-                    color = Color.FromHSV(h, s*0.85, v*0.85)
-                    PetColor[key] = color
-                end
-
-                return color
-            end
+        if not color then
+            color = Color[key]
+            local h, s, v = color:ToHSV()
+            color = Color.FromHSV(h, s*0.85, v*0.85)
+            PetColor[key] = color
         end
-        return Color[UnitClassBase(unit) or "GREEN"]
+
+        return color
     end)
 end
 
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPetOwnerName()
-    return Wow.FromUnitEvent(Wow.FromEvent("ASHTOASH_BLZ_SKIN_PET_OWNER_UPDATE")):Next():Map(function(unit)
-        if not unit then return end
-        local guid = UnitGUID(unit)
-        if guid then
-            local petOwnerInfo = PetOwnerClassMap[guid]
-            if petOwnerInfo and petOwnerInfo ~= -1 then
-                local name
-                if petOwnerInfo.name then
-                    name = petOwnerInfo.name
-                end
-                if name then return name end
-            end
-        end
+    return AshBlzSkinApi.UnitPetOwner():Map(function(unit)
+        local name = UnitName(unit)
+        if name then return name end
         
         local getTipLines = GetGameTooltipLines("Unit", unit)
         local _, left = getTipLines(_, 1)
