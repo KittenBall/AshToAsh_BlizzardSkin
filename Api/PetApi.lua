@@ -31,12 +31,7 @@ end
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPetOwnerName()
     return AshBlzSkinApi.UnitPetOwner():Map(function(unit)
-        local name = UnitName(unit)
-        if name then return name end
-        
-        local getTipLines = GetGameTooltipLines("Unit", unit)
-        local _, left = getTipLines(_, 1)
-        return left
+        return UnitName(unit) or ""
     end)
 end
 
