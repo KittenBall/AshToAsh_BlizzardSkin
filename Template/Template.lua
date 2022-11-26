@@ -95,7 +95,7 @@ class "UnlockButton"(function()
 
     local function OnEnter(self)
         if not UnitAffectingCombat("player") then
-            self:SetAlpha(100)
+            self:SetAlpha(1)
         end
     end
 
