@@ -44,6 +44,7 @@ _Parent.DefaultTemplate = {
                     "WARLOCK", -- [10]
                     "HUNTER", -- [11]
                     "DEMONHUNTER", -- [12]
+                    "EVOKER",-- [13]
                 },
                 ["orientation"] = "VERTICAL",
                 ["location"] = {
@@ -74,6 +75,7 @@ _Parent.DefaultTemplate = {
                     "WARLOCK", -- [10]
                     "HUNTER", -- [11]
                     "DEMONHUNTER", -- [12]
+                    "EVOKER",-- [13]
                 },
                 ["showDeadOnly"] = false,
                 ["showPlayer"] = true,
@@ -131,6 +133,7 @@ _Parent.DefaultTemplate = {
                     "WARLOCK", -- [10]
                     "HUNTER", -- [11]
                     "DEMONHUNTER", -- [12]
+                    "EVOKER",-- [13]
                 },
                 ["showDeadOnly"] = false,
                 ["showPlayer"] = true,
@@ -188,6 +191,7 @@ _Parent.DefaultTemplate = {
                     "WARLOCK", -- [10]
                     "HUNTER", -- [11]
                     "DEMONHUNTER", -- [12]
+                    "EVOKER",-- [13]
                 },
                 ["showDeadOnly"] = false,
                 ["showPlayer"] = true,
@@ -245,6 +249,7 @@ _Parent.DefaultTemplate = {
                     "WARLOCK", -- [10]
                     "HUNTER", -- [11]
                     "DEMONHUNTER", -- [12]
+                    "EVOKER",-- [13]
                 },
                 ["showDeadOnly"] = false,
                 ["showPlayer"] = true,
@@ -302,6 +307,7 @@ _Parent.DefaultTemplate = {
                     "WARLOCK", -- [10]
                     "HUNTER", -- [11]
                     "DEMONHUNTER", -- [12]
+                    "EVOKER",-- [13]
                 },
                 ["showDeadOnly"] = false,
                 ["showPlayer"] = true,
@@ -359,6 +365,7 @@ _Parent.DefaultTemplate = {
                     "WARLOCK", -- [10]
                     "HUNTER", -- [11]
                     "DEMONHUNTER", -- [12]
+                    "EVOKER",-- [13]
                 },
                 ["showDeadOnly"] = false,
                 ["showPlayer"] = true,
@@ -416,6 +423,7 @@ _Parent.DefaultTemplate = {
                     "WARLOCK", -- [10]
                     "HUNTER", -- [11]
                     "DEMONHUNTER", -- [12]
+                    "EVOKER",-- [13]
                 },
                 ["showDeadOnly"] = false,
                 ["showPlayer"] = true,

@@ -480,7 +480,7 @@ class "CastBar" (function(_ENV)
         self.maxValue = 0
         self.spark = self:GetChild("Spark")
         self.targetMark = self:GetChild("TargetMark")
-        self:SetStatusBarColor(self.NormalColor)
+        self:SetStatusBarColor(self.NormalColor.r, self.NormalColor.g, self.NormalColor.b)
         self.OnUpdate = self.OnUpdate + OnUpdate
         self.OnShow = self.OnShow + OnShow
     end

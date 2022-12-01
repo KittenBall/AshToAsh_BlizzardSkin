@@ -13,7 +13,7 @@ function AshBlzSkinApi.UnitColor()
             return Color.GRAY
         else
             local _, cls            = UnitClass(unit)
-            if UnitIsPlayer(unit) or UnitTreatAsPlayerForDisplay(unit)  then
+            if UnitIsPlayer(unit) or UnitTreatAsPlayerForDisplay(unit) then
                 return Color[cls or "PALADIN"]
             elseif not UnitPlayerControlled(unit) and UnitIsTapDenied(unit) then
                 return tapDeniedColor
