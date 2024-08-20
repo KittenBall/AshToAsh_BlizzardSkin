@@ -9,6 +9,7 @@ function AshBlzSkinApi.UnitColor()
     local shareColor = Color(1, 1, 1, 1)
     local tapDeniedColor = ColorType(0.9, 0.9, 0.9)
     return Wow.FromUnitEvent(Wow.FromEvent("UNIT_CONNECTION", "UNIT_NAME_UPDATE", "GROUP_ROSTER_UPDATE"):Map("unit => unit or 'any'")):Next():Map(function(unit)
+        unit = Wow.GetUnitOwner(unit)
         if not UnitIsConnected(unit) then
             return Color.GRAY
         else
@@ -144,15 +145,6 @@ function AshBlzSkinApi.UnitCenterStatus()
     return Wow.FromUnitEvent(CenterStatusSubject):Next()
 end
 --@end-non-version-retail@]===]
-
--------------------------------------------------
--- Role
--------------------------------------------------
-
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitRole()
-    return Wow.FromUnitEvent(Wow.FromEvent("PLAYER_ROLES_ASSIGNED"):Map("=> any"))
-end
 
 -------------------------------------------------
 -- Leader, Assistant, MasterLooter etc

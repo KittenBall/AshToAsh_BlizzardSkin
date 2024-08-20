@@ -497,7 +497,7 @@ SKIN_STYLE =                                                                    
             wordWrap                                                                        = false,
             justifyH                                                                        = "LEFT",
             visible                                                                         = AshBlzSkinApi.UnitIsPet(),
-            text                                                                            = AshBlzSkinApi.UnitPetOwnerName(),
+            text                                                                            = Wow.UnitOwnerName(),
             location                                                                        = {
                 Anchor("TOPLEFT", 0, 0, "NameLabel", "BOTTOMLEFT"),
                 Anchor("RIGHT", 0, 0, nil, "RIGHT"),
@@ -512,7 +512,7 @@ SKIN_STYLE =                                                                    
             location                                                                        = {
                 Anchor("TOPLEFT", 3, -2)
             },
-            refresh                                                                         = AshBlzSkinApi.UnitRole()
+            refresh                                                                         = Wow.UnitOwnerRole()
         },
 
         -- 队长图标
@@ -614,7 +614,7 @@ SKIN_STYLE =                                                                    
             drawLayer                                                                       = "ARTWORK",
             wordWrap                                                                        = false,
             justifyH                                                                        = "LEFT",
-            text                                                                            = AshBlzSkinApi.UnitPetOwnerName(),
+            text                                                                            = Wow.UnitOwnerName(),
             location                                                                        = {
                 Anchor("TOPLEFT", 0, 0, "NameLabel", "BOTTOMLEFT"),
                 Anchor("RIGHT", 0, 0, nil, "RIGHT"),

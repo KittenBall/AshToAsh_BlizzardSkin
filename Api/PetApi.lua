@@ -9,17 +9,8 @@ function AshBlzSkinApi.UnitIsPet()
 end
 
 __Static__() __AutoCache__()
-function AshBlzSkinApi.UnitPetOwner()
-    return Wow.Unit():Map(function(unit)
-        unit            = unit:gsub("pet", "")
-        if unit == "" then unit = "player" end
-        return unit
-    end)
-end
-
-__Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPetColor()
-    return AshBlzSkinApi.UnitPetOwner():Map(function(unit)
+    return Wow.UnitOwner():Map(function(unit)
         local key = UnitClassBase(unit) or "GREEN"
         local color = PetColor[key]
         
@@ -31,13 +22,6 @@ function AshBlzSkinApi.UnitPetColor()
         end
 
         return color
-    end)
-end
-
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitPetOwnerName()
-    return AshBlzSkinApi.UnitPetOwner():Map(function(unit)
-        return UnitName(unit) or ""
     end)
 end
 

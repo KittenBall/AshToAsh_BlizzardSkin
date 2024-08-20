@@ -206,8 +206,8 @@ class "RoleIcon"(function()
 	    	self:SetSize(size, size)
 	    else
             local raidId = UnitInRaid(unit)
-            if raidID then
-                local role = select(10, GetRaidRosterInfo(raidID))
+            if raidId then
+                local role = select(10, GetRaidRosterInfo(raidId))
 	    	    self:SetTexture("Interface\\GroupFrame\\UI-Group-"..role.."Icon")
 	    	    self:SetTexCoord(0, 1, 0, 1)
 	    	    self:Show()
