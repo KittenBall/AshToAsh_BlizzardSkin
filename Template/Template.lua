@@ -206,8 +206,8 @@ class "RoleIcon"(function()
 	    	self:SetSize(size, size)
 	    else
             local raidId = UnitInRaid(unit)
-            if raidId then
-                local role = select(10, GetRaidRosterInfo(raidId))
+            local role = raidId and select(10, GetRaidRosterInfo(raidId))
+            if role then
 	    	    self:SetTexture("Interface\\GroupFrame\\UI-Group-"..role.."Icon")
 	    	    self:SetTexCoord(0, 1, 0, 1)
 	    	    self:Show()
@@ -215,7 +215,7 @@ class "RoleIcon"(function()
                 return
             end
 
-	    	local role = UnitGroupRolesAssigned(unit)
+	    	role = UnitGroupRolesAssigned(unit)
 	    	if role == "TANK" or role == "HEALER" or role == "DAMAGER" then
 	    		self:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES")
 	    		self:SetTexCoord(GetTexCoordsForRoleSmallCircle(role))
