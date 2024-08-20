@@ -47,7 +47,13 @@ end
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitInRange()
     return Wow.UnitTimer():Map(function(unit)
-        return UnitExists(unit) and UnitIsUnit(unit, "player") or UnitInRange(unit)
+        if not UnitExists(unit) then return false end
+        if UnitIsUnit(unit, "player") then
+            return true
+        else
+            local inRange, checkedRange = UnitInRange(unit)
+            return not (checkedRange and not inRange)
+        end
     end)
 end
 

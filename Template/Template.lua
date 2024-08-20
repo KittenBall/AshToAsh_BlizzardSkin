@@ -218,7 +218,7 @@ class "RoleIcon"(function()
 	    	role = UnitGroupRolesAssigned(unit)
 	    	if role == "TANK" or role == "HEALER" or role == "DAMAGER" then
 	    		self:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES")
-	    		self:SetTexCoord(GetTexCoordsForRoleSmallCircle(role))
+	    		self:SetTexCoord(GetTexCoordsForOldRoleSmallCircle(role))
 	    		self:Show()
 	    		self:SetSize(size, size)
                 return

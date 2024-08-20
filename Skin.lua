@@ -273,7 +273,7 @@ SHARE_NAMELABEL_SKIN                                                            
 NAMELABEL_SKIN                                                                              = {
     SHARE_NAMELABEL_SKIN,
 
-    text                                                                                    = AshBlzSkinApi.UnitName(),
+    text                                                                                    = Wow.UnitOwnerName(),
     location                                                                                = {
         Anchor("TOPLEFT", 0, -1, "AshBlzSkinRoleIcon", "TOPRIGHT"), 
         Anchor("TOPRIGHT", -3, -3) 
@@ -490,20 +490,6 @@ SKIN_STYLE =                                                                    
         -- 名字
         NameLabel                                                                           = AshBlzSkinApi.NameSkin(),
 
-        -- 主人名字，当玩家进入载具时有效
-        Label                                                                               = {
-            fontObject                                                                      = GameFontWhiteTiny,
-            drawLayer                                                                       = "ARTWORK",
-            wordWrap                                                                        = false,
-            justifyH                                                                        = "LEFT",
-            visible                                                                         = AshBlzSkinApi.UnitIsPet(),
-            text                                                                            = Wow.UnitOwnerName(),
-            location                                                                        = {
-                Anchor("TOPLEFT", 0, 0, "NameLabel", "BOTTOMLEFT"),
-                Anchor("RIGHT", 0, 0, nil, "RIGHT"),
-            }
-        },
-
         -- 状态文本
         AshBlzSkinStatusText                                                                = AshBlzSkinApi.StatusSkin(),
 
@@ -512,7 +498,7 @@ SKIN_STYLE =                                                                    
             location                                                                        = {
                 Anchor("TOPLEFT", 3, -2)
             },
-            refresh                                                                         = Wow.FromUnitEvent(Wow.FromEvent("GROUP_ROSTER_UPDATE", "PLAYER_ROLES_ASSIGNED"):Map("=>'any'")):Map(Wow.GetUnitOwner)
+            refresh                                                                         = Wow.FromUnitEvent(Wow.FromEvent("GROUP_ROSTER_UPDATE", "PLAYER_ROLES_ASSIGNED", "UNIT_ENTERED_VEHICLE", "UNIT_EXITED_VEHICLE", "PLAYER_GAINS_VEHICLE_DATA", "PLAYER_LOSES_VEHICLE_DATA"):Map("=> 'any'")):Map(Wow.GetUnitOwner)
         },
 
         -- 队长图标
