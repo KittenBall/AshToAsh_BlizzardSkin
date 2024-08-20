@@ -197,7 +197,6 @@ class "RoleIcon"(function()
         end
     }
 
-    --@retail@
     function Refresh(self, unit)
         local size = self:GetHeight()
 	    if UnitInVehicle(unit) and UnitHasVehicleUI(unit) then
@@ -229,27 +228,6 @@ class "RoleIcon"(function()
 	    	self:SetSize(1, size)
 	    end
     end
-    --@end-retail@
-
-    --[===[@non-version-retail@
-    function Refresh(self, unit)
-        local size = self:GetHeight()
-	    local raidID = UnitInRaid(unit)
-        if raidID then
-	    	local role = select(10, GetRaidRosterInfo(raidID))
-            if role then
-	    	    self:SetTexture("Interface\\GroupFrame\\UI-Group-"..role.."Icon")
-	    	    self:SetTexCoord(0, 1, 0, 1)
-	    	    self:Show()
-	    	    self:SetSize(size, size)
-                return
-            end
-	    end
-        
-        self:Hide()
-        self:SetSize(1, size)
-    end
-    --@end-non-version-retail@]===]
 
     function __ctor(self)
         self:SetSize(12, 12)

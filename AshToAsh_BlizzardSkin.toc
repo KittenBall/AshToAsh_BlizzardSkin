@@ -1,7 +1,7 @@
-## Interface: 100002
+## Interface: 110002
 ## Interface-BCC: 20504
 ## Interface-Classic: 11400
-## Interface-Wrath: 30400
+## Interface-Wrath: 30403
 ## Author: 绿毛龟12138
 ## Version: @project-version@
 ## Title: AshToAsh_BlizzardSkin

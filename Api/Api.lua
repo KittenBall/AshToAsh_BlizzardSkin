@@ -149,19 +149,10 @@ end
 -- Role
 -------------------------------------------------
 
---@retail@
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitRole()
     return Wow.FromUnitEvent(Wow.FromEvent("PLAYER_ROLES_ASSIGNED"):Map("=> any"))
 end
---@end-retail@
-
---[===[@non-version-retail@
-__Static__() __AutoCache__()
-function AshBlzSkinApi.UnitRole()
-    return Wow.Unit()
-end
---@end-non-version-retail@]===]
 
 -------------------------------------------------
 -- Leader, Assistant, MasterLooter etc

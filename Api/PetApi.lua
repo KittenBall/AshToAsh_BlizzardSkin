@@ -2,6 +2,12 @@ Scorpio "AshToAsh.BlizzardSkin.Api.Pet" ""
 
 PetColor = {}
 
+function AshBlzSkinApi.UnitIsPet()
+    return Wow.Unit():Map(function(unit)
+        return unit and unit:match("[pP][eE][tT]") and true or false
+    end)
+end
+
 __Static__() __AutoCache__()
 function AshBlzSkinApi.UnitPetOwner()
     return Wow.Unit():Map(function(unit)

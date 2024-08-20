@@ -490,6 +490,20 @@ SKIN_STYLE =                                                                    
         -- 名字
         NameLabel                                                                           = AshBlzSkinApi.NameSkin(),
 
+        -- 主人名字，当玩家进入载具时有效
+        Label                                                                               = {
+            fontObject                                                                      = GameFontWhiteTiny,
+            drawLayer                                                                       = "ARTWORK",
+            wordWrap                                                                        = false,
+            justifyH                                                                        = "LEFT",
+            visible                                                                         = AshBlzSkinApi.UnitIsPet(),
+            text                                                                            = AshBlzSkinApi.UnitPetOwnerName(),
+            location                                                                        = {
+                Anchor("TOPLEFT", 0, 0, "NameLabel", "BOTTOMLEFT"),
+                Anchor("RIGHT", 0, 0, nil, "RIGHT"),
+            }
+        },
+
         -- 状态文本
         AshBlzSkinStatusText                                                                = AshBlzSkinApi.StatusSkin(),
 
