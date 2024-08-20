@@ -512,7 +512,7 @@ SKIN_STYLE =                                                                    
             location                                                                        = {
                 Anchor("TOPLEFT", 3, -2)
             },
-            refresh                                                                         = Wow.UnitOwnerRole()
+            refresh                                                                         = Wow.FromUnitEvent(Wow.FromEvent("GROUP_ROSTER_UPDATE", "PLAYER_ROLES_ASSIGNED"):Map("=>'any'")):Map(Wow.GetUnitOwner)
         },
 
         -- 队长图标
