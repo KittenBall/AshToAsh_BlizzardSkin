@@ -487,8 +487,21 @@ SKIN_STYLE =                                                                    
         -- 仇恨指示器
         AshBlzSkinAggroHighlight                                                            = AshBlzSkinApi.AggroSkin(),
 
-        -- 名字
-        NameLabel                                                                           = AshBlzSkinApi.NameSkin(),
+        -- 主人名字和单位名字的组合
+        CombineNameLabel                                                                    = {
+            OwnerName                                                                       = AshBlzSkinApi.NameSkin(),
+            Name                                                                            = {
+                fontObject                                                                  = GameFontWhiteTiny,
+                text                                                                        = Wow.UnitName(),
+                drawLayer                                                                   = "ARTWORK",
+                wordWrap                                                                    = false,
+                justifyH                                                                    = "LEFT",
+                location                                                                    = {
+                    Anchor("TOPLEFT", 0, 0, "OwnerName", "BOTTOMLEFT"),
+                    Anchor("RIGHT", 0, 0, nil, "RIGHT"),
+                }
+            }
+        },
 
         -- 状态文本
         AshBlzSkinStatusText                                                                = AshBlzSkinApi.StatusSkin(),

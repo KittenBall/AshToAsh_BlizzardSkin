@@ -40,6 +40,20 @@ class "MasterLooterIcon" { Texture }
 __Sealed__() __ChildProperty__(AshGroupPetPanel, "AshBlzSkinPanelLabel")
 class "PetPanelLabel" { FontString }
 
+-- 组合名称
+__Sealed__() __ChildProperty__(AshUnitFrame, "CombineNameLabel")
+class "CombineNameLabel"(function()
+    inherit "Frame"
+
+    __Template__{
+        OwnerName   = FontString,
+        Name        = FontString
+    }
+    function __ctor(self)
+    end
+
+end)
+
 -- 支持OmniCC的Cooldown
 __Sealed__() __ChildProperty__(Frame, "OmniCCCooldown")
 class "OmniCCCooldown"(function()

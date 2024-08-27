@@ -4,7 +4,3 @@ ignore:
   - README.md
   - .vscode
   - .gitattributes
-
-manual-changelog:
-  filename: changelog.md
-  markup-type: markdown
