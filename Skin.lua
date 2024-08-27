@@ -269,39 +269,49 @@ SHARE_NAMELABEL_SKIN                                                            
     textColor                                                                               = Color.WHITE
 }
 
--- 名字指示器
-NAMELABEL_SKIN                                                                              = {
-    SHARE_NAMELABEL_SKIN,
-
-    text                                                                                    = Wow.UnitOwnerName(),
-    location                                                                                = {
-        Anchor("TOPLEFT", 0, -1, "AshBlzSkinRoleIcon", "TOPRIGHT"), 
-        Anchor("TOPRIGHT", -3, -3) 
-    }
-}
-
 __Static__() __AutoCache__()
-function AshBlzSkinApi.NameSkin()
+function AshBlzSkinApi.CombineNameSkin()
+    local skin                                                                              = {
+        location                                                                            = {
+            Anchor("TOPLEFT", 1, -3, "AshBlzSkinRoleIcon", "TOPRIGHT"), 
+            Anchor("TOPRIGHT", -3, -3),
+            Anchor("BOTTOMLEFT", 3, 3),
+            Anchor("BOTTOMRIGHT", -3, 3)
+        },
+        OwnerName                                                                           = {
+            SHARE_NAMELABEL_SKIN,
+
+            text                                                                            = Wow.UnitOwnerName(),
+        },
+        Name                                                                                = {
+            fontObject                                                                      = GameFontWhiteTiny,
+            text                                                                            = Wow.UnitName(),
+            drawLayer                                                                       = "ARTWORK",
+            wordWrap                                                                        = false,
+            justifyH                                                                        = "LEFT",
+            visible                                                                         = Wow.Unit():Map(function(unit) return unit and unit:match("[pP][eE][tT]") and true or false end),
+        }
+    }
     return AshBlzSkinApi.OnConfigChanged():Map(function()
-            if DB().Appearance.Name.ScaleWithFrame then
-                NAMELABEL_SKIN.Font = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
-                    local fontType = {}
-                    fontType.font = GetLibSharedMediaFont(DB().Appearance.Name.Font) or NameFont
-                    fontType.outline = DB().Appearance.Name.FontOutline
-                    fontType.monochrome = DB().Appearance.Name.FontMonochrome
-                    fontType.height = getDynamicFontHeight(h, DB().Appearance.Name.FontSize, 0.6)
-                    return fontType
-                    end)
-            else
+        if DB().Appearance.Name.ScaleWithFrame then
+            skin.OwnerName.Font = Wow.FromFrameSize(UnitFrame):Map(function(w, h)
                 local fontType = {}
-                fontType.font = GetLibSharedMediaFont(DB().Appearance.Name.Font) or HealthLabelFont
+                fontType.font = GetLibSharedMediaFont(DB().Appearance.Name.Font) or NameFont
                 fontType.outline = DB().Appearance.Name.FontOutline
                 fontType.monochrome = DB().Appearance.Name.FontMonochrome
-                fontType.height = DB().Appearance.Name.FontSize
-                NAMELABEL_SKIN.Font = fontType
-            end
-        return NAMELABEL_SKIN
-    end)
+                fontType.height = getDynamicFontHeight(h, DB().Appearance.Name.FontSize, 0.6)
+                return fontType
+                end)
+        else
+            local fontType = {}
+            fontType.font = GetLibSharedMediaFont(DB().Appearance.Name.Font) or HealthLabelFont
+            fontType.outline = DB().Appearance.Name.FontOutline
+            fontType.monochrome = DB().Appearance.Name.FontMonochrome
+            fontType.height = DB().Appearance.Name.FontSize
+            skin.OwnerName.Font = fontType
+        end
+    return skin
+end)
 end
 
 -------------------------------------------------
@@ -488,20 +498,7 @@ SKIN_STYLE =                                                                    
         AshBlzSkinAggroHighlight                                                            = AshBlzSkinApi.AggroSkin(),
 
         -- 主人名字和单位名字的组合
-        CombineNameLabel                                                                    = {
-            OwnerName                                                                       = AshBlzSkinApi.NameSkin(),
-            Name                                                                            = {
-                fontObject                                                                  = GameFontWhiteTiny,
-                text                                                                        = Wow.UnitName(),
-                drawLayer                                                                   = "ARTWORK",
-                wordWrap                                                                    = false,
-                justifyH                                                                    = "LEFT",
-                location                                                                    = {
-                    Anchor("TOPLEFT", 0, 0, "OwnerName", "BOTTOMLEFT"),
-                    Anchor("RIGHT", 0, 0, nil, "RIGHT"),
-                }
-            }
-        },
+        CombineNameLabel                                                                    = AshBlzSkinApi.CombineNameSkin(),
 
         -- 状态文本
         AshBlzSkinStatusText                                                                = AshBlzSkinApi.StatusSkin(),

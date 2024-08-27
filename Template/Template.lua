@@ -50,9 +50,20 @@ class "CombineNameLabel"(function()
         Name        = FontString
     }
     function __ctor(self)
+        self.OwnerName:SetPoint("TOPLEFT", self, "TOPLEFT")
+        self.OwnerName:SetPoint("TOPRIGHT", self, "TOPRIGHT")
+        self.Name:SetPoint("TOPLEFT", self.OwnerName, "BOTTOMLEFT", 0, 1)
+        self.Name:SetPoint("RIGHT", self, "RIGHT")
     end
 
 end)
+
+Style.UpdateSkin(SKIN_NAME,                                             {
+    [CombineNameLabel]                                                  = {
+        enableMouse                                                     = false,
+        enableMouseMotion                                               = false
+    }
+})
 
 -- 支持OmniCC的Cooldown
 __Sealed__() __ChildProperty__(Frame, "OmniCCCooldown")
