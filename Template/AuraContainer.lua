@@ -782,7 +782,7 @@ class "AuraContainer"(function()
     --@end-non-version-retail@]===]
 
     -- @todo will remake
-    function Refresh(self, unit)
+    function DoRefresh(self, unit)
         if not UnitExists(unit) then return self:HideAllAuras() end
 
         wipeCaches()
@@ -1354,7 +1354,7 @@ class "AuraContainer"(function()
     }
 
     property "Refresh"              {
-        set                         = "Refresh"
+        set                         = "DoRefresh"
     }
 
     property "PaddingLeft"          {

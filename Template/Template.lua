@@ -157,7 +157,7 @@ class "StatusText" (function()
 
     property "Refresh"          {
         set                     = function(self, unit)
-            self:Refresh(unit)
+            self:DoRefresh(unit)
         end
     }
 
@@ -173,7 +173,7 @@ class "StatusText" (function()
         end
     end
 
-    function Refresh(self, unit)
+    function DoRefresh(self, unit)
         local text
         local color = Color.WHITE
         if UnitExists(unit) then
@@ -218,11 +218,11 @@ class "RoleIcon"(function()
 
     property "Refresh"          {
         set                     = function(self, unit)
-            self:Refresh(unit)
+            self:DoRefresh(unit)
         end
     }
 
-    function Refresh(self, unit)
+    function DoRefresh(self, unit)
         local size = self:GetHeight()
 	    if UnitInVehicle(unit) and UnitHasVehicleUI(unit) then
 	    	self:SetTexture("Interface\\Vehicles\\UI-Vehicles-Raid-Icon")
@@ -650,7 +650,7 @@ class "CenterStatusIcon"(function()
 
     property "Refresh"      {
         set                 = function(self, unit)
-            self:Refresh(unit)
+            self:DoRefresh(unit)
         end
     }
 
@@ -674,7 +674,7 @@ class "CenterStatusIcon"(function()
 
     --@retail@
     local SummonStatus = _G.Enum.SummonStatus
-    function Refresh(self, unit)
+    function DoRefresh(self, unit)
         local texture = self:GetChild("Texture")
         local border = self:GetChild("Border")
         if UnitInOtherParty(unit) then
@@ -728,7 +728,7 @@ class "CenterStatusIcon"(function()
     --@end-retail@
 
     --[===[@non-version-retail@
-    function Refresh(self, unit)
+    function DoRefresh(self, unit)
         local texture = self:GetChild("Texture")
         local border = self:GetChild("Border")
         if UnitInOtherParty(unit) then
